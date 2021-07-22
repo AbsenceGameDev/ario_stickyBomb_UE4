@@ -7,13 +7,9 @@
 #include "ario_stickyBomb_UE4GameMode.generated.h"
 
 UCLASS(minimalapi)
-class Aario_stickyBomb_UE4GameMode : public AGameModeBase
-{
-	GENERATED_BODY()
+class Aario_stickyBomb_UE4GameMode : public AGameModeBase {
+  GENERATED_BODY()
 
 public:
-	Aario_stickyBomb_UE4GameMode();
+  Aario_stickyBomb_UE4GameMode();
 };
-
-
-
