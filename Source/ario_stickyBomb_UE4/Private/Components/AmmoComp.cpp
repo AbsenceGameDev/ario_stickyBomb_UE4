@@ -1,35 +1,68 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Components/AmmoComp.h"
 
+#include "Net/UnrealNetwork.h"
+#include "StickyGameMode.h"
 
 // Sets default values for this component's properties
 UAmmoComp::UAmmoComp()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+  // Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+  // off to improve performance if you don't need them.
+  PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+  // ...
 }
-
 
 // Called when the game starts
 void UAmmoComp::BeginPlay()
 {
-	Super::BeginPlay();
+  Super::BeginPlay();
 
-	// ...
-	
+  // ...
 }
 
+void UAmmoComp::OnReplicateAmmo(int PrevAmmo)
+{
+  float AmmoDiff = AmmoCount - PrevAmmo;
+
+  OnAmmoChanged.Broadcast(this, AmmoCount, AmmoDiff);
+}
+
+void UAmmoComp::HandleAmmoUsage(UAmmoComp* ThisAmmoClip, int RoundsOfAmmo)
+{
+	// Not enough rounds left in the clip or called with RoundsOfAmmo = 0
+	if (RoundsOfAmmo < 1 || bIsEmpty || RoundsOfAmmo > AmmoCount) {
+	  return;
+	}
+
+  // Update health clamped
+  AmmoCount = -RoundsOfAmmo;
+
+  UE_LOG(LogTemp, Log, TEXT("Ammo Changed: %s"), *FString::FromInt(AmmoCount));
+
+  bIsEmpty = AmmoCount < 1;
+
+  OnAmmoChanged.Broadcast(this, AmmoCount, RoundsOfAmmo);
+}
 
 // Called every frame
 void UAmmoComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+  Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+  // ...
 }
 
+int UAmmoComp::GetAmmo() const
+{
+  return AmmoCount;
+}
+
+void UAmmoComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+  Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+  DOREPLIFETIME(UAmmoComp, AmmoCount);
+}
