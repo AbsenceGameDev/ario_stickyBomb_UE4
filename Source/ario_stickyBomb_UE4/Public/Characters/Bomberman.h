@@ -2,28 +2,30 @@
 
 #pragma once
 
+#include "Characters/BaseShooter.h"
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
 
 #include "Bomberman.generated.h"
 
+class UInputComponent;
+class USkeletalMeshComponent;
+class UStickyGunSkeletalComp;
+class USceneComponent;
+class UCameraComponent;
+class UMotionControllerComponent;
+class UAnimMontage;
+class USoundBase;
 
 UCLASS()
-class ARIO_STICKYBOMB_UE4_API ABomberman : public ACharacter {
+class ARIO_STICKYBOMB_UE4_API ABomberman : public ABaseShooter
+{
   GENERATED_BODY()
 
   public:
-  // Sets default values for this character's properties
   ABomberman();
 
   protected:
-  // Called when the game starts or when spawned
-  virtual void BeginPlay() override;
+  virtual void BeginPlay();
 
-  public:
-  // Called every frame
-  virtual void Tick(float DeltaTime) override;
-
-  // Called to bind functionality to input
-  virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+  virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 };

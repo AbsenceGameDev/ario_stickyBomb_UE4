@@ -30,20 +30,18 @@ void UAmmoComp::OnReplicateAmmo(int PrevAmmo)
   OnAmmoChanged.Broadcast(this, AmmoCount, AmmoDiff);
 }
 
-void UAmmoComp::HandleAmmoUsage(UAmmoComp* ThisAmmoClip, int RoundsOfAmmo)
+void UAmmoComp::ChangeAmmoCount(int RoundsOfAmmo)
 {
+  int RoundsAbs = (-RoundsOfAmmo * (RoundsOfAmmo < 0)) + (RoundsOfAmmo * (RoundsOfAmmo > 0));
 	// Not enough rounds left in the clip or called with RoundsOfAmmo = 0
-	if (RoundsOfAmmo < 1 || bIsEmpty || RoundsOfAmmo > AmmoCount) {
+	if (RoundsOfAmmo == 0 || bIsEmpty || RoundsAbs > AmmoCount) {
 	  return;
 	}
 
-  // Update health clamped
-  AmmoCount = -RoundsOfAmmo;
-
-  UE_LOG(LogTemp, Log, TEXT("Ammo Changed: %s"), *FString::FromInt(AmmoCount));
-
+  AmmoCount += RoundsOfAmmo;
   bIsEmpty = AmmoCount < 1;
 
+  UE_LOG(LogTemp, Log, TEXT("Ammo Changed: %s"), *FString::FromInt(AmmoCount));
   OnAmmoChanged.Broadcast(this, AmmoCount, RoundsOfAmmo);
 }
 
@@ -58,6 +56,11 @@ void UAmmoComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 int UAmmoComp::GetAmmo() const
 {
   return AmmoCount;
+}
+
+bool UAmmoComp::IsFullClip() const
+{
+  return AmmoCount >= MaxAmmo;
 }
 
 void UAmmoComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

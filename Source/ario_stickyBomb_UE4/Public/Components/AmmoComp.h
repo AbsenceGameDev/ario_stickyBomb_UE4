@@ -11,7 +11,8 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAmmoChangedSignature, UAmmoComp*, OwningAmmoComp, int, Ammo, int, AmmoDelta);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent {
+class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
+{
   GENERATED_BODY()
 
   public:
@@ -22,25 +23,27 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent {
   // Called when the game starts
   virtual void BeginPlay() override;
 
-  UPROPERTY(ReplicatedUsing = OnReplicateAmmo, BlueprintReadOnly, Category = "AmmoComp")
-  int AmmoCount;
-
-  UFUNCTION()
-  void OnReplicateAmmo(int PrevAmmo);
-
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AmmoComp")
-  int MaxAmmo;
+  int MaxAmmo = 3;
+
+  UPROPERTY(ReplicatedUsing = OnReplicateAmmo, BlueprintReadOnly, Category = "AmmoComp")
+  int AmmoCount = MaxAmmo;
 
   bool bIsEmpty;
 
   UFUNCTION()
-  void HandleAmmoUsage(UAmmoComp* ThisAmmoClip, int RoundsOfAmmo);
+  void OnReplicateAmmo(int PrevAmmo);
 
   public:
   // Called every frame
   virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+  UFUNCTION()
+  void ChangeAmmoCount(int RoundsOfAmmo);
+
   int GetAmmo() const;
+
+  bool IsFullClip() const;
 
   UPROPERTY(BlueprintAssignable, Category = "Events")
   FOnAmmoChangedSignature OnAmmoChanged;
