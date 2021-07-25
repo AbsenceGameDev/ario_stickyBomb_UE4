@@ -8,6 +8,18 @@ UStickyGunSkeletalComp::UStickyGunSkeletalComp()
 {
   ProjectileClass = AStickyProjectile::StaticClass();
   AmmoComp = NewObject<UAmmoComp>();
+
+  static ConstructorHelpers::FObjectFinder<USoundBase> SoundBaseObj(
+	TEXT("/Game/FirstPerson/Audio/FirstPersonTemplateWeaponFire02.FirstPersonTemplateWeaponFire02"));
+	if (SoundBaseObj.Succeeded()) {
+	  FireSound = SoundBaseObj.Object;
+	}
+
+  static ConstructorHelpers::FObjectFinder<UAnimMontage> AnimMontageObj(
+	TEXT("/Game/FirstPerson/Animations/FirstPersonFire_Montage.FirstPersonFire_Montage"));
+	if (AnimMontageObj.Succeeded()) {
+	  FireAnimation = AnimMontageObj.Object;
+	}
 }
 
 // For THREE_STATE_GATE() to evaluate to true, input 'MustExist' has to be true, the other input is optional

@@ -50,7 +50,7 @@ AStickyProjectile::AStickyProjectile()
 	  MeshMaterialInstance = UMaterialInstanceDynamic::Create(Material.Object, MeshComponentPtr);
 	}
   MeshComponentPtr->SetMaterial(0, MeshMaterialInstance);
-  MeshComponentPtr->SetRelativeScale3D(FVector(0.09f, 0.09f, 0.09f));
+  MeshComponentPtr->SetRelativeScale3D(FVector(0.12f, 0.12f, 0.12f));
   MeshComponentPtr->SetupAttachment(RootComponent);
 
   // Die after 8 seconds by default
