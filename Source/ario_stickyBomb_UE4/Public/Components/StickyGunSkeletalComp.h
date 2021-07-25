@@ -17,14 +17,22 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 {
   GENERATED_BODY()
 
+  protected:
+  UStickyGunSkeletalComp();
+
   public:
   /** Location on gun mesh where projectiles should spawn. */
   UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-  USceneComponent* FP_MuzzleLocation;
+  USceneComponent* PlacementComp;
 
   ABaseShooter* OwningCharacter;
 
   UAmmoComp* AmmoComp;
+
+  bool bDisable = true;
+
+  UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+  USkeletalMesh* MeshPtr;
 
   /** Gun muzzle's offset from the characters location */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -46,7 +54,7 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
   void OnFire();
 
   /** Set-up sticky gun, should be right after called after constructing StickyGunSkeletalComp as a subobject */
-  void InitStickyGun(USceneComponent* RootComponent, FVector GunOffset);
+  void InitStickyGun(ABaseShooter* Caller, FVector GunOffset, USceneComponent* MuzzlePlacementComp);
 
   UAmmoComp* GetAmmoCompPtr();
 };

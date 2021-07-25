@@ -4,17 +4,27 @@
 
 #include "Actors/StickyProjectile.h"
 
+UStickyGunSkeletalComp::UStickyGunSkeletalComp()
+{
+  ProjectileClass = AStickyProjectile::StaticClass();
+  AmmoComp = NewObject<UAmmoComp>();
+}
+
+// For THREE_STATE_GATE() to evaluate to true, input 'MustExist' has to be true, the other input is optional
+#define THREE_STATE_GATE(MustExist, IsOptional) \
+  (MustExist != nullptr && (IsOptional == false)) || (MustExist != nullptr && (IsOptional == true))
+
 void UStickyGunSkeletalComp::OnFire()
 {
 	// try and fire a projectile
-	if (ProjectileClass != nullptr) {
+	if ((ProjectileClass != nullptr) && !bDisable) {
 	  UWorld* const World = GetWorld();
 		if (World != nullptr) {
 		  const FRotator SpawnRotation = OwningCharacter->GetControlRotation();
 		  // MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to
 		  // find the final muzzle position
 		  const FVector SpawnLocation =
-			((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : OwningCharacter->GetActorLocation()) +
+			((PlacementComp != nullptr) ? PlacementComp->GetComponentLocation() : OwningCharacter->GetActorLocation()) +
 			SpawnRotation.RotateVector(GunOffset);
 
 		  // Set Spawn Collision Handling Override
@@ -30,16 +40,31 @@ void UStickyGunSkeletalComp::OnFire()
 	}
 }
 
-void UStickyGunSkeletalComp::InitStickyGun(USceneComponent* LocalRootComponent, FVector LocalGunOffset)
+void UStickyGunSkeletalComp::InitStickyGun(ABaseShooter* Caller, FVector LocalGunOffset, USceneComponent* MuzzlePlacementComp)
 {
+	// Set the skeletal mesh asset of the USkeletalMeshComponent
+	if (MeshPtr == nullptr) {
+	  static ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletalMeshObj(TEXT("/Game/FirstPerson/FPWeapon/Mesh/SK_FPGun"));
+	  MeshPtr = SkeletalMeshObj.Object;
+	}
+  SetSkeletalMesh(MeshPtr, true);
+
   SetOnlyOwnerSee(false);	 // otherwise won't be visible in the multiplayer
   bCastDynamicShadow = false;
   CastShadow = false;
-  SetupAttachment(LocalRootComponent);
 
-  // FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));	  // causes crash
-  // FP_MuzzleLocation->SetupAttachment(this);
-  // FP_MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
+	if (Caller != nullptr) {
+	  bDisable = false;
+	  SetupAttachment(Caller->GetRootComponent());
+	  OwningCharacter = Caller;
+	}
+
+	if (MuzzlePlacementComp != nullptr) {
+	  MuzzlePlacementComp->SetupAttachment(this);
+	  MuzzlePlacementComp->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
+	  PlacementComp = MuzzlePlacementComp;
+	}
+
   GunOffset = LocalGunOffset;
 }
 

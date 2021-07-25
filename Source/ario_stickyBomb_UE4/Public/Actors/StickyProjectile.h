@@ -19,6 +19,13 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
   UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
   USphereComponent* CollisionComp;
 
+  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+  UStaticMeshComponent* MeshComponentPtr;
+
+  // Projectile material
+  UPROPERTY(VisibleDefaultsOnly, Category = Movement)
+  UMaterialInstanceDynamic* MeshMaterialInstance;
+
   /** Projectile movement component */
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
   UProjectileMovementComponent* ProjectileMovement;

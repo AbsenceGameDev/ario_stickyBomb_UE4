@@ -15,6 +15,7 @@ class UCameraComponent;
 class UMotionControllerComponent;
 class UAnimMontage;
 class USoundBase;
+class UHealthComp;
 
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter
@@ -24,7 +25,7 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter
   protected:
   /** Pawn mesh: 1st person view (arms; seen only by self) */
   UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-  USkeletalMeshComponent* Mesh1P;
+  USkeletalMeshComponent* MeshPtr;
 
   /** Gun mesh: 1st person view (seen only by self) */
   UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
@@ -33,6 +34,10 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter
   /** First person camera */
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
   UCameraComponent* FirstPersonCameraComponent;
+
+  /** Generic health component */
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+  UHealthComp* HealthComponent;
 
   public:
   ABaseShooter();
@@ -77,13 +82,14 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter
   void FireGunEffects(UStickyGunSkeletalComp* StickyGunPtr);
   void InitSkeletalBody();
   void InitCamera();
+  void InitActorComponents();
   void SetupStickyGun();
   UStickyGunSkeletalComp* GetStickyGunPtr();
 
   /** Returns Mesh1P subobject **/
-  USkeletalMeshComponent* GetMesh1P() const
+  USkeletalMeshComponent* GetMeshPtr() const
   {
-	return Mesh1P;
+	return MeshPtr;
   }
   /** Returns FirstPersonCameraComponent subobject **/
   UCameraComponent* GetFirstPersonCameraComponent() const

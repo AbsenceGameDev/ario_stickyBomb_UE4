@@ -25,12 +25,33 @@ AStickyProjectile::AStickyProjectile()
   RootComponent = CollisionComp;
 
   // Use a ProjectileMovementComponent to govern this projectile's movement
+  // Maybe move to defaultingthese values by deriving a class from
+  // UProjectileMovementComponent and set their default values to the ones below
   ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
   ProjectileMovement->UpdatedComponent = CollisionComp;
   ProjectileMovement->InitialSpeed = 3000.f;
   ProjectileMovement->MaxSpeed = 3000.f;
   ProjectileMovement->bRotationFollowsVelocity = true;
   ProjectileMovement->bShouldBounce = true;
+
+  SetActorHiddenInGame(false);
+
+  // Create the static mesh component
+  MeshComponentPtr = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
+  static ConstructorHelpers::FObjectFinder<UStaticMesh> Mesh(
+	TEXT("/Game/FirstPerson/Meshes/FirstPersonProjectileMesh.FirstPersonProjectileMesh"));
+	if (Mesh.Succeeded()) {
+	  MeshComponentPtr->SetStaticMesh(Mesh.Object);
+	}
+
+  static ConstructorHelpers::FObjectFinder<UMaterial> Material(
+	TEXT("/Game/FirstPerson/Meshes/FirstPersonProjectileMaterial.FirstPersonProjectileMaterial"));
+	if (Material.Succeeded()) {
+	  MeshMaterialInstance = UMaterialInstanceDynamic::Create(Material.Object, MeshComponentPtr);
+	}
+  MeshComponentPtr->SetMaterial(0, MeshMaterialInstance);
+  MeshComponentPtr->SetRelativeScale3D(FVector(0.09f, 0.09f, 0.09f));
+  MeshComponentPtr->SetupAttachment(RootComponent);
 
   // Die after 8 seconds by default
   InitialLifeSpan = 8.0f;
