@@ -44,28 +44,68 @@ AStickyProjectile::AStickyProjectile()
 	  MeshComponentPtr->SetStaticMesh(Mesh.Object);
 	}
 
-  static ConstructorHelpers::FObjectFinder<UMaterial> Material(
-	TEXT("/Game/FirstPerson/Meshes/FirstPersonProjectileMaterial.FirstPersonProjectileMaterial"));
-	if (Material.Succeeded()) {
-	  MeshMaterialInstance = UMaterialInstanceDynamic::Create(Material.Object, MeshComponentPtr);
+  // TODO: pass the material as a constructor parameter instead of generating it here every spawn
+  static ConstructorHelpers::FObjectFinder<UMaterial> BaseMaterial(TEXT("/Game/FirstPerson/Meshes/BaseMaterial.BaseMaterial"));
+	if (BaseMaterial.Succeeded()) {
+	  MeshMaterialInstance = UMaterialInstanceDynamic::Create(BaseMaterial.Object, MeshComponentPtr, "BaseMaterial");
+	  MeshMaterialInstance->SetVectorParameterValue("DiffuseColor", FLinearColor::Red);
+	  MeshComponentPtr->SetMaterial(0, MeshMaterialInstance);
+
+	  // MeshMaterialInstance = UMaterialInstanceDynamic::Create(Material.Object, MeshComponentPtr);
 	}
-  MeshComponentPtr->SetMaterial(0, MeshMaterialInstance);
   MeshComponentPtr->SetRelativeScale3D(FVector(0.12f, 0.12f, 0.12f));
   MeshComponentPtr->SetupAttachment(RootComponent);
 
+  // Init timeline and curve
+
   // Die after 8 seconds by default
+  StickyTimeline.SetTimelineLength(8.0f);
   InitialLifeSpan = 8.0f;
+  PrimaryActorTick.bCanEverTick = true;
+  SetActorTickEnabled(true);
+}
+
+void AStickyProjectile::BeginPlay()
+{
+  Super::BeginPlay();
+
+	if (StickyTimelineCurve != nullptr) {
+	  FOnTimelineFloatStatic StickyTimelineCallBack;
+	  StickyTimelineCallBack.BindUFunction(this, TEXT("ModulateColor"));
+	  StickyTimeline.AddInterpFloat(StickyTimelineCurve, StickyTimelineCallBack);
+	}
+}
+
+void AStickyProjectile::Tick(float DeltaTime)
+{
+  Super::Tick(DeltaTime);
+  StickyTimeline.TickTimeline(DeltaTime);
+}
+void AStickyProjectile::ModulateColor()
+{
+  float TimelinePosition = StickyTimeline.GetPlaybackPosition();
+  auto Fmodifier = StickyTimelineCurve->GetFloatValue(TimelinePosition);
+  BaseColor = BaseColor - FLinearColor(Fmodifier, Fmodifier, Fmodifier, 0.0);
+  MeshMaterialInstance->SetVectorParameterValue("DiffuseColor", BaseColor);
+  MeshComponentPtr->SetMaterial(0, MeshMaterialInstance);
+  // UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"CURVE: TICK!\""));
 }
 
 void AStickyProjectile::OnHit(
   UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics()) {
+	// Only add impulse and attach projectile if we hit a player/character that is not the object causing the hit
+	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr)) {
 	  OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 	  auto BaseCharacter = StaticCast<ABaseShooter*>(OtherActor);
-		if (BaseCharacter != nullptr) {
+		if (BaseCharacter == nullptr) {
+		  return;
+		}
+		if (BaseCharacter->StaticClass() == ABaseShooter::StaticClass()) {
+		  UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"HIT YOU!\""));
 		  // Stick to other character skeleton here, at impact point.
+		  // AttachToComponent(BaseCharacter->GetMeshPtr(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
+		  StickyTimeline.SetPlayRate(2.0f);
 		}
 	}
 }
@@ -85,4 +125,9 @@ bool AStickyProjectile::DidPickUp(AActor* OtherActor)
 		}
 	}
   return false;
+}
+
+void AStickyProjectile::SetCurve(UCurveFloat* InCurve)
+{
+  StickyTimelineCurve = InCurve;
 }

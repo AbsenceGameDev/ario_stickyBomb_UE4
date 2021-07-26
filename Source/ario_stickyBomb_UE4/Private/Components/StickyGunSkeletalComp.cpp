@@ -20,6 +20,9 @@ UStickyGunSkeletalComp::UStickyGunSkeletalComp()
 	if (AnimMontageObj.Succeeded()) {
 	  FireAnimation = AnimMontageObj.Object;
 	}
+
+  GeneratedRichCurve = new FRichCurve();
+  FloatCurve = NewObject<UCurveFloat>();
 }
 
 // For THREE_STATE_GATE() to evaluate to true, input 'MustExist' has to be true, the other input is optional
@@ -29,7 +32,7 @@ UStickyGunSkeletalComp::UStickyGunSkeletalComp()
 void UStickyGunSkeletalComp::OnFire()
 {
 	// try and fire a projectile
-	if ((ProjectileClass != nullptr) && !bDisable) {
+	if ((ProjectileClass != nullptr) && !bDisable && !AmmoComp->IsEmpty()) {
 	  UWorld* const World = GetWorld();
 		if (World != nullptr) {
 		  const FRotator SpawnRotation = OwningCharacter->GetControlRotation();
@@ -44,8 +47,12 @@ void UStickyGunSkeletalComp::OnFire()
 		  ActorSpawnParams.SpawnCollisionHandlingOverride =
 			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
-		  // spawn the projectile at the muzzle
-		  World->SpawnActor<AStickyProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+		  // spawn the projectile at the muzzle and passing Curve into spawned projectile
+		  auto LocalProjectileActorPtr =
+			World->SpawnActor<AStickyProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			if (LocalProjectileActorPtr != nullptr) {	 // Don't spawn
+			  LocalProjectileActorPtr->SetCurve(FloatCurve);
+			}
 		  AmmoComp->ChangeAmmoCount(-1);
 		  OwningCharacter->FireGunEffects(this);
 		}
@@ -78,9 +85,28 @@ void UStickyGunSkeletalComp::InitStickyGun(ABaseShooter* Caller, FVector LocalGu
 	}
 
   GunOffset = LocalGunOffset;
+  GenerateCurve();
 }
 
 UAmmoComp* UStickyGunSkeletalComp::GetAmmoCompPtr()
 {
   return AmmoComp;
+}
+
+void UStickyGunSkeletalComp::GenerateCurve()
+{
+  UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"CURVE GENERATED!\""));
+  float SignageAlternator = -1.0f;
+  float LocalTimeStep = 0.0f;
+  float LocalMaxTime = 8.0f;
+  float LocalValue = 0.0f;	  // Clamp between [ -1, +1 ]
+	for (; LocalTimeStep < LocalMaxTime;) {
+	  GeneratedRichCurve->AddKey(LocalTimeStep, LocalValue);
+	  LocalTimeStep += 0.05f;
+	  SignageAlternator *= -1;
+	  LocalValue = SignageAlternator * (LocalTimeStep / LocalMaxTime);
+	}
+
+  auto CurveList = FloatCurve->GetCurves();
+  CurveList.Add(FRichCurveEditInfo(GeneratedRichCurve, FName{TEXT("GeneratedRichCurve")}));
 }

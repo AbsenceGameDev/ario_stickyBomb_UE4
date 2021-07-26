@@ -1,20 +1,26 @@
-LoginId:8aa8dcb337a140be9311e04e39b719b6-000003e8
-EpicAccountId:
+Color not changing in tick
 
-Caught signal 11 Segmentation fault
 
-libUE4Editor-ario_stickyBomb_UE4.so!UAmmoComp::ChangeAmmoCount(int) 
-  [/home/arioa/Src/ario_stickyBomb_UE4/Source/ario_stickyBomb_UE4/Private/Components/AmmoComp.cpp:37]
 
-libUE4Editor-ario_stickyBomb_UE4.so!UStickyGunSkeletalComp::OnFire() 
-  [/home/arioa/Src/ario_stickyBomb_UE4/Source/ario_stickyBomb_UE4/Private/Components/StickyGunSkeletalComp.cpp:36]
+Caught signal 7 Bus error
 
-libUE4Editor-Engine.so!UPlayerInput::ProcessInputStack(TArray<UInputComponent*, TSizedDefaultAllocator<32> > const&, float, bool) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/UserInterface/PlayerInput.cpp:1388]
-libUE4Editor-Engine.so!APlayerController::ProcessPlayerInput(float, bool) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/PlayerController.cpp:2531]
-libUE4Editor-Engine.so!APlayerController::TickPlayerInput(float, bool) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/PlayerController.cpp:4549]
-libUE4Editor-Engine.so!APlayerController::PlayerTick(float) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/PlayerController.cpp:2177]
-libUE4Editor-Engine.so!APlayerController::TickActor(float, ELevelTick, FActorTickFunction&) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/PlayerController.cpp:4702]
-libUE4Editor-Engine.so!FActorTickFunction::ExecuteTick(float, ELevelTick, ENamedThreads::Type, TRefCountPtr<FGraphEvent> const&) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/Actor.cpp:173]
+libUE4Editor-Engine.so!USceneComponent::AttachToComponent(USceneComponent*, FAttachmentTransformRules const&, FName) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/Components/SceneComponent.cpp:1851]
+libUE4Editor-ario_stickyBomb_UE4.so!AStickyProjectile::OnHit(UPrimitiveComponent*, AActor*, UPrimitiveComponent*, FVector, FHitResult const&) [/home/arioa/Src/ario_stickyBomb_UE4/Source/ario_stickyBomb_UE4/Private/Actors/StickyProjectile.cpp:99]
+libUE4Editor-ario_stickyBomb_UE4.so!AStickyProjectile::execOnHit(UObject*, FFrame&, void*) [/home/arioa/Src/ario_stickyBomb_UE4/Intermediate/Build/Linux/B4D820EA/UE4Editor/Inc/ario_stickyBomb_UE4/StickyProjectile.gen.cpp:48]
+libUE4Editor-CoreUObject.so!UFunction::Invoke(UObject*, FFrame&, void*) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/CoreUObject/Private/UObject/Class.cpp:5588]
+libUE4Editor-CoreUObject.so!UObject::ProcessEvent(UFunction*, void*) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/CoreUObject/Private/UObject/ScriptCore.cpp:1990]
+libUE4Editor-Engine.so!AActor::ProcessEvent(UFunction*, void*) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/Actor.cpp:864]
+libUE4Editor-Engine.so!void TScriptDelegate<FWeakObjectPtr>::ProcessDelegate<UObject>(void*) const [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Core/Public/UObject/ScriptDelegates.h:247]
+libUE4Editor-Engine.so!void TMulticastScriptDelegate<FWeakObjectPtr>::ProcessMulticastDelegate<UObject>(void*) const [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Core/Public/UObject/ScriptDelegates.h:493]
+libUE4Editor-Engine.so!void TSparseDynamicDelegate<FComponentHitSignature_MCSignature, UPrimitiveComponent, FComponentHitSignatureInfoGetter>::Broadcast<UPrimitiveComponent*, AActor*, UPrimitiveComponent*, FVector, FHitResult>(UPrimitiveComponent*, AActor*, UPrimitiveComponent*, FVector, FHitResult) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/CoreUObject/Public/UObject/SparseDelegate.h:326]
+libUE4Editor-Engine.so!AActor::InternalDispatchBlockingHit(UPrimitiveComponent*, UPrimitiveComponent*, bool, FHitResult const&) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/Actor.cpp:2543]
+libUE4Editor-Engine.so!AActor::DispatchBlockingHit(UPrimitiveComponent*, UPrimitiveComponent*, bool, FHitResult const&) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/Actor.cpp:2550]
+libUE4Editor-Engine.so!UPrimitiveComponent::DispatchBlockingHit(AActor&, FHitResult const&) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/Components/PrimitiveComponent.cpp:2424]
+libUE4Editor-Engine.so!UPrimitiveComponent::MoveComponentImpl(FVector const&, FQuat const&, bool, FHitResult*, EMoveComponentFlags, ETeleportType) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/Components/PrimitiveComponent.cpp:2379]
+libUE4Editor-Engine.so!UMovementComponent::MoveUpdatedComponentImpl(FVector const&, FQuat const&, bool, FHitResult*, ETeleportType) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/Components/MovementComponent.cpp:527]
+libUE4Editor-Engine.so!UMovementComponent::SafeMoveUpdatedComponent(FVector const&, FQuat const&, bool, FHitResult&, ETeleportType) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/Components/MovementComponent.cpp:569]
+libUE4Editor-Engine.so!UProjectileMovementComponent::TickComponent(float, ELevelTick, FActorComponentTickFunction*) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/Components/ProjectileMovementComponent.cpp:213]
+libUE4Editor-Engine.so!FActorComponentTickFunction::ExecuteTick(float, ELevelTick, ENamedThreads::Type, TRefCountPtr<FGraphEvent> const&) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/Components/ActorComponent.cpp:1010]
 libUE4Editor-Engine.so!FTickFunctionTask::DoTask(ENamedThreads::Type, TRefCountPtr<FGraphEvent> const&) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Engine/Private/TickTaskManager.cpp:284]
 libUE4Editor-Engine.so!TGraphTask<FTickFunctionTask>::ExecuteTask(TArray<FBaseGraphTask*, TSizedDefaultAllocator<32> >&, ENamedThreads::Type) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Core/Public/Async/TaskGraphInterfaces.h:886]
 libUE4Editor-Core.so!FNamedTaskThread::ProcessTasksNamedThread(int, bool) [/home/arioa/Vendors/tools/UnrealEngine/Engine/Source/Runtime/Core/Private/Async/TaskGraph.cpp:709]

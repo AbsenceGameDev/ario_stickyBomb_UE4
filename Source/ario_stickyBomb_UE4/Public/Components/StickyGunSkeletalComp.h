@@ -31,6 +31,9 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 
   bool bDisable = true;
 
+  FRichCurve* GeneratedRichCurve;
+  UCurveFloat* FloatCurve;
+
   UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
   USkeletalMesh* MeshPtr;
 
@@ -57,4 +60,7 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
   void InitStickyGun(ABaseShooter* Caller, FVector GunOffset, USceneComponent* MuzzlePlacementComp);
 
   UAmmoComp* GetAmmoCompPtr();
+
+  void GenerateCurve();
+  void AddKeyToCurve(FRichCurve& InColorCurve, float Time, float Value);
 };

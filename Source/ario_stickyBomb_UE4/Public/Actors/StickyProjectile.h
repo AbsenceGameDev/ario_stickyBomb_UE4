@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Components/TimelineComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 
@@ -15,23 +16,13 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 {
   GENERATED_BODY()
 
-  /** Sphere collision component */
-  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-  USphereComponent* CollisionComp;
-
-  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-  UStaticMeshComponent* MeshComponentPtr;
-
-  // Projectile material
-  UPROPERTY(VisibleDefaultsOnly, Category = Movement)
-  UMaterialInstanceDynamic* MeshMaterialInstance;
-
-  /** Projectile movement component */
-  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-  UProjectileMovementComponent* ProjectileMovement;
-
   public:
   AStickyProjectile();
+
+  virtual void BeginPlay() final;
+  virtual void Tick(float DeltaTime) final;
+
+  void ModulateColor();
 
   /** called when projectile hits something */
   UFUNCTION()
@@ -52,4 +43,31 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
   {
 	return ProjectileMovement;
   }
+
+  void SetCurve(UCurveFloat* InCurve);
+
+  private:
+  FLinearColor BaseColor = FLinearColor(0.960784, 0.584314, 0.109804, 1.000000);
+
+  // Declare a Timeline ptr, pased into Projectile through SetTimeline
+  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+  FTimeline StickyTimeline;
+
+  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+  UCurveFloat* StickyTimelineCurve;
+
+  /** Sphere collision component */
+  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+  USphereComponent* CollisionComp;
+
+  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+  UStaticMeshComponent* MeshComponentPtr;
+
+  // Projectile material
+  UPROPERTY(VisibleDefaultsOnly, Category = Movement)
+  UMaterialInstanceDynamic* MeshMaterialInstance;
+
+  /** Projectile movement component */
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+  UProjectileMovementComponent* ProjectileMovement;
 };

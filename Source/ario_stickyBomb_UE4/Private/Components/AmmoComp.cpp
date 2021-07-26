@@ -58,6 +58,11 @@ int UAmmoComp::GetAmmo() const
   return AmmoCount;
 }
 
+bool UAmmoComp::IsEmpty() const
+{
+  return (AmmoCount < 1);
+}
+
 bool UAmmoComp::IsFullClip() const
 {
   return AmmoCount >= MaxAmmo;

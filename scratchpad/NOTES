@@ -41,23 +41,23 @@ Adrien David
 Conclusion: 
   -- ALL SYSTEMS BELOW MUST WORK IN MULTIPLAYER ENVIRONMENT.
 
-  -- Use the UE4 First Person C++ template.
+  -- Use the UE4 First Person C++ template. (Done, Made my own version instead)
   -- Expose variables to BP if necessary.
 
-  -- Write a Health-system/module
+  -- Write a Health-system/module (Partly Done, widget and networking left)
     -- Have variables for HP (and possibly stamina) 
     -- Add methods to receive and remove health (and possibly stamina).
     -- Create onHealthChanged event and use it to update UI
 
-  -- Write a Weapons class 
+  -- Write a Weapons class (Partly Done, widget and networking left)
     -- shootProjectile method that triggers OnAmmoChanged event if successful
     -- has simple ammo structure, possibly clamped on ammo pickup / etc
     -- (can be destroyed? Possibly, explore idea after the rest is implemented)
 
-  -- Write a simple interaction interface.
+  -- Write a simple interaction interface. (Not Started)
     -- Implement the interface on the character, the ui, the weapon & the projectile class.
 
-  -- Write a projectile class 
+  -- Write a projectile class (Partly Done, need to add networked interaction (Picking it up))
     -- Can be interacted (Picked up or Held, Held will not stop it's timer?) using the above menttioned interface
     -- Picked up projectiles will be re-added to the ammo.
     -- Should attach to skeletal meshes only, should bounce on any other mesh.

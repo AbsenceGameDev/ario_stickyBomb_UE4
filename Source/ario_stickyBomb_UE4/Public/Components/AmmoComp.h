@@ -41,7 +41,11 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
   UFUNCTION()
   void ChangeAmmoCount(int RoundsOfAmmo);
 
+  UFUNCTION()
   int GetAmmo() const;
+
+  UFUNCTION()
+  bool IsEmpty() const;
 
   bool IsFullClip() const;
 
