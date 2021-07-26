@@ -91,6 +91,13 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter
   {
 	return MeshPtr;
   }
+
+  /** Returns Healthcomponent subobject **/
+  UHealthComp* GetHealthCompPtr() const
+  {
+	return HealthComponent;
+  }
+
   /** Returns FirstPersonCameraComponent subobject **/
   UCameraComponent* GetFirstPersonCameraComponent() const
   {

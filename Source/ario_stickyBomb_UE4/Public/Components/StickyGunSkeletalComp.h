@@ -17,22 +17,10 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 {
   GENERATED_BODY()
 
-  protected:
-  UStickyGunSkeletalComp();
-
   public:
   /** Location on gun mesh where projectiles should spawn. */
   UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
   USceneComponent* PlacementComp;
-
-  ABaseShooter* OwningCharacter;
-
-  UAmmoComp* AmmoComp;
-
-  bool bDisable = true;
-
-  FRichCurve* GeneratedRichCurve;
-  UCurveFloat* FloatCurve;
 
   UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
   USkeletalMesh* MeshPtr;
@@ -63,4 +51,17 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 
   void GenerateCurve();
   void AddKeyToCurve(FRichCurve& InColorCurve, float Time, float Value);
+
+  ABaseShooter* GetOwningCharacter()
+  {
+	return OwningCharacter;
+  }
+
+  protected:
+  UStickyGunSkeletalComp();
+  ABaseShooter* OwningCharacter;
+  UAmmoComp* AmmoComp;
+  bool bDisable = true;
+  FRichCurve* GeneratedRichCurve;
+  UCurveFloat* FloatCurve;
 };

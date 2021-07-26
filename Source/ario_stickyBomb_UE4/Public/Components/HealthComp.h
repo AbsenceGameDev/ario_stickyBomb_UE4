@@ -40,7 +40,15 @@ class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
 	AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
   public:
-  float GetHealth() const;
+  float GetHealth() const
+  {
+	return Health;
+  }
+
+  bool IsDead() const
+  {
+	return bIsDead;
+  }
 
   UPROPERTY(BlueprintAssignable, Category = "Events")
   FOnHealthChangedSignature OnHealthChanged;

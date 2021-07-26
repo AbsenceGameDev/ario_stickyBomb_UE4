@@ -103,7 +103,7 @@ void UStickyGunSkeletalComp::GenerateCurve()
 	for (; LocalTimeStep < LocalMaxTime;) {
 	  GeneratedRichCurve->AddKey(LocalTimeStep, LocalValue);
 	  LocalTimeStep += 0.05f;
-	  SignageAlternator *= -1;
+	  SignageAlternator *= -1.0f;
 	  LocalValue = SignageAlternator * (LocalTimeStep / LocalMaxTime);
 	}
 

@@ -22,7 +22,16 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
   virtual void BeginPlay() final;
   virtual void Tick(float DeltaTime) final;
 
-  void ModulateColor();
+  UFUNCTION()
+  void ModulateColor(float InterpValue);
+
+  UFUNCTION()
+  void TriggerExplosion();
+
+  UFUNCTION()
+  void SetCurve(UCurveFloat* InCurve);
+
+  void PlayTimeline();
 
   /** called when projectile hits something */
   UFUNCTION()
@@ -44,14 +53,16 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 	return ProjectileMovement;
   }
 
-  void SetCurve(UCurveFloat* InCurve);
-
   private:
   FLinearColor BaseColor = FLinearColor(0.960784, 0.584314, 0.109804, 1.000000);
 
+  // Timeline Direction enum
+  UPROPERTY()
+  TEnumAsByte<ETimelineDirection::Type> TimelineDirection = ETimelineDirection::Type::Forward;
+
   // Declare a Timeline ptr, pased into Projectile through SetTimeline
   UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-  FTimeline StickyTimeline;
+  UTimelineComponent* StickyTimelineComp;
 
   UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
   UCurveFloat* StickyTimelineCurve;
