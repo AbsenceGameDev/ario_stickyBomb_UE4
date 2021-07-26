@@ -30,7 +30,7 @@ void AStickyGameMode::CheckAnyPlayerAlive()
 		  UHealthComp* HealthComp = Cast<UHealthComp>(MyPawn->GetComponentByClass(UHealthComp::StaticClass()));
 			if (ensure(HealthComp) && HealthComp->GetHealth() > 0.0f) {
 			  // A player is still alive.
-			  UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"PLAYERS ALIVE!\""));
+			  // UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"PLAYERS ALIVE!\""));
 			  return;
 			}
 		}

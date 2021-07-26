@@ -57,6 +57,8 @@ AStickyProjectile::AStickyProjectile()
   MeshComponentPtr->SetRelativeScale3D(FVector(0.12f, 0.12f, 0.12f));
   MeshComponentPtr->SetupAttachment(RootComponent);
 
+  StickyTimelineComp = CreateDefaultSubobject<UTimelineComponent>(TEXT("StickyTimelineComp"));
+
   // Die after 8 seconds by default
   // StickyTimelineComp.SetTimelineLength(8.0f);
   InitialLifeSpan = 8.0f;
@@ -66,12 +68,13 @@ AStickyProjectile::AStickyProjectile()
 
 void AStickyProjectile::BeginPlay()
 {
-  FOnTimelineFloat OnTimelineCallback;
-  FOnTimelineEventStatic OnTimelineFinishedCallback;
   Super::BeginPlay();
 
 	if (StickyTimelineCurve != nullptr) {
-	  StickyTimelineComp = NewObject<UTimelineComponent>(this, FName("TimelineAnimation"));
+	  UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"GENERATED CURVE PASSED SUCCESSFULLY \""));
+	  FOnTimelineFloat OnTimelineTickDelegate;
+	  FOnTimelineEventStatic OnTimelineFinishedCallback;
+
 	  StickyTimelineComp->CreationMethod =
 		EComponentCreationMethod::Native;					 // Indicate it comes from source code, and is native to the actor
 	  this->ReplicatedComponents.Add(StickyTimelineComp);	 // Add to array so it gets saved
@@ -87,14 +90,16 @@ void AStickyProjectile::BeginPlay()
 	  StickyTimelineComp->SetPlaybackPosition(0.0f, false);
 
 	  // Add the float curve to the timeline and connect it to your timelines's interpolation function
-	  OnTimelineCallback.BindUFunction(this, FName{TEXT("ModulateColor")});
+	  OnTimelineTickDelegate.BindUFunction(this, FName{TEXT("ModulateColor")});
 	  OnTimelineFinishedCallback.BindUFunction(this, FName{TEXT("TriggerExplosion")});
-	  StickyTimelineComp->AddInterpFloat(StickyTimelineCurve, OnTimelineCallback);
+	  StickyTimelineComp->AddInterpFloat(StickyTimelineCurve, OnTimelineTickDelegate);
 	  StickyTimelineComp->SetTimelineFinishedFunc(OnTimelineFinishedCallback);
 
 	  StickyTimelineComp->RegisterComponent();
 	  PlayTimeline();
+	  return;
 	}
+  UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"GENERATED CURVE DID NOT PASS SUCCESSFULLY \""));
 }
 
 void AStickyProjectile::Tick(float DeltaTime)
@@ -106,7 +111,7 @@ void AStickyProjectile::Tick(float DeltaTime)
 	}
 }
 
-void AStickyProjectile::ModulateColor(float InterpValue)
+void AStickyProjectile::ModulateColor(const float InterpValue)
 {
   // float TimelinePosition = StickyTimelineComp->GetPlaybackPosition();
   auto Fmodifier = StickyTimelineCurve->GetFloatValue(InterpValue);
@@ -128,13 +133,24 @@ void AStickyProjectile::OnHit(
 	// Only add impulse and attach projectile if we hit a player/character that is not the object causing the hit
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr)) {
 	  OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-	  auto* BaseCharacter = StaticCast<ABaseShooter*>(OtherActor);
+	  auto* CastOtherBaseShooter = StaticCast<ABaseShooter*>(OtherActor);
 
-		if (StaticCast<ABaseShooter*>(this->GetOwner()) /* ->GetOwningCharacter() */ != BaseCharacter) {
-		  bool bLocalIsDead = BaseCharacter->GetHealthCompPtr()->IsDead();
+	  auto* CastOwnerBaseShooter = StaticCast<ABaseShooter*>(this->GetOwner());
+
+		if (this->GetOwner() == nullptr) {
+		  UE_LOG(LogTemp, Warning, TEXT("Projectile Has No Owner!"));
+		  return;
+		}
+	  UE_LOG(LogTemp, Log, TEXT("Projectile Owner Name: %s"), *this->GetOwner()->GetName());
+
+		if (CastOwnerBaseShooter == nullptr || CastOtherBaseShooter == nullptr) {
+		  return;
+		}
+		if (CastOwnerBaseShooter->GetUniqueID() != OtherActor->GetUniqueID()) {
+		  bool bLocalIsDead = CastOtherBaseShooter->GetHealthCompPtr()->IsDead();
 		  UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"HIT YOU!\""));
 		  // Stick to other character skeleton here, at impact point.
-		  // AttachToComponent(BaseCharacter->GetMeshPtr(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
+		  // AttachToComponent(CastOtherBaseShooter->GetMeshPtr(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
 
 		  // Seems to crash the timeline component, not using a timelinecomp seems less errorprone
 		  // StickyTimelineComp->SetPlayRate(2.0f);
@@ -162,6 +178,13 @@ bool AStickyProjectile::DidPickUp(AActor* OtherActor)
 void AStickyProjectile::SetCurve(UCurveFloat* InCurve)
 {
   StickyTimelineCurve = InCurve;
+
+	if (StickyTimelineCurve != nullptr) {
+	  UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"INCURVE PROPERLY PASSED TO FUNCTION!\""));
+	}
+	if (StickyTimelineCurve != nullptr) {
+	  UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"STICKYTIMELINECURVE PROPERLY COPIED!\""));
+	}
 }
 
 void AStickyProjectile::PlayTimeline()
@@ -169,4 +192,22 @@ void AStickyProjectile::PlayTimeline()
 	if (StickyTimelineComp != nullptr) {
 	  StickyTimelineComp->PlayFromStart();
 	}
+}
+
+float AStickyProjectile::GetDamageRadius()
+{
+  return DamageRadius;
+}
+void AStickyProjectile::SetDamageRadius(float InRadius)
+{
+  DamageRadius = InRadius;
+}
+
+float AStickyProjectile::GetDamageAmount()
+{
+  return DamageValue;
+}
+void AStickyProjectile::SetDamageAmount(float InDamage)
+{
+  DamageValue = InDamage;
 }

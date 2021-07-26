@@ -3,6 +3,7 @@
 #include "Components/StickyGunSkeletalComp.h"
 
 #include "Actors/StickyProjectile.h"
+#include "Kismet/GameplayStatics.h"
 
 UStickyGunSkeletalComp::UStickyGunSkeletalComp()
 {
@@ -25,10 +26,6 @@ UStickyGunSkeletalComp::UStickyGunSkeletalComp()
   FloatCurve = NewObject<UCurveFloat>();
 }
 
-// For THREE_STATE_GATE() to evaluate to true, input 'MustExist' has to be true, the other input is optional
-#define THREE_STATE_GATE(MustExist, IsOptional) \
-  (MustExist != nullptr && (IsOptional == false)) || (MustExist != nullptr && (IsOptional == true))
-
 void UStickyGunSkeletalComp::OnFire()
 {
 	// try and fire a projectile
@@ -46,12 +43,15 @@ void UStickyGunSkeletalComp::OnFire()
 		  FActorSpawnParameters ActorSpawnParams;
 		  ActorSpawnParams.SpawnCollisionHandlingOverride =
 			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+		  auto SpawnTransform = FTransform(SpawnRotation, SpawnLocation, FVector(1.0f, 1.0f, 1.0f));
 
 		  // spawn the projectile at the muzzle and passing Curve into spawned projectile
-		  auto LocalProjectileActorPtr =
-			World->SpawnActor<AStickyProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			if (LocalProjectileActorPtr != nullptr) {	 // Don't spawn
+		  auto LocalProjectileActorPtr = World->SpawnActorDeferred<AStickyProjectile>(ProjectileClass, SpawnTransform,
+			OwningCharacter, OwningCharacter, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding);
+			if (LocalProjectileActorPtr != nullptr) {	 // If did spawn
 			  LocalProjectileActorPtr->SetCurve(FloatCurve);
+			  LocalProjectileActorPtr =
+				StaticCast<AStickyProjectile*>(UGameplayStatics::FinishSpawningActor(LocalProjectileActorPtr, SpawnTransform));
 			}
 		  AmmoComp->ChangeAmmoCount(-1);
 		  OwningCharacter->FireGunEffects(this);
@@ -109,4 +109,11 @@ void UStickyGunSkeletalComp::GenerateCurve()
 
   auto CurveList = FloatCurve->GetCurves();
   CurveList.Add(FRichCurveEditInfo(GeneratedRichCurve, FName{TEXT("GeneratedRichCurve")}));
+
+	if (GeneratedRichCurve == nullptr) {
+	  UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"RICH CURVE NOT PROPERLY GENERATED!\""));
+	}
+	if (FloatCurve == nullptr) {
+	  UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"FLOAT CURVE NOT PROPERLY COPIED!\""));
+	}
 }

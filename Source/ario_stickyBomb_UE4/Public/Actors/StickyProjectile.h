@@ -23,20 +23,19 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
   virtual void Tick(float DeltaTime) final;
 
   UFUNCTION()
-  void ModulateColor(float InterpValue);
-
-  UFUNCTION()
-  void TriggerExplosion();
-
-  UFUNCTION()
   void SetCurve(UCurveFloat* InCurve);
 
-  void PlayTimeline();
-
-  /** called when projectile hits something */
   UFUNCTION()
-  void OnHit(
-	UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+  float GetDamageRadius();
+
+  UFUNCTION()
+  void SetDamageRadius(float InRadius);
+
+  UFUNCTION()
+  float GetDamageAmount();
+
+  UFUNCTION()
+  void SetDamageAmount(float InDamage);
 
   /** called when projectile gets picked up/interacted with */
   UFUNCTION()
@@ -53,8 +52,29 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 	return ProjectileMovement;
   }
 
-  private:
-  FLinearColor BaseColor = FLinearColor(0.960784, 0.584314, 0.109804, 1.000000);
+  protected:
+  void PlayTimeline();
+
+  UFUNCTION()
+  void ModulateColor(const float InterpValue);
+
+  UFUNCTION()
+  void TriggerExplosion();
+
+  /** called when projectile hits something */
+  UFUNCTION()
+  void OnHit(
+	UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+#pragma region Components
+  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+  UCurveFloat* StickyTimelineCurve;
+
+  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+  UStaticMeshComponent* MeshComponentPtr;
+
+  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+  USceneComponent* RootSceneComp;
 
   // Timeline Direction enum
   UPROPERTY()
@@ -63,22 +83,28 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
   // Declare a Timeline ptr, pased into Projectile through SetTimeline
   UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
   UTimelineComponent* StickyTimelineComp;
+#pragma endregion
 
-  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-  UCurveFloat* StickyTimelineCurve;
+  private:
+  FLinearColor BaseColor = FLinearColor(0.960784, 0.584314, 0.109804, 1.000000);
 
   /** Sphere collision component */
   UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
   USphereComponent* CollisionComp;
 
-  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-  UStaticMeshComponent* MeshComponentPtr;
-
   // Projectile material
-  UPROPERTY(VisibleDefaultsOnly, Category = Movement)
+  UPROPERTY(VisibleDefaultsOnly, Category = Material)
   UMaterialInstanceDynamic* MeshMaterialInstance;
 
   /** Projectile movement component */
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
   UProjectileMovementComponent* ProjectileMovement;
+
+  // Projectile damage
+  UPROPERTY(VisibleDefaultsOnly, Category = Damage)
+  float DamageValue;
+
+  // Projectile damage-radius
+  UPROPERTY(VisibleDefaultsOnly, Category = Damage)
+  float DamageRadius;
 };
