@@ -48,7 +48,7 @@ AStickyProjectile::AStickyProjectile()
   // TODO: pass the material as a constructor parameter instead of generating it here every spawn
   static ConstructorHelpers::FObjectFinder<UMaterial> BaseMaterial(TEXT("/Game/FirstPerson/Meshes/BaseMaterial.BaseMaterial"));
 	if (BaseMaterial.Succeeded()) {
-	  MeshMaterialInstance = UMaterialInstanceDynamic::Create(BaseMaterial.Object, MeshComponentPtr, "BaseMaterial");
+	  MeshMaterialInstance = UMaterialInstanceDynamic::Create(BaseMaterial.Object, MeshComponentPtr, "BaseMaterialInstance");
 	  MeshMaterialInstance->SetVectorParameterValue("DiffuseColor", FLinearColor::Red);
 	  MeshComponentPtr->SetMaterial(0, MeshMaterialInstance);
 
@@ -60,8 +60,7 @@ AStickyProjectile::AStickyProjectile()
   StickyTimelineComp = CreateDefaultSubobject<UTimelineComponent>(TEXT("StickyTimelineComp"));
 
   // Die after 8 seconds by default
-  // StickyTimelineComp.SetTimelineLength(8.0f);
-  InitialLifeSpan = 8.0f;
+  InitialLifeSpan = MaxCurrentLifetime;
   PrimaryActorTick.bCanEverTick = true;
   SetActorTickEnabled(true);
 }
@@ -84,7 +83,7 @@ void AStickyProjectile::BeginPlay()
 	  StickyTimelineComp->SetDirectionPropertyName(FName("TimelineDirection"));
 
 	  StickyTimelineComp->SetLooping(false);
-	  StickyTimelineComp->SetTimelineLength(8.0f);
+	  StickyTimelineComp->SetTimelineLength(MaxCurrentLifetime);
 	  StickyTimelineComp->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 
 	  StickyTimelineComp->SetPlaybackPosition(0.0f, false);
@@ -95,7 +94,7 @@ void AStickyProjectile::BeginPlay()
 	  StickyTimelineComp->AddInterpFloat(StickyTimelineCurve, OnTimelineTickDelegate);
 	  StickyTimelineComp->SetTimelineFinishedFunc(OnTimelineFinishedCallback);
 
-	  StickyTimelineComp->RegisterComponent();
+	  // StickyTimelineComp->RegisterComponent();
 	  PlayTimeline();
 	  return;
 	}
@@ -113,18 +112,33 @@ void AStickyProjectile::Tick(float DeltaTime)
 
 void AStickyProjectile::ModulateColor(const float InterpValue)
 {
-  // float TimelinePosition = StickyTimelineComp->GetPlaybackPosition();
-  auto Fmodifier = StickyTimelineCurve->GetFloatValue(InterpValue);
-  BaseColor = BaseColor - FLinearColor(Fmodifier, Fmodifier, Fmodifier, 0.0);
-  MeshMaterialInstance->SetVectorParameterValue("DiffuseColor", BaseColor);
-  MeshComponentPtr->SetMaterial(0, MeshMaterialInstance);
-  UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"COLOR MODULATION: CALCULATING..\""));
+  static int TestModulator = 1;	   // Only sets once per object
+  TestModulator *= -1;			   // Flip value
+
+  float TimelinePosition = StickyTimelineComp->GetPlaybackPosition() / MaxPossibleLifetime;
+  auto Fmodifier = StickyTimelineCurve->GetFloatValue(TimelinePosition);
+  auto ValMod = TestModulator + Fmodifier;
+  auto ColorAdditive = (FLinearColor(ValMod, ValMod, ValMod, 0.0f));
+  BaseColor += ColorAdditive;
+  // MeshMaterialInstance->SetVectorParameterValue("DiffuseColor", BaseColor);
+
+  //
+  // MeshComponentPtr->GetMaterial(0)
+  // ->GetMaterialResource(ERHIFeatureLevel::Type::Num, EMaterialQualityLevel::Type::Num)
+
+  auto DynamicMaterialInstance = MeshComponentPtr->CreateDynamicMaterialInstance(0);
+  DynamicMaterialInstance->SetVectorParameterValue("DiffuseColor", BaseColor);
+  UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"TimelinePosition: %f -- Fmodifier: %f -- ValMod: %f \""), TimelinePosition,
+	Fmodifier, ValMod);
+  UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"COLOR.R: %f -- COLOR.G: %f -- COLOR.B: %f \""), ColorAdditive.R, ColorAdditive.G,
+	ColorAdditive.B);
 }
 
 void AStickyProjectile::TriggerExplosion()
 {
   UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"COLOR MODULATION: SUCCESS??\""));
-  // Kill actor
+  // Kill or Damage actor, trigger HealthComponent OnDamage
+  // at the very least on any BaseShooter derived character within DamageRadius
 }
 
 void AStickyProjectile::OnHit(
@@ -194,19 +208,21 @@ void AStickyProjectile::PlayTimeline()
 	}
 }
 
-float AStickyProjectile::GetDamageRadius()
+float AStickyProjectile::GetDamageRadius() const
 {
   return DamageRadius;
 }
-void AStickyProjectile::SetDamageRadius(float InRadius)
-{
-  DamageRadius = InRadius;
-}
-
-float AStickyProjectile::GetDamageAmount()
+float AStickyProjectile::GetDamageAmount() const
 {
   return DamageValue;
 }
+
+void AStickyProjectile::SetDamageRadius(float InRadius)
+{
+  // Apply effect on InRadius before setting DamageRadius?
+  DamageRadius = InRadius;
+}
+
 void AStickyProjectile::SetDamageAmount(float InDamage)
 {
   DamageValue = InDamage;

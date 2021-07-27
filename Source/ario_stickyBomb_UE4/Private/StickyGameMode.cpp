@@ -2,12 +2,13 @@
 
 #include "StickyGameMode.h"
 
-#include "../ario_stickyBomb_UE4HUD.h"
 #include "Characters/Bomberman.h"
 #include "Components/HealthComp.h"
 #include "EngineUtils.h"
+#include "StickyHUD.h"
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
+
 
 AStickyGameMode::AStickyGameMode() : Super()
 {
@@ -15,7 +16,7 @@ AStickyGameMode::AStickyGameMode() : Super()
   DefaultPawnClass = ABomberman::StaticClass();
 
   // use our custom HUD class
-  HUDClass = Aario_stickyBomb_UE4HUD::StaticClass();
+  HUDClass = AStickyHUD::StaticClass();
 
   PrimaryActorTick.bCanEverTick = true;
   PrimaryActorTick.TickInterval = 1.0f;

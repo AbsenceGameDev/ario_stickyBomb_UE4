@@ -26,13 +26,13 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
   void SetCurve(UCurveFloat* InCurve);
 
   UFUNCTION()
-  float GetDamageRadius();
+  float GetDamageRadius() const;
+
+  UFUNCTION()
+  float GetDamageAmount() const;
 
   UFUNCTION()
   void SetDamageRadius(float InRadius);
-
-  UFUNCTION()
-  float GetDamageAmount();
 
   UFUNCTION()
   void SetDamageAmount(float InDamage);
@@ -73,9 +73,6 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
   UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
   UStaticMeshComponent* MeshComponentPtr;
 
-  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-  USceneComponent* RootSceneComp;
-
   // Timeline Direction enum
   UPROPERTY()
   TEnumAsByte<ETimelineDirection::Type> TimelineDirection = ETimelineDirection::Type::Forward;
@@ -107,4 +104,7 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
   // Projectile damage-radius
   UPROPERTY(VisibleDefaultsOnly, Category = Damage)
   float DamageRadius;
+
+  float MaxPossibleLifetime = 8.0f;
+  float MaxCurrentLifetime = MaxPossibleLifetime;
 };

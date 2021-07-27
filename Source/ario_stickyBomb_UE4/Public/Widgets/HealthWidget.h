@@ -2,19 +2,20 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "CoreMinimal.h"
+
 #include "HealthWidget.generated.h"
 
+
 /**
- * 
+ *
  */
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API UHealthWidget : public UUserWidget
 {
-	GENERATED_BODY()
-	
-	
-	
-	
+  GENERATED_BODY()
+
+  public:
+  UHealthWidget(const FObjectInitializer& ObjectInitializer);
 };
