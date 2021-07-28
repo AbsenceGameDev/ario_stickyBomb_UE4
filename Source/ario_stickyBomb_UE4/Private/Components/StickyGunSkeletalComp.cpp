@@ -3,7 +3,9 @@
 #include "Components/StickyGunSkeletalComp.h"
 
 #include "Actors/StickyProjectile.h"
-#include "Kismet/GameplayStatics.h"
+
+#include <Kismet/GameplayStatics.h>
+#include <Net/UnrealNetwork.h>
 
 UStickyGunSkeletalComp::UStickyGunSkeletalComp()
 {
@@ -24,39 +26,7 @@ UStickyGunSkeletalComp::UStickyGunSkeletalComp()
 
   GeneratedRichCurve = new FRichCurve();
   FloatCurve = NewObject<UCurveFloat>();
-}
-
-void UStickyGunSkeletalComp::OnFire()
-{
-	// try and fire a projectile
-	if ((ProjectileClass != nullptr) && !bDisable && !AmmoComp->IsEmpty()) {
-	  UWorld* const World = GetWorld();
-		if (World != nullptr) {
-		  const FRotator SpawnRotation = OwningCharacter->GetControlRotation();
-		  // MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to
-		  // find the final muzzle position
-		  const FVector SpawnLocation =
-			((PlacementComp != nullptr) ? PlacementComp->GetComponentLocation() : OwningCharacter->GetActorLocation()) +
-			SpawnRotation.RotateVector(GunOffset);
-
-		  // Set Spawn Collision Handling Override
-		  FActorSpawnParameters ActorSpawnParams;
-		  ActorSpawnParams.SpawnCollisionHandlingOverride =
-			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-		  auto SpawnTransform = FTransform(SpawnRotation, SpawnLocation, FVector(1.0f, 1.0f, 1.0f));
-
-		  // spawn the projectile at the muzzle and passing Curve into spawned projectile
-		  auto LocalProjectileActorPtr = World->SpawnActorDeferred<AStickyProjectile>(ProjectileClass, SpawnTransform,
-			OwningCharacter, OwningCharacter, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding);
-			if (LocalProjectileActorPtr != nullptr) {	 // If did spawn
-			  LocalProjectileActorPtr->SetCurve(FloatCurve);
-			  LocalProjectileActorPtr =
-				StaticCast<AStickyProjectile*>(UGameplayStatics::FinishSpawningActor(LocalProjectileActorPtr, SpawnTransform));
-			}
-		  AmmoComp->ChangeAmmoCount(-1);
-		  OwningCharacter->FireGunEffects(this);
-		}
-	}
+  SetIsReplicated(true);
 }
 
 void UStickyGunSkeletalComp::InitStickyGun(ABaseShooter* Caller, FVector LocalGunOffset, USceneComponent* MuzzlePlacementComp)
@@ -88,11 +58,6 @@ void UStickyGunSkeletalComp::InitStickyGun(ABaseShooter* Caller, FVector LocalGu
   GenerateCurve();
 }
 
-UAmmoComp* UStickyGunSkeletalComp::GetAmmoCompPtr()
-{
-  return AmmoComp;
-}
-
 void UStickyGunSkeletalComp::GenerateCurve()
 {
   UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"CURVE GENERATED!\""));
@@ -117,3 +82,69 @@ void UStickyGunSkeletalComp::GenerateCurve()
 	  UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"FLOAT CURVE NOT PROPERLY COPIED!\""));
 	}
 }
+
+void UStickyGunSkeletalComp::TryStartFire()
+{
+  OnFire();
+}
+
+void UStickyGunSkeletalComp::OnFire()
+{
+	// Request Server if we are Client
+	if (GetOwnerRole() < ROLE_Authority) {
+	  ServerOnFire();
+	}
+
+	// try and fire a projectile
+	if ((ProjectileClass != nullptr) && !bDisable && !AmmoComp->IsEmpty()) {
+	  UWorld* const World = GetWorld();
+		if (World != nullptr) {
+		  const FRotator SpawnRotation = OwningCharacter->GetControlRotation();
+		  // MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to
+		  // find the final muzzle position
+		  const FVector SpawnLocation =
+			((PlacementComp != nullptr) ? PlacementComp->GetComponentLocation() : OwningCharacter->GetActorLocation()) +
+			SpawnRotation.RotateVector(GunOffset);
+
+		  // Set Spawn Collision Handling Override
+		  FActorSpawnParameters ActorSpawnParams;
+		  ActorSpawnParams.SpawnCollisionHandlingOverride =
+			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+		  auto SpawnTransform = FTransform(SpawnRotation, SpawnLocation, FVector(1.0f, 1.0f, 1.0f));
+
+		  // spawn the projectile at the muzzle and passing Curve into spawned projectile
+		  auto LocalProjectileActorPtr = World->SpawnActorDeferred<AStickyProjectile>(ProjectileClass, SpawnTransform,
+			OwningCharacter, OwningCharacter, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding);
+			if (LocalProjectileActorPtr != nullptr) {	 // If did spawn
+			  LocalProjectileActorPtr->SetCurve(FloatCurve);
+			  LocalProjectileActorPtr =
+				StaticCast<AStickyProjectile*>(UGameplayStatics::FinishSpawningActor(LocalProjectileActorPtr, SpawnTransform));
+			}
+		  AmmoComp->ChangeAmmoCount(-1);
+		  OwningCharacter->FireGunEffects(this);
+		}
+	}
+}
+
+void UStickyGunSkeletalComp::ServerOnFire_Implementation()
+{
+  OnFire();
+}
+
+// intended for anti-cheat, validates code
+bool UStickyGunSkeletalComp::ServerOnFire_Validate()
+{
+  return true;
+}
+
+UAmmoComp* UStickyGunSkeletalComp::GetAmmoCompPtr()
+{
+  return AmmoComp;
+}
+
+// doesn't need to specified in the header file, unreal header tool auto generates this for us
+// void UStickyGunSkeletalComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+// {
+//   Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+//   DOREPLIFETIME_CONDITION(UStickyGunSkeletalComp, HitScan, COND_SkipOwner);
+// }

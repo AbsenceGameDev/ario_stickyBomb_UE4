@@ -4,8 +4,9 @@
 
 #include "Characters/BaseShooter.h"
 #include "Components/AmmoComp.h"
-#include "Components/SkeletalMeshComponent.h"
 #include "CoreMinimal.h"
+
+#include <Components/SkeletalMeshComponent.h>
 
 #include "StickyGunSkeletalComp.generated.h"
 
@@ -18,6 +19,11 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
   GENERATED_BODY()
 
   public:
+  UStickyGunSkeletalComp();
+
+  UFUNCTION()
+  void TryStartFire();
+
   /** Location on gun mesh where projectiles should spawn. */
   UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
   USceneComponent* PlacementComp;
@@ -41,9 +47,6 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
   UAnimMontage* FireAnimation;
 
-  /** Fires a projectile. */
-  void OnFire();
-
   /** Set-up sticky gun, should be right after called after constructing StickyGunSkeletalComp as a subobject */
   void InitStickyGun(ABaseShooter* Caller, FVector GunOffset, USceneComponent* MuzzlePlacementComp);
 
@@ -58,10 +61,24 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
   }
 
   protected:
-  UStickyGunSkeletalComp();
+  /**
+   * @brief Send request to host server, withValidation = ...
+   *
+   **/
+  UFUNCTION(Server, Reliable, WithValidation)
+  void ServerOnFire();
+
+  /** Fires a projectile.
+   *   @todo clean up replication
+   **/
+  void OnFire();
+
+  // Object
   ABaseShooter* OwningCharacter;
   UAmmoComp* AmmoComp;
-  bool bDisable = true;
-  FRichCurve* GeneratedRichCurve;
+
   UCurveFloat* FloatCurve;
+  FRichCurve* GeneratedRichCurve;
+
+  bool bDisable = true;
 };

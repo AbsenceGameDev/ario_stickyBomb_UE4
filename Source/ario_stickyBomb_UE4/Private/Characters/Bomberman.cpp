@@ -2,16 +2,17 @@
 
 #include "Characters/Bomberman.h"
 
-#include "Animation/AnimInstance.h"
-#include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "Components/InputComponent.h"
 #include "Components/StickyGunSkeletalComp.h"
-#include "GameFramework/InputSettings.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
-#include "Kismet/GameplayStatics.h"
-#include "MotionControllerComponent.h"
-#include "XRMotionControllerBase.h"	   // for FXRMotionControllerBase::RightHandSourceId
+
+#include <Animation/AnimInstance.h>
+#include <Camera/CameraComponent.h>
+#include <Components/CapsuleComponent.h>
+#include <Components/InputComponent.h>
+#include <GameFramework/InputSettings.h>
+#include <HeadMountedDisplayFunctionLibrary.h>
+#include <Kismet/GameplayStatics.h>
+#include <MotionControllerComponent.h>
+#include <XRMotionControllerBase.h>	   // for FXRMotionControllerBase::RightHandSourceId
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -39,7 +40,7 @@ void ABomberman::SetupPlayerInputComponent(class UInputComponent* PlayerInputCom
   PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
   // Bind fire event
-  PlayerInputComponent->BindAction("Fire", IE_Pressed, StickyGun, &UStickyGunSkeletalComp::OnFire);
+  PlayerInputComponent->BindAction("Fire", IE_Pressed, StickyGun, &UStickyGunSkeletalComp::TryStartFire);
 
   // Bind movement events
   PlayerInputComponent->BindAxis("MoveForward", this, &ABomberman::MoveForward);

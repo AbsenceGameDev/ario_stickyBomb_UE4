@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "Components/TimelineComponent.h"
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+
+#include <Components/TimelineComponent.h>
+#include <GameFramework/Actor.h>
 
 #include "StickyProjectile.generated.h"
 
@@ -19,6 +20,7 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
   public:
   AStickyProjectile();
 
+  virtual void LifeSpanExpired() final;
   virtual void BeginPlay() final;
   virtual void Tick(float DeltaTime) final;
 
@@ -65,6 +67,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
   UFUNCTION()
   void OnHit(
 	UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+  void OnExplode();
 
 #pragma region Components
   UPROPERTY(VisibleDefaultsOnly, Category = Projectile)

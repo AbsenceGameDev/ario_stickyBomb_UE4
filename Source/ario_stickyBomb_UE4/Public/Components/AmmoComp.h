@@ -5,10 +5,13 @@
 #include "Components/ActorComponent.h"
 #include "CoreMinimal.h"
 
+#include <Engine/EngineTypes.h>
+
 #include "AmmoComp.generated.h"
 
 // OnAmmoChanged event
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAmmoChangedSignature, UAmmoComp*, OwningAmmoComp, int, Ammo, int, AmmoDelta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(
+  FOnAmmoChangedSignature, UAmmoComp*, OwningAmmoComp, int, Ammo, int, AmmoDelta, class AController*, InstigatedBy);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
@@ -23,16 +26,16 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
   // Called when the game starts
   virtual void BeginPlay() override;
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AmmoComp")
-  int MaxAmmo = 3;
-
-  UPROPERTY(ReplicatedUsing = OnReplicateAmmo, BlueprintReadOnly, Category = "AmmoComp")
-  int AmmoCount = MaxAmmo;
-
   bool bIsEmpty;
 
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AmmoComp")
+  int MaxAmmo;
+
+  UPROPERTY(ReplicatedUsing = OnRep_Ammo, BlueprintReadOnly, Category = "AmmoComp")
+  int AmmoCount;
+
   UFUNCTION()
-  void OnReplicateAmmo(int PrevAmmo);
+  void OnRep_Ammo(int PrevAmmo);
 
   public:
   // Called every frame
@@ -41,14 +44,19 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
   UFUNCTION()
   void ChangeAmmoCount(int RoundsOfAmmo);
 
-  UFUNCTION()
-  int GetAmmo() const;
-
-  UFUNCTION()
-  bool IsEmpty() const;
-
-  bool IsFullClip() const;
-
   UPROPERTY(BlueprintAssignable, Category = "Events")
   FOnAmmoChangedSignature OnAmmoChanged;
+
+  float GetAmmo() const
+  {
+	return AmmoCount;
+  }
+  bool IsEmpty() const
+  {
+	return bIsEmpty;
+  }
+  bool IsFullClip() const
+  {
+	return AmmoCount >= MaxAmmo;
+  }
 };

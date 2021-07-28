@@ -5,9 +5,12 @@
 #include "Characters/BaseShooter.h"
 #include "Components/AmmoComp.h"
 #include "Components/HealthComp.h"
-#include "Components/SphereComponent.h"
-#include "Components/StickyGunSkeletalComp.h"
-#include "GameFramework/ProjectileMovementComponent.h"
+
+#include <Components/SphereComponent.h>
+#include <Components/StickyGunSkeletalComp.h>
+#include <GameFramework/ProjectileMovementComponent.h>
+#include <Kismet/GameplayStatics.h>
+#include <Net/UnrealNetwork.h>
 
 AStickyProjectile::AStickyProjectile()
 {
@@ -62,6 +65,8 @@ AStickyProjectile::AStickyProjectile()
   // Die after 8 seconds by default
   InitialLifeSpan = MaxCurrentLifetime;
   PrimaryActorTick.bCanEverTick = true;
+  SetReplicates(true);
+  SetReplicateMovement(true);
   SetActorTickEnabled(true);
 }
 
@@ -144,18 +149,14 @@ void AStickyProjectile::TriggerExplosion()
 void AStickyProjectile::OnHit(
   UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	if (GetLocalRole() != ROLE_Authority) {
+	  return;
+	}
 	// Only add impulse and attach projectile if we hit a player/character that is not the object causing the hit
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr)) {
 	  OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 	  auto* CastOtherBaseShooter = StaticCast<ABaseShooter*>(OtherActor);
-
 	  auto* CastOwnerBaseShooter = StaticCast<ABaseShooter*>(this->GetOwner());
-
-		if (this->GetOwner() == nullptr) {
-		  UE_LOG(LogTemp, Warning, TEXT("Projectile Has No Owner!"));
-		  return;
-		}
-	  UE_LOG(LogTemp, Log, TEXT("Projectile Owner Name: %s"), *this->GetOwner()->GetName());
 
 		if (CastOwnerBaseShooter == nullptr || CastOtherBaseShooter == nullptr) {
 		  return;
@@ -169,6 +170,20 @@ void AStickyProjectile::OnHit(
 		  // Seems to crash the timeline component, not using a timelinecomp seems less errorprone
 		  // StickyTimelineComp->SetPlayRate(2.0f);
 		}
+	}
+}
+
+void AStickyProjectile::LifeSpanExpired()
+{
+  Super::LifeSpanExpired();
+  OnExplode();
+}
+
+void AStickyProjectile::OnExplode()
+{
+	if (GetLocalRole() == ROLE_Authority) {
+	  UGameplayStatics::ApplyRadialDamage(GetWorld(), DamageValue, GetActorLocation(), DamageRadius, UDamageType::StaticClass(),
+		TArray<AActor*>(), this, this->GetInstigatorController(), true, ECC_Visibility);
 	}
 }
 
