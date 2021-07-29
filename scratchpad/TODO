@@ -9,11 +9,13 @@ TODO:
     ☐ Generate doxyblock documentation with doxygen.
 
   NETWORKING: 
-      ☐ Networking: Replicate VFX/SFX          
-        -> VFX/SFX should be run on client only.  
-      Networking: Replicate ProjectileActor:  
-        ☐ -> In OnHit function, Attach to bone of hit character
-        ☐ -> Smoothen Movement
+    Networking: Replicate Movement:
+      ☐ -> Pitch is not replicated, should be.
+    Networking: Replicate VFX/SFX:          
+      ☐ -> VFX/SFX should be run on client only.  
+    Networking: Replicate ProjectileActor:  
+      ☐ -> In OnHit function, Attach to bone of hit character
+      ☐ -> Smoothen Movement
         1. Set as default to smoothen movement
         Location Quantization: Round to two decimals
         Velocity Quantization: Round to two decimals
@@ -22,17 +24,17 @@ TODO:
           a. Spawn the Projectile Replicated on the Server
           b. Calculate the Movement on Client and Server (no replication yet)
           c. Let the Server replicate his Movement 
-      Networking: Replicate HealthComponent:
-        ☐ -> Make TryHeal(health), OnHeal(health), and OnServerHeal(health) functions.
-      Networking: Replicate Timeline Comp. :
-        ✔ -> Crashes when switching CLient in PIE, @done(21-07-29 16:59)
-        seem to be related to the projectiles Timeline Component.
+    Networking: Replicate HealthComponent:
+      ☐ -> Make TryHeal(health), OnHeal(health), and OnServerHeal(health) functions.
+    Networking: Replicate Timeline Comp. :
+      ✔ -> Crashes when switching CLient in PIE, @done(21-07-29 16:59)
+        Seemed related to the projectiles Timeline Component when checking the callstack.
 
   COMPONENTS:
-    - StickyProjectile: Change Projectile color. 
-    - StickyProjectile: Detect hits on BaseShooter. 
-    - StickyProjectile: Set up collision channels.
-    - StickyProjectile: Broadcast radial damage.
+    ☐ StickyProjectile: Change Projectile color. 
+    ☐ StickyProjectile: Detect hits on BaseShooter. 
+    ☐ StickyProjectile: Set up collision channels.
+    ☐ StickyProjectile: Broadcast radial damage.
 
 OVERVIEW GOALS:
   General:
