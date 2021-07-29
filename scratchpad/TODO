@@ -11,9 +11,9 @@ TODO:
   NETWORKING: 
       ☐ Networking: Replicate VFX/SFX          
         -> VFX/SFX should be run on client only.  
-      ☐ Networking: Replicate ProjectileActor  
-        -> In OnHit function, Attach to bone of hit character
-        -> Smoothen Movement,
+      Networking: Replicate ProjectileActor:  
+        ☐ -> In OnHit function, Attach to bone of hit character
+        ☐ -> Smoothen Movement
         1. Set as default to smoothen movement
         Location Quantization: Round to two decimals
         Velocity Quantization: Round to two decimals
@@ -22,10 +22,10 @@ TODO:
           a. Spawn the Projectile Replicated on the Server
           b. Calculate the Movement on Client and Server (no replication yet)
           c. Let the Server replicate his Movement 
-      ☐ Networking: Replicate HealthComponent  
-        -> Make TryHeal(health), OnHeal(health), and OnServerHeal(health) functions.
-      ☐ Networking: Replicate Timeline Comp.   
-        -> Crashes when switching CLient in PIE, 
+      Networking: Replicate HealthComponent:
+        ☐ -> Make TryHeal(health), OnHeal(health), and OnServerHeal(health) functions.
+      Networking: Replicate Timeline Comp. :
+        ✔ -> Crashes when switching CLient in PIE, @done(21-07-29 16:59)
         seem to be related to the projectiles Timeline Component.
 
   COMPONENTS:
