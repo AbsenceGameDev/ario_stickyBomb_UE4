@@ -16,6 +16,8 @@ class USkeletalMeshComponent;
 class UAnimMontage;
 class USoundBase;
 
+class AStickyProjectile;
+
 class UHealthComp;
 class UAmmoComp;
 class UStickyGunSkeletalComp;

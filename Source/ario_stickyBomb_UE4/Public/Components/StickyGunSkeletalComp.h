@@ -44,6 +44,8 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 	void ServerOnFire();
 
 	void OnFire();
+	void PrepDeferredSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr);
+	void FinishSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr, FTransform const& SpawnTransform);
 
 	/** ================================= **/
 	/** Protected Methods: Client actions **/

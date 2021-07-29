@@ -29,8 +29,11 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 	/** =============================== **/
 	/** Public Methods: Getters/Setters **/
 
+	float													GetMaxLifetime() const;
 	USphereComponent*							GetCollisionComp() const;
 	UProjectileMovementComponent* GetProjectileMovement() const;
+	UTimelineComponent*						GetTimelineComp() const;
+	TArray<UActorComponent*>&			GetReplicatedComponents();
 
 	UFUNCTION()
 	float GetDamageRadius() const;
@@ -46,6 +49,9 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 
 	UFUNCTION()
 	void SetCurve(UCurveFloat* InCurve);
+
+	UFUNCTION()
+	UCurveFloat* GetCurve();
 
 	/** ============================ **/
 	/** Public Methods: Conditionals **/

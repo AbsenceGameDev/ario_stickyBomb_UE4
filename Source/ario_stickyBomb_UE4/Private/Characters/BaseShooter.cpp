@@ -100,7 +100,7 @@ void ABaseShooter::InitSkeletalBody()
 	static ConstructorHelpers::FObjectFinder<UAnimBlueprint> FpsAnimClassObj(TEXT("/Game/FirstPerson/Animations/FirstPerson_AnimBP"));
 	MeshPtr->SetAnimInstanceClass(FpsAnimClassObj.Object->GeneratedClass);
 
-	MeshPtr->SetOnlyOwnerSee(true);
+	MeshPtr->SetOnlyOwnerSee(false);
 	MeshPtr->SetupAttachment(FirstPersonCameraComponent);
 	MeshPtr->bCastDynamicShadow = false;
 	MeshPtr->CastShadow					= false;

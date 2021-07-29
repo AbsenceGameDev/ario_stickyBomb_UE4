@@ -118,12 +118,67 @@ void UStickyGunSkeletalComp::OnFire()
 		ProjectileClass, SpawnTransform, OwningCharacter, OwningCharacter,
 		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding);
 
-	if (LocalProjectileActorPtr != nullptr) {		 // If did spawn
-		LocalProjectileActorPtr->SetCurve(FloatCurve);
-		LocalProjectileActorPtr =
-			StaticCast<AStickyProjectile*>(UGameplayStatics::FinishSpawningActor(LocalProjectileActorPtr, SpawnTransform));
-		OwningCharacter->FireGunEffects(this);
+	// if (LocalProjectileActorPtr != nullptr) {		 // If did spawn
+	// 	LocalProjectileActorPtr->SetCurve(FloatCurve);
+	// 	LocalProjectileActorPtr =
+	// 		StaticCast<AStickyProjectile*>(UGameplayStatics::FinishSpawningActor(LocalProjectileActorPtr, SpawnTransform));
+	// 	OwningCharacter->FireGunEffects(this);
+	// }
+
+	PrepDeferredSpawnProjectile(LocalProjectileActorPtr);
+	FinishSpawnProjectile(LocalProjectileActorPtr, SpawnTransform);
+}
+
+void UStickyGunSkeletalComp::PrepDeferredSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr)
+{
+	if (LocalProjectileActorPtr == nullptr) {
+		return;
 	}
+	LocalProjectileActorPtr->SetCurve(FloatCurve);
+
+	UTimelineComponent* StickyTimelineComp = LocalProjectileActorPtr->GetTimelineComp();
+
+	if (LocalProjectileActorPtr->GetCurve() != nullptr && StickyTimelineComp != nullptr) {
+		UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"GENERATED CURVE PASSED SUCCESSFULLY \""));
+
+		StickyTimelineComp->CreationMethod =
+			EComponentCreationMethod::Native;		 // Indicate it comes from source code, and is native to the actor
+		LocalProjectileActorPtr->GetReplicatedComponents().Add(StickyTimelineComp);		 // Add to array so it gets saved
+		StickyTimelineComp->SetNetAddressable();		// This component has a stable name that can be referenced for replication
+
+		StickyTimelineComp->SetPropertySetObject(
+			LocalProjectileActorPtr);		 // Set which object the timeline should drive properties on
+		StickyTimelineComp->SetDirectionPropertyName(FName("TimelineDirection"));
+
+		StickyTimelineComp->SetLooping(false);
+		StickyTimelineComp->SetTimelineLength(LocalProjectileActorPtr->GetMaxLifetime());
+		StickyTimelineComp->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+
+		StickyTimelineComp->SetPlaybackPosition(0.0f, false);
+
+		// Add the float curve to the timeline and connect it to your timelines's interpolation function
+		FOnTimelineFloat			 OnTimelineTickDelegate;
+		FOnTimelineEventStatic OnTimelineFinishedCallback;
+		OnTimelineTickDelegate.BindUFunction(LocalProjectileActorPtr, FName{TEXT("ModulateColor")});
+		OnTimelineFinishedCallback.BindUFunction(LocalProjectileActorPtr, FName{TEXT("TriggerExplosionFX")});
+		StickyTimelineComp->AddInterpFloat(LocalProjectileActorPtr->GetCurve(), OnTimelineTickDelegate);
+		StickyTimelineComp->SetTimelineFinishedFunc(OnTimelineFinishedCallback);
+
+		// StickyTimelineComp->RegisterComponent();
+		// PlayTimeline();
+		return;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"GENERATED CURVE DID NOT PASS SUCCESSFULLY \""));
+}
+
+void UStickyGunSkeletalComp::FinishSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr, FTransform const& SpawnTransform)
+{
+	if (LocalProjectileActorPtr == nullptr) {
+		return;
+	}
+	LocalProjectileActorPtr =
+		StaticCast<AStickyProjectile*>(UGameplayStatics::FinishSpawningActor(LocalProjectileActorPtr, SpawnTransform));
+	OwningCharacter->FireGunEffects(this);
 }
 
 void UStickyGunSkeletalComp::ServerOnFire_Implementation() { OnFire(); }

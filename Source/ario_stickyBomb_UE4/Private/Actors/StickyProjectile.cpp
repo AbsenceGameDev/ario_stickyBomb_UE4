@@ -27,6 +27,7 @@ AStickyProjectile::AStickyProjectile()
 	bReplicates = true;		 // Correct procedure for pre-init actors
 	SetActorHiddenInGame(false);
 	SetReplicateMovement(true);
+
 	SetActorTickEnabled(true);
 }
 
@@ -42,41 +43,7 @@ void AStickyProjectile::Tick(float DeltaTime)
 	}
 }
 
-void AStickyProjectile::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (StickyTimelineCurve != nullptr) {
-		UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"GENERATED CURVE PASSED SUCCESSFULLY \""));
-		FOnTimelineFloat			 OnTimelineTickDelegate;
-		FOnTimelineEventStatic OnTimelineFinishedCallback;
-
-		StickyTimelineComp->CreationMethod =
-			EComponentCreationMethod::Native;										 // Indicate it comes from source code, and is native to the actor
-		this->ReplicatedComponents.Add(StickyTimelineComp);		 // Add to array so it gets saved
-		StickyTimelineComp->SetNetAddressable();		// This component has a stable name that can be referenced for replication
-
-		StickyTimelineComp->SetPropertySetObject(this);		 // Set which object the timeline should drive properties on
-		StickyTimelineComp->SetDirectionPropertyName(FName("TimelineDirection"));
-
-		StickyTimelineComp->SetLooping(false);
-		StickyTimelineComp->SetTimelineLength(MaxCurrentLifetime);
-		StickyTimelineComp->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
-
-		StickyTimelineComp->SetPlaybackPosition(0.0f, false);
-
-		// Add the float curve to the timeline and connect it to your timelines's interpolation function
-		OnTimelineTickDelegate.BindUFunction(this, FName{TEXT("ModulateColor")});
-		OnTimelineFinishedCallback.BindUFunction(this, FName{TEXT("TriggerExplosionFX")});
-		StickyTimelineComp->AddInterpFloat(StickyTimelineCurve, OnTimelineTickDelegate);
-		StickyTimelineComp->SetTimelineFinishedFunc(OnTimelineFinishedCallback);
-
-		// StickyTimelineComp->RegisterComponent();
-		PlayTimeline();
-		return;
-	}
-	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"GENERATED CURVE DID NOT PASS SUCCESSFULLY \""));
-}
+void AStickyProjectile::BeginPlay() { Super::BeginPlay(); }
 
 void AStickyProjectile::LifeSpanExpired()
 {
@@ -87,13 +54,20 @@ void AStickyProjectile::LifeSpanExpired()
 /** =============================== **/
 /** Public Methods: Getters/Setters **/
 
+float													AStickyProjectile::GetMaxLifetime() const { return MaxCurrentLifetime; };
 USphereComponent*							AStickyProjectile::GetCollisionComp() const { return CollisionComp; }
 UProjectileMovementComponent* AStickyProjectile::GetProjectileMovement() const { return ProjectileMovement; }
-float													AStickyProjectile::GetDamageRadius() const { return DamageRadius; }
-float													AStickyProjectile::GetDamageAmount() const { return DamageValue; }
-void													AStickyProjectile::SetDamageRadius(float InRadius) { DamageRadius = InRadius; }
-void													AStickyProjectile::SetDamageAmount(float InDamage) { DamageValue = InDamage; }
-void													AStickyProjectile::SetCurve(UCurveFloat* InCurve) { StickyTimelineCurve = InCurve; }
+UTimelineComponent*						AStickyProjectile::GetTimelineComp() const { return StickyTimelineComp; }
+TArray<UActorComponent*>&			AStickyProjectile::GetReplicatedComponents() { return ReplicatedComponents; };
+
+float AStickyProjectile::GetDamageRadius() const { return DamageRadius; }
+void	AStickyProjectile::SetDamageRadius(float InRadius) { DamageRadius = InRadius; }
+
+float AStickyProjectile::GetDamageAmount() const { return DamageValue; }
+void	AStickyProjectile::SetDamageAmount(float InDamage) { DamageValue = InDamage; }
+
+void				 AStickyProjectile::SetCurve(UCurveFloat* InCurve) { StickyTimelineCurve = InCurve; }
+UCurveFloat* AStickyProjectile::GetCurve() { return StickyTimelineCurve; }
 
 /** ============================ **/
 /** Public Methods: Conditionals **/
