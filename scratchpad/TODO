@@ -1,18 +1,78 @@
-Issues:
-  - Projectile Color not changing in timeline
-  - OnHit collision does not detect BaseShooter class, maybe because I'm actually hitting a derived class instead?
-    - Seems like the projectile does not have any owner, maybe it needs to be explicitly set when spawning?
-  - Set up Collision channels?
-  - Add damage-radius variable to projectle class as-well as fleshing out TriggerExplosion. (Check native hit/attack events)
+TODO:
+  GENERAL:
+    ✔ Restructure/Reordering decl. and def. @done(21-07-29 12:27)
+      Regarding cohesiveness in their placements (Not refactoring).
 
-(TESTED & REPLICATION WORKS FOR ANYTHING ESSENTIAL): 
-  ✔ Networking: Replicate PlayerMovement @done(21-07-28 12:24)
-  ✔ Networking: Replicate HealthComponent @done(21-07-28 15:49)
+    ☐ Refactor if needed.
+    ☐ Remove superflous UE_LOGs.
+    ☐ Doxygen compatible comment blocks in headers.
+    ☐ Generate doxyblock documentation with doxygen.
 
-(NOT TESTED BUT REPLICATION SHOULD WORK FOR ANYTHING ESSENTIAL): 
-  ✔ Networking: Replicate ProjectileActor -> In OnHit function, check aactor role, also check aactor role in OnExplode() @done(21-07-28 15:51)
-  - Networking: Replicate WeaponSkeletalMeshComponent
-  - Networking: Replicate AmmoComponent
+  NETWORKING: 
+      ☐ Networking: Replicate VFX/SFX          
+        -> VFX/SFX should be run on client only.  
+      ☐ Networking: Replicate ProjectileActor  
+        -> In OnHit function, Attach to bone of hit character
+        -> Smoothen Movement,
+        1. Set as default to smoothen movement
+        Location Quantization: Round to two decimals
+        Velocity Quantization: Round to two decimals
+        
+        2. Rewrite Spawn projectile code to something more like this 
+          a. Spawn the Projectile Replicated on the Server
+          b. Calculate the Movement on Client and Server (no replication yet)
+          c. Let the Server replicate his Movement 
+      ☐ Networking: Replicate HealthComponent  
+        -> Make TryHeal(health), OnHeal(health), and OnServerHeal(health) functions.
+      ☐ Networking: Replicate Timeline Comp.   
+        -> Crashes when switching CLient in PIE, 
+        seem to be related to the projectiles Timeline Component.
 
-(NOT WORKING):
-  - Networking: Crashes when switching CLient in PIE, seem to be related to the Timeline Component in the projectile, maybe it isn't replicated properly
+  COMPONENTS:
+    - StickyProjectile: Change Projectile color. 
+    - StickyProjectile: Detect hits on BaseShooter. 
+    - StickyProjectile: Set up collision channels.
+    - StickyProjectile: Broadcast radial damage.
+
+OVERVIEW GOALS:
+  General:
+    ✔ General: StickyGamemode                          @done(21-07-29 07:21)
+    ✔ General: StickyPlayerState                       @done(21-07-29 07:21)
+    ☐ General: StickyGameSession
+    ✔ General: Helpers/Macros.h                        @done(21-07-29 07:22)
+
+  Actors (Replicated):
+    ☐ Actor: StickyProjectile
+
+  Actors - ACharacters:
+    ✔ Character: BaseShooter, Base class               @done(21-07-29 07:20)
+    ✔ Character: Bomberman, Inherits from BaseShooter  @done(21-07-29 07:21)
+
+  Components (Replicated):
+    ✔ Component: StickyGunSkeletalComp                 @done(21-07-29 07:21)
+    ✔ Component: AmmoComp                              @done(21-07-29 07:21)
+    ☐ Component: HealthComp
+
+  Interfaces: 
+    ☐ Interface: Events
+    ☐ Interface: Items
+
+  UI:
+    ✔ UI: StickyHUD              (HUD Override)        @done(21-07-29 07:22)
+    ✔ UI: SInGameOverlay         (Overlay body)        @done(21-07-29 07:22)
+    ☐ UI: Ammo Widget            (Ammo Counter)
+    ☐ UI: Health Widget          (Health Counter)
+    ✔ UI: SKillsWidget           (Kill Counter)        @done(21-07-29 07:22)
+    ✔ UI: SlideInText            (Slides in at kill)   @done(21-07-29 07:22)
+    ✔ UI: SKillContentContainer  (Content box)         @done(21-07-29 07:22)
+
+  NETWORKING: 
+    REPLICATION WORKS FOR ANYTHING ESSENTIAL: 
+      ✔ Networking: Repl. PlayerMovement               @done(21-07-28 12:24)
+      ✔ Networking: Repl. WeaponSkeletalMeshComponent  @done(21-07-28 17:44)
+      ✔ Networking: Repl. AmmoComponent                @done(21-07-29 04:11)
+    
+    NOT TESTED BUT REPLICATION SHOULD WORK FOR ANYTHING ESSENTIAL: 
+      ✔ Networking: Repl, ProjectileActor              @done(21-07-28 15:51)
+      ☐ Networking: Repl. HealthComponent
+

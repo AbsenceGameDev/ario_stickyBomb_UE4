@@ -15,22 +15,31 @@
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyPlayerState : public APlayerState
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
-  UFUNCTION()
-  void OnRep_Kills();
+	public:
+	/** ================================ **/
+	/** Public Methods: Client interface **/
+	UFUNCTION(BlueprintCallable, Category = "Score")
+	void AddUserScore(float DeltaScore);
 
-  UPROPERTY(ReplicatedUsing = OnRep_Kills, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Kills")
-  int32 Kills;
+	UFUNCTION(BlueprintCallable, Category = "Score")
+	float GetUserScore() const;
 
-  public:
-  UFUNCTION(BlueprintCallable, Category = "Score")
-  void AddUserScore(float DeltaScore);
+	UFUNCTION(BlueprintCallable, Category = "Kills")
+	void AddKill(int32 KillCount);
 
-  float GetUserScore() const;
+	UFUNCTION(BlueprintCallable, Category = "Kills")
+	int32 GetKills() const;
 
-  UFUNCTION(BlueprintCallable, Category = "Kills")
-  void AddKill(int32 KillCount);
+	protected:
+	/** ======================================== **/
+	/** Protected Methods: Server/Client Actions **/
+	UFUNCTION()
+	void OnRep_Kills();
 
-  int32 GetKills() const;
+	/** ================================== **/
+	/** Protected Fields: Basic properties **/
+	UPROPERTY(ReplicatedUsing = OnRep_Kills, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Kills")
+	int32 Kills;
 };

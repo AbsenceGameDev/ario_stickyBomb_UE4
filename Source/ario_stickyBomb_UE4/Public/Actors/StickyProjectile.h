@@ -3,112 +3,124 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Helpers/ForwardDecls.h"
 
 #include <Components/TimelineComponent.h>
 #include <GameFramework/Actor.h>
 
 #include "StickyProjectile.generated.h"
 
-class USphereComponent;
-class UProjectileMovementComponent;
-
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
-  public:
-  AStickyProjectile();
+	public:
+	AStickyProjectile();
 
-  virtual void LifeSpanExpired() final;
-  virtual void BeginPlay() final;
-  virtual void Tick(float DeltaTime) final;
+	protected:
+	/** ============================ **/
+	/** Inherited Methods: Overrides **/
+	virtual void Tick(float DeltaTime) final;
+	virtual void BeginPlay() final;
+	virtual void LifeSpanExpired() final;
 
-  UFUNCTION()
-  void SetCurve(UCurveFloat* InCurve);
+	public:
+	/** =============================== **/
+	/** Public Methods: Getters/Setters **/
 
-  UFUNCTION()
-  float GetDamageRadius() const;
+	USphereComponent*							GetCollisionComp() const;
+	UProjectileMovementComponent* GetProjectileMovement() const;
 
-  UFUNCTION()
-  float GetDamageAmount() const;
+	UFUNCTION()
+	float GetDamageRadius() const;
 
-  UFUNCTION()
-  void SetDamageRadius(float InRadius);
+	UFUNCTION()
+	float GetDamageAmount() const;
 
-  UFUNCTION()
-  void SetDamageAmount(float InDamage);
+	UFUNCTION()
+	void SetDamageRadius(float InRadius);
 
-  /** called when projectile gets picked up/interacted with */
-  UFUNCTION()
-  bool DidPickUp(AActor* OtherActor);
+	UFUNCTION()
+	void SetDamageAmount(float InDamage);
 
-  /** Returns CollisionComp subobject **/
-  USphereComponent* GetCollisionComp() const
-  {
-	return CollisionComp;
-  }
-  /** Returns ProjectileMovement subobject **/
-  UProjectileMovementComponent* GetProjectileMovement() const
-  {
-	return ProjectileMovement;
-  }
+	UFUNCTION()
+	void SetCurve(UCurveFloat* InCurve);
 
-  protected:
-  void PlayTimeline();
+	/** ============================ **/
+	/** Public Methods: Conditionals **/
 
-  UFUNCTION()
-  void ModulateColor(const float InterpValue);
+	UFUNCTION()
+	bool DidPickUp(AActor* OtherActor);
 
-  UFUNCTION()
-  void TriggerExplosion();
+	protected:
+	/** ======================================== **/
+	/** Protected Methods: Client/Server actions **/
+	void PlayTimeline();
 
-  /** called when projectile hits something */
-  UFUNCTION()
-  void OnHit(
-	UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION()
+	void OnHit(
+		UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-  void OnExplode();
+	UFUNCTION()
+	void OnExplode();
 
-#pragma region Components
-  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-  UCurveFloat* StickyTimelineCurve;
+	/** ========================== **/
+	/** Protected Methods: VFX/SFX **/
 
-  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-  UStaticMeshComponent* MeshComponentPtr;
+	UFUNCTION()
+	void ModulateColor(const float InterpValue);
 
-  // Timeline Direction enum
-  UPROPERTY()
-  TEnumAsByte<ETimelineDirection::Type> TimelineDirection = ETimelineDirection::Type::Forward;
+	UFUNCTION()
+	void TriggerExplosionFX();
 
-  // Declare a Timeline ptr, pased into Projectile through SetTimeline
-  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-  UTimelineComponent* StickyTimelineComp;
-#pragma endregion
+	/** ============================ **/
+	/** Protected Fields: Components **/
 
-  private:
-  FLinearColor BaseColor = FLinearColor(0.960784, 0.584314, 0.109804, 1.000000);
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	USphereComponent* CollisionComp;
 
-  /** Sphere collision component */
-  UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-  USphereComponent* CollisionComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UProjectileMovementComponent* ProjectileMovement;
 
-  // Projectile material
-  UPROPERTY(VisibleDefaultsOnly, Category = Material)
-  UMaterialInstanceDynamic* MeshMaterialInstance;
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UStaticMeshComponent* MeshComponentPtr;
 
-  /** Projectile movement component */
-  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-  UProjectileMovementComponent* ProjectileMovement;
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UTimelineComponent* StickyTimelineComp;
 
-  // Projectile damage
-  UPROPERTY(VisibleDefaultsOnly, Category = Damage)
-  float DamageValue;
+	/** ================================== **/
+	/** Protected Fields: Timeline-Members **/
 
-  // Projectile damage-radius
-  UPROPERTY(VisibleDefaultsOnly, Category = Damage)
-  float DamageRadius;
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UCurveFloat* StickyTimelineCurve;
 
-  float MaxPossibleLifetime = 8.0f;
-  float MaxCurrentLifetime = MaxPossibleLifetime;
+	UPROPERTY()
+	TEnumAsByte<ETimelineDirection::Type> TimelineDirection = ETimelineDirection::Type::Forward;
+
+	/** ======================================= **/
+	/** Private Methods: Component Initializers **/
+	private:
+	void ConstructCollisionComponent();
+	void ConstructProjectileMovementComponent();
+	void ConstructStaticMeshComponent();
+
+	/** ================================ **/
+	/** Private Fields: Basic Properties **/
+	FLinearColor BaseColor = FLinearColor(0.960784, 0.584314, 0.109804, 1.000000);
+
+	// Projectile material
+	UPROPERTY(VisibleDefaultsOnly, Category = Material)
+	UMaterialInstanceDynamic* MeshMaterialInstance;
+
+	// Projectile damage
+	UPROPERTY(VisibleDefaultsOnly, Category = Damage)
+	float DamageValue;
+
+	// Projectile damage-radius
+	UPROPERTY(VisibleDefaultsOnly, Category = Damage)
+	float DamageRadius;
+
+	float MaxPossibleLifetime = 8.0f;
+	float MaxCurrentLifetime	= MaxPossibleLifetime;
 };

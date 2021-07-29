@@ -2,6 +2,7 @@
 
 #include "Characters/BaseShooter.h"
 
+#include "Components/AmmoComp.h"
 #include "Components/HealthComp.h"
 #include "Components/StickyGunSkeletalComp.h"
 
@@ -14,141 +15,139 @@
 #include <Kismet/GameplayStatics.h>
 #include <MotionControllerComponent.h>
 #include <UObject/ConstructorHelpers.h>
-#include <XRMotionControllerBase.h>	   // for FXRMotionControllerBase::RightHandSourceId
-
+#include <XRMotionControllerBase.h>		 // for FXRMotionControllerBase::RightHandSourceId
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 // Sets default values
 ABaseShooter::ABaseShooter()
 {
-  // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-  // PrimaryActorTick.bCanEverTick = true;
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// PrimaryActorTick.bCanEverTick = true;
 
-  // Set size for collision capsule
-  GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
+	// Set size for collision capsule
+	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
-  // set our turn rates for input
-  BaseTurnRate = 45.f;
-  BaseLookUpRate = 45.f;
-  // Init CameraComponent
-  InitCamera();
+	InitCamera();
+	InitSkeletalBody();
+	InitActorComponents();
+	SetupStickyGun();
 
-  // Init a 1st-person arms skeletal mesh (when controlling this pawn)
-  InitSkeletalBody();
-
-  InitActorComponents();
-
-  // Create a gun mesh component
-  SetupStickyGun();
+	// set our turn rates for input
+	BaseTurnRate	 = 45.f;
+	BaseLookUpRate = 45.f;
 }
+
+/** ============================ **/
+/** Inherited Methods: Overrides **/
 
 void ABaseShooter::BeginPlay()
 {
-  // Call the base class
-  Super::BeginPlay();
+	// Call the base class
+	Super::BeginPlay();
 
-  // Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
-  StickyGun->AttachToComponent(MeshPtr, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-
-  // Show or hide the two versions of the gun based on whether or not we're using motion controllers.
-  MeshPtr->SetHiddenInGame(false, true);
+	// Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
+	StickyGun->AttachToComponent(MeshPtr, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	MeshPtr->SetHiddenInGame(false, true);
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Input
+void ABaseShooter::SetupPlayerInputComponent(UInputComponent* InputComponent) {}
+
+/** ======================= **/
+/** Public Methods: Getters **/
+
+UStickyGunSkeletalComp* ABaseShooter::GetStickyGunPtr() { return StickyGun; }
+USkeletalMeshComponent* ABaseShooter::GetMeshPtr() { return MeshPtr; }
+UHealthComp*						ABaseShooter::GetHealthCompPtr() { return HealthComponent; }
+UAmmoComp*							ABaseShooter::GetAmmoCompPtr() { return AmmoComp; }
+UCameraComponent*				ABaseShooter::GetFirstPersonCameraComponent() { return FirstPersonCameraComponent; }
+
+/** ======================= **/
+/** Public Methods: VFX/SFX **/
+
+void ABaseShooter::FireGunEffects(UStickyGunSkeletalComp* StickyGunPtr)
+{
+	USoundBase*		LocalSoundPtr				= StickyGunPtr->GetFireSound();
+	UAnimMontage* LocalAnimMontagePtr = StickyGunPtr->GetFireAnimMontage();
+
+	// try and play the sound if specified
+	if (LocalSoundPtr != nullptr) {
+		UGameplayStatics::PlaySoundAtLocation(this, LocalSoundPtr, GetActorLocation());
+	}
+
+	// try and play a firing animation if specified
+	if (LocalAnimMontagePtr != nullptr) {
+		// Get the animation object for the arms mesh
+		UAnimInstance* AnimInstance = MeshPtr->GetAnimInstance();
+		if (AnimInstance != nullptr) {
+			AnimInstance->Montage_Play(LocalAnimMontagePtr, 1.f);
+		}
+	}
+}
+
+/** ================================== **/
+/** Protected Methods: Component Setup **/
+
+void ABaseShooter::InitSkeletalBody()
+{
+	MeshPtr = GetMesh();
+
+	// Set the skeletal mesh asset of the USkeletalMeshComponent
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletalMeshObj(
+		TEXT("/Game/FirstPerson/Character/Mesh/SK_Mannequin_Arms"));
+	USkeletalMesh* ArmsSkeletalMesh = SkeletalMeshObj.Object;
+	MeshPtr->SetSkeletalMesh(ArmsSkeletalMesh, true);
+
+	static ConstructorHelpers::FObjectFinder<UAnimBlueprint> FpsAnimClassObj(TEXT("/Game/FirstPerson/Animations/FirstPerson_AnimBP"));
+	MeshPtr->SetAnimInstanceClass(FpsAnimClassObj.Object->GeneratedClass);
+
+	MeshPtr->SetOnlyOwnerSee(true);
+	MeshPtr->SetupAttachment(FirstPersonCameraComponent);
+	MeshPtr->bCastDynamicShadow = false;
+	MeshPtr->CastShadow					= false;
+	MeshPtr->SetRelativeRotation(FRotator(1.9f, -19.19f, 5.2f));
+	MeshPtr->SetRelativeLocation(FVector(-0.5f, -4.4f, -155.7f));
+}
+
+void ABaseShooter::InitCamera()
+{
+	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
+	FirstPersonCameraComponent->SetRelativeLocation(FVector(-39.56f, 1.75f, 64.f));		 // Position the camera
+	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+}
+
+void ABaseShooter::InitActorComponents()
+{
+	HealthComponent = CreateDefaultSubobject<UHealthComp>(TEXT("HealthSystem"));
+	// HealthComponent->InitHealthComponent();
+}
+
+void ABaseShooter::SetupStickyGun()
+{
+	StickyGun = CreateDefaultSubobject<UStickyGunSkeletalComp>(TEXT("StickyGun"));
+	AmmoComp	= CreateDefaultSubobject<UAmmoComp>(TEXT("AmmoComp"));
+
+	// Initializing using RootComponent for attachment and Offset for placement
+	StickyGun->InitStickyGun(this, FVector(100.0f, 0.0f, 10.0f), CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation")));
+}
+
+/** ========================= **/
+/** Protected Methods: Inputs **/
+
 void ABaseShooter::MoveForward(float Value)
 {
 	if (Value != 0.0f) {
-	  AddMovementInput(GetActorForwardVector(), Value);
+		AddMovementInput(GetActorForwardVector(), Value);
 	}
 }
 
 void ABaseShooter::MoveRight(float Value)
 {
 	if (Value != 0.0f) {
-	  AddMovementInput(GetActorRightVector(), Value);
+		AddMovementInput(GetActorRightVector(), Value);
 	}
 }
 
 // calculate delta for this frame from the rate information
-void ABaseShooter::TurnAtRate(float Rate)
-{
-  AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
-}
-void ABaseShooter::LookUpAtRate(float Rate)
-{
-  AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
-}
-
-void ABaseShooter::SetupPlayerInputComponent(UInputComponent* InputComponent)
-{
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Effects
-
-void ABaseShooter::FireGunEffects(UStickyGunSkeletalComp* StickyGunPtr)
-{
-	// try and play the sound if specified
-	if (StickyGunPtr->FireSound != nullptr) {
-	  UGameplayStatics::PlaySoundAtLocation(this, StickyGunPtr->FireSound, GetActorLocation());
-	}
-
-	// try and play a firing animation if specified
-	if (StickyGunPtr->FireAnimation != nullptr) {
-	  // Get the animation object for the arms mesh
-	  UAnimInstance* AnimInstance = MeshPtr->GetAnimInstance();
-		if (AnimInstance != nullptr) {
-		  AnimInstance->Montage_Play(StickyGunPtr->FireAnimation, 1.f);
-		}
-	}
-}
-
-// Does not sucessfully create the subobjects in the methods defined below
-void ABaseShooter::InitSkeletalBody()
-{
-  MeshPtr = GetMesh();
-
-  // Set the skeletal mesh asset of the USkeletalMeshComponent
-  static ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletalMeshObj(
-	TEXT("/Game/FirstPerson/Character/Mesh/SK_Mannequin_Arms"));
-  USkeletalMesh* ArmsSkeletalMesh = SkeletalMeshObj.Object;
-  MeshPtr->SetSkeletalMesh(ArmsSkeletalMesh, true);
-
-  static ConstructorHelpers::FObjectFinder<UAnimBlueprint> FpsAnimClassObj(TEXT("/Game/FirstPerson/Animations/FirstPerson_AnimBP"));
-  MeshPtr->SetAnimInstanceClass(FpsAnimClassObj.Object->GeneratedClass);
-
-  MeshPtr->SetOnlyOwnerSee(true);
-  MeshPtr->SetupAttachment(FirstPersonCameraComponent);
-  MeshPtr->bCastDynamicShadow = false;
-  MeshPtr->CastShadow = false;
-  MeshPtr->SetRelativeRotation(FRotator(1.9f, -19.19f, 5.2f));
-  MeshPtr->SetRelativeLocation(FVector(-0.5f, -4.4f, -155.7f));
-}
-
-void ABaseShooter::InitCamera()
-{
-  FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
-  FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-  FirstPersonCameraComponent->SetRelativeLocation(FVector(-39.56f, 1.75f, 64.f));	 // Position the camera
-  FirstPersonCameraComponent->bUsePawnControlRotation = true;
-}
-
-void ABaseShooter::InitActorComponents()
-{
-  HealthComponent = CreateDefaultSubobject<UHealthComp>(TEXT("HealthSystem"));
-  // HealthComponent->InitHealthComponent();
-}
-
-void ABaseShooter::SetupStickyGun()
-{
-  StickyGun = CreateDefaultSubobject<UStickyGunSkeletalComp>(TEXT("StickyGun"));
-
-  // Initializing using RootComponent for attachment and Offset for placement
-  StickyGun->InitStickyGun(this, FVector(100.0f, 0.0f, 10.0f), CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation")));
-}
-
-UStickyGunSkeletalComp* ABaseShooter::GetStickyGunPtr()
-{
-  return StickyGun;
-}
+void ABaseShooter::TurnAtRate(float Rate) { AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds()); }
+void ABaseShooter::LookUpAtRate(float Rate) { AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds()); }

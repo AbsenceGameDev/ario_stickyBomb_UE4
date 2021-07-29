@@ -3,38 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
-#include <Containers/UnrealString.h>
-#include <Engine/World.h>
-#include <Templates/SharedPointer.h>
-#include <Widgets/SCompoundWidget.h>
-#include <Widgets/Views/SListView.h>
-#include <Widgets/Views/STableRow.h>
-
-class SSlideInText;
-class AStickyHUD;
+#include "Helpers/ForwardDecls.h"
 
 class ARIO_STICKYBOMB_UE4_API SKillContentContainer : public SCompoundWidget
 {
-  public:
-  SLATE_BEGIN_ARGS(SKillContentContainer)
-  {
-  }
-  SLATE_ARGUMENT(class AStickyHUD*, OwnerHud)
-  SLATE_END_ARGS()
+	public:
+	SLATE_BEGIN_ARGS(SKillContentContainer)
+	{
+	}
+	SLATE_ARGUMENT(class AStickyHUD*, OwnerHud)
+	SLATE_END_ARGS()
 
-  void Construct(const FArguments& InArgs);
+	void Construct(const FArguments& InArgs);
+	void AddSlot(FString Value);
 
-  void AddSlot(FString Value);
+	protected:
+	TSharedRef<ITableRow> OnGenerateRowForList(TSharedPtr<FString> NewItem, const TSharedRef<STableViewBase>& OwnerTable);
 
-  protected:
-  AStickyHUD* OwnerHud;
-
-  TArray<TSharedPtr<FString>> Items;
-
-  TSharedRef<ITableRow> OnGenerateRowForList(TSharedPtr<FString> NewItem, const TSharedRef<STableViewBase>& OwnerTable);
-
-  TSharedPtr<SListView<TSharedPtr<FString>>> ListViewWidget;
-
-  FSlateFontInfo FontForKills;
+	AStickyHUD*																 OwnerHud;
+	TArray<TSharedPtr<FString>>								 Items;
+	TSharedPtr<SListView<TSharedPtr<FString>>> ListViewWidget;
+	FSlateFontInfo														 FontForKills;
 };

@@ -2,64 +2,125 @@
 
 #include "Components/AmmoComp.h"
 
+#include "Helpers/Macros.h"
 #include "StickyGameMode.h"
 
 #include <Net/UnrealNetwork.h>
 
-
 // Sets default values for this component's properties
 UAmmoComp::UAmmoComp()
 {
-  // Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-  // off to improve performance if you don't need them.
-  PrimaryComponentTick.bCanEverTick = true;
+	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	// off to improve performance if you don't need them.
+	PrimaryComponentTick.bCanEverTick = false;
 
-  MaxAmmo = 100.0f;
-  bIsEmpty = false;
+	MaxAmmo	 = 3;
+	bIsEmpty = false;
 
-  SetIsReplicatedByDefault(true);
-  SetIsReplicated(true);
+	SetIsReplicatedByDefault(true);
+	SetIsReplicated(true);
 }
 
-// Called when the game starts
+/** ============================ **/
+/** Inherited Methods: Overrides **/
+
 void UAmmoComp::BeginPlay()
 {
-  Super::BeginPlay();
-
-  AmmoCount = MaxAmmo;
+	Super::BeginPlay();
+	AmmoCount = MaxAmmo;
 }
+
+// Disabled
+void UAmmoComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+/** ================================ **/
+/** Public Methods: Client interface **/
+
+void UAmmoComp::TryFire()
+{
+	OnFire();
+}
+
+void UAmmoComp::TryPickupRound()
+{
+	OnFire();
+}
+
+/** ======================================== **/
+/** Protected Methods: Client/Server actions **/
 
 void UAmmoComp::OnRep_Ammo(int PrevAmmo)
 {
-  float AmmoDiff = AmmoCount - PrevAmmo;
-  OnAmmoChanged.Broadcast(this, AmmoCount, AmmoDiff, nullptr);
+	float AmmoDiff = AmmoCount - PrevAmmo;
+	OnAmmoChanged.Broadcast(this, AmmoCount, AmmoDiff, nullptr);
 }
 
-void UAmmoComp::ChangeAmmoCount(int RoundsOfAmmo)
+void UAmmoComp::OnFire()
 {
-  int RoundsAbs = (-RoundsOfAmmo * (RoundsOfAmmo < 0)) + (RoundsOfAmmo * (RoundsOfAmmo > 0));
-	// Not enough rounds left in the clip or called with RoundsOfAmmo = 0
-	if (RoundsOfAmmo == 0 || bIsEmpty || RoundsAbs > AmmoCount) {
-	  return;
+	UE_LOG(LogTemp, Log, TEXT("UAmmoComp::OnFire  Begin"));
+	if (GetOwnerRole() < ROLE_Authority) {
+		UE_LOG(LogTemp, Log, TEXT("UAmmoComp::OwnerCheck  Failed"));
+		return;
 	}
 
-  AmmoCount += RoundsOfAmmo;
-  bIsEmpty = AmmoCount < 1;
+	if (AmmoCount == 0) {
+		return;
+	}
 
-  UE_LOG(LogTemp, Log, TEXT("Ammo Changed: %s"), *FString::FromInt(AmmoCount));
-  OnAmmoChanged.Broadcast(this, AmmoCount, RoundsOfAmmo, nullptr);
+	AmmoCount--;
+	bIsEmpty = (AmmoCount = LL_CLAMP(AmmoCount, 0, MaxAmmo)) < 1;
+
+	UE_LOG(LogTemp, Log, TEXT("Current Ammo: %s"), *FString::FromInt(AmmoCount));
+	// OnAmmoChanged.Broadcast(this, AmmoCount, RoundsOfAmmo, nullptr);
 }
 
-// Called every frame
-void UAmmoComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UAmmoComp::ServerOnFire_Implementation()
 {
-  Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (GetOwnerRole() == ROLE_Authority) {
+		OnFire();
+	}
+}
 
-  // ...
+// intended for anti-cheat, validates code
+bool UAmmoComp::ServerOnFire_Validate()
+{
+	return true;
+}
+
+void UAmmoComp::OnPickupRound()
+{
+	if (GetOwnerRole() < ROLE_Authority) {
+		/** @todo Change validation to come from an async callback, this is not feasible having to wait for the server */
+		ServerOnPickupRound();
+		return;
+	}
+
+	if (AmmoCount == MaxAmmo) {
+		return;
+	}
+
+	AmmoCount++;
+	bIsEmpty = (AmmoCount = LL_CLAMP(AmmoCount, 0, MaxAmmo)) < 1;
+
+	UE_LOG(LogTemp, Log, TEXT("Current Ammo: %s"), *FString::FromInt(AmmoCount));
+	// OnAmmoChanged.Broadcast(this, AmmoCount, RoundsOfAmmo, nullptr);
+}
+
+void UAmmoComp::ServerOnPickupRound_Implementation()
+{
+	OnPickupRound();
+}
+
+bool UAmmoComp::ServerOnPickupRound_Validate()
+{
+	return true;
 }
 
 void UAmmoComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-  Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-  DOREPLIFETIME(UAmmoComp, AmmoCount);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UAmmoComp, AmmoCount);
 }

@@ -8,12 +8,11 @@
 
 #include "UserDisplayUOI.generated.h"
 
-
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UUserDisplayUOI : public UInterface
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 };
 
 /**
@@ -21,8 +20,8 @@ class UUserDisplayUOI : public UInterface
  */
 class ARIO_STICKYBOMB_UE4_API IUserDisplayUOI
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
-  // Add interface functions to this class. This is the class that will be inherited to implement this interface.
-  public:
+	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
+	public:
 };

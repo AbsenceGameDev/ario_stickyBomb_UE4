@@ -3,20 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Helpers/ForwardDecls.h"
 
 #include <Components/WidgetComponent.h>
 #include <GameFramework/HUD.h>
 
 #include "StickyHUD.generated.h"
-
-/** Forward decl. @todo Have not made this widget yet, mid-priority */
-class SAmmoWidget;
-class SHealthWidget;
-
-/** Forward decl. */
-class SKillWidget;
-class SSlideInText;
-class SKillContentContainer;
 
 /**
  *
@@ -24,38 +16,49 @@ class SKillContentContainer;
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyHUD : public AHUD
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
-  public:
-  AStickyHUD();
+	public:
+	AStickyHUD();
 
-  virtual void Tick(float DeltaTime) final;
-  virtual void DrawHUD() final;
+	/** ============================ **/
+	/** Inherited Methods: Overrides **/
+	protected:
+	virtual void PostInitializeComponents() override;
+	virtual void BeginPlay() final;
 
-  // UFUNCTION()
-  // void UpdateAmmoCount(int AmmoCount);
+	public:
+	virtual void Tick(float DeltaTime) final;
+	virtual void DrawHUD() final;
 
-  //  UFUNCTION()
-  //  void AppendReloadPrompt();
+	/** ================================ **/
+	/** Public Methods: Client interface **/
+	UFUNCTION(BlueprintCallable, Category = "UIActions")
+	void UpdateTotalKills();
 
-  UFUNCTION(BlueprintCallable, Category = "UIActions")
-  void UpdateTotalKills();
+	// UFUNCTION()
+	// void UpdateAmmoWidget(int AmmoCount);
 
-  void ToggleGameMenu();
-  void AddKillToWidget(FString Kill);
+	void ToggleGameMenu();
+	// void AppendReloadPrompt();
+	void AddKillToWidget(FString Kill);
 
-  protected:
-  TSharedPtr<SKillWidget> TotalKillsWidget;
-  TSharedPtr<SSlideInText> OverlayMenu;
-  TSharedPtr<SKillContentContainer> KillList;
+	protected:
+	/** =============================== **/
+	/** Protected Methods: Init Widgets **/
+	void InitializeKillOverlayWidget();
+	void InitializeTotalKillsWidget();
+	// void InitializeAmmoWidget();
 
-  bool bIsTitleVisible;
-  bool bisKillWidgetInitialized;
-  bool bisOverlayMenuVisible;
+	/** ========================= **/
+	/** Protected Fields: Widgets **/
+	TSharedPtr<SKillWidget>						TotalKillsWidget;
+	TSharedPtr<SSlideInText>					OverlayMenu;
+	TSharedPtr<SKillContentContainer> KillList;
 
-  void InitializeKillOverlayWidget();
-  void InitializeTotalKillsWidget();
-
-  virtual void BeginPlay() final;
-  virtual void PostInitializeComponents() override;
+	/** ================================== **/
+	/** Protected Fields: Basic properties **/
+	bool bIsTitleVisible;
+	bool bisKillWidgetInitialized;
+	bool bisOverlayMenuVisible;
 };

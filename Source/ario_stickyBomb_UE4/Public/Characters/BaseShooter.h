@@ -3,104 +3,91 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "Helpers/ForwardDecls.h"
+
+#include <GameFramework/Character.h>
 
 #include "BaseShooter.generated.h"
-
-class UInputComponent;
-class USkeletalMeshComponent;
-class UStickyGunSkeletalComp;
-class USceneComponent;
-class UCameraComponent;
-class UMotionControllerComponent;
-class UAnimMontage;
-class USoundBase;
-class UHealthComp;
 
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
-  protected:
-  /** Pawn mesh: 1st person view (arms; seen only by self) */
-  UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-  USkeletalMeshComponent* MeshPtr;
+	public:
+	ABaseShooter();
 
-  /** Gun mesh: 1st person view (seen only by self) */
-  UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-  UStickyGunSkeletalComp* StickyGun;
+	/** ============================ **/
+	/** Inherited Methods: Overrides **/
+	protected:
+	virtual void BeginPlay();
+	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
-  /** First person camera */
-  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-  UCameraComponent* FirstPersonCameraComponent;
+	/** ======================= **/
+	/** Public Methods: Getters **/
+	public:
+	UStickyGunSkeletalComp* GetStickyGunPtr();
+	USkeletalMeshComponent* GetMeshPtr();
+	UHealthComp*						GetHealthCompPtr();
+	UAmmoComp*							GetAmmoCompPtr();
+	UCameraComponent*				GetFirstPersonCameraComponent();
 
-  /** Generic health component */
-  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-  UHealthComp* HealthComponent;
+	/** ======================= **/
+	/** Public Methods: VFX/SFX **/
+	void FireGunEffects(UStickyGunSkeletalComp* StickyGunPtr);
 
-  public:
-  ABaseShooter();
+	/** =========================== **/
+	/** Public Fields: Rates/Limits **/
 
-  protected:
-  virtual void BeginPlay();
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	float BaseTurnRate; /** In deg/sec. Other scaling may affect final turn rate. */
 
-  public:
-  /** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-  float BaseTurnRate;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	float BaseLookUpRate; /** In deg/sec. Other scaling may affect final rate. */
 
-  /** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-  float BaseLookUpRate;
+	/** ================================== **/
+	/** Protected Methods: Component Setup **/
+	protected:
+	void InitSkeletalBody();
+	void InitCamera();
+	void InitActorComponents();
+	void SetupStickyGun();
 
-  protected:
-  /** Handles moving forward/backward */
-  void MoveForward(float Val);
+	/** ========================= **/
+	/** Protected Methods: Inputs **/
+	void MoveRight(float Val);
+	void MoveForward(float Val);
 
-  /** Handles stafing movement, left and right */
-  void MoveRight(float Val);
+	/**
+	 * @brief Turn Rate
+	 * @details Called via input to turn at a given rate.
+	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
+	 */
+	void TurnAtRate(float Rate);
 
-  /**
-   * Called via input to turn at a given rate.
-   * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
-   */
-  void TurnAtRate(float Rate);
+	/**
+	 * @brief LookUp Rate
+	 * @details Called via input to turn look up/down at a given rate.
+	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
+	 */
+	void LookUpAtRate(float Rate);
 
-  /**
-   * Called via input to turn look up/down at a given rate.
-   * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
-   */
-  void LookUpAtRate(float Rate);
+	/** ============================ **/
+	/** Protected Fields: Components **/
 
-  protected:
-  // APawn interface
-  virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-  // End of APawn interface
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent* MeshPtr; /** SkelMesh: 1st person view arms */
 
-  public:
-  void FireGunEffects(UStickyGunSkeletalComp* StickyGunPtr);
-  void InitSkeletalBody();
-  void InitCamera();
-  void InitActorComponents();
-  void SetupStickyGun();
-  UStickyGunSkeletalComp* GetStickyGunPtr();
+	/** Gun mesh: 1st person view (seen only by self) */
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	UStickyGunSkeletalComp* StickyGun; /** SkelMesh: Skeletal Gun mesh */
 
-  /** Returns Mesh1P subobject **/
-  USkeletalMeshComponent* GetMeshPtr() const
-  {
-	return MeshPtr;
-  }
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FirstPersonCameraComponent; /** First person camera */
 
-  /** Returns Healthcomponent subobject **/
-  UHealthComp* GetHealthCompPtr() const
-  {
-	return HealthComponent;
-  }
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
+	UHealthComp* HealthComponent; /** Generic health component */
 
-  /** Returns FirstPersonCameraComponent subobject **/
-  UCameraComponent* GetFirstPersonCameraComponent() const
-  {
-	return FirstPersonCameraComponent;
-  }
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammo, meta = (AllowPrivateAccess = "true"))
+	UAmmoComp* AmmoComp; /** Generic ammo component */
 };

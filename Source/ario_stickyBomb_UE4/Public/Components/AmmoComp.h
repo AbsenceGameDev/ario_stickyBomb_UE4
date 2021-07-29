@@ -4,6 +4,7 @@
 
 #include "Components/ActorComponent.h"
 #include "CoreMinimal.h"
+#include "Helpers/ForwardDecls.h"
 
 #include <Engine/EngineTypes.h>
 
@@ -11,52 +12,76 @@
 
 // OnAmmoChanged event
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(
-  FOnAmmoChangedSignature, UAmmoComp*, OwningAmmoComp, int, Ammo, int, AmmoDelta, class AController*, InstigatedBy);
+	FOnAmmoChangedSignature, UAmmoComp*, OwningAmmoComp, int, Ammo, int, AmmoDelta, AController*, InstigatedBy);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
-  public:
-  // Sets default values for this component's properties
-  UAmmoComp();
+	public:
+	UAmmoComp();
 
-  protected:
-  // Called when the game starts
-  virtual void BeginPlay() override;
+	protected:
+	/** ============================ **/
+	/** Inherited Methods: Overrides **/
+	virtual void BeginPlay() override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-  bool bIsEmpty;
+	public:
+	/** ================================ **/
+	/** Public Methods: Client interface **/
+	UFUNCTION()
+	void TryFire();
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AmmoComp")
-  int MaxAmmo;
+	UFUNCTION()
+	void TryPickupRound();
 
-  UPROPERTY(ReplicatedUsing = OnRep_Ammo, BlueprintReadOnly, Category = "AmmoComp")
-  int AmmoCount;
+	/** =============================== **/
+	/** Public Methods: Inlined Getters **/
+	float GetAmmo() const
+	{
+		return AmmoCount;
+	}
+	bool IsEmpty() const
+	{
+		return bIsEmpty;
+	}
+	bool IsFullClip() const
+	{
+		return AmmoCount >= MaxAmmo;
+	}
 
-  UFUNCTION()
-  void OnRep_Ammo(int PrevAmmo);
+	/** =============================== **/
+	/** Public Fields: Events/Delegates **/
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnAmmoChangedSignature OnAmmoChanged;
 
-  public:
-  // Called every frame
-  virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	protected:
+	/** ======================================== **/
+	/** Protected Methods: Client/Server actions **/
+	UFUNCTION()
+	void OnRep_Ammo(int PrevAmmo);
 
-  UFUNCTION()
-  void ChangeAmmoCount(int RoundsOfAmmo);
+	UFUNCTION()
+	void OnFire();
 
-  UPROPERTY(BlueprintAssignable, Category = "Events")
-  FOnAmmoChangedSignature OnAmmoChanged;
+	UFUNCTION()
+	void OnPickupRound();
 
-  float GetAmmo() const
-  {
-	return AmmoCount;
-  }
-  bool IsEmpty() const
-  {
-	return bIsEmpty;
-  }
-  bool IsFullClip() const
-  {
-	return AmmoCount >= MaxAmmo;
-  }
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerOnFire(); /** Send request to host server, withValidation **/
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerOnPickupRound(); /** Send request to host server, withValidation **/
+
+	/** ======================================== **/
+	/** Protected Fields: Ammo **/
+	bool bIsEmpty;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AmmoComp")
+	int MaxAmmo;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Ammo, BlueprintReadOnly, Category = "AmmoComp")
+	int AmmoCount;
 };

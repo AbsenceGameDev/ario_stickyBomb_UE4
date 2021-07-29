@@ -7,11 +7,11 @@
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 void SInGameOverlay::Construct(const FArguments& InArgs)
 {
-  /*
-  ChildSlot
-  [
-	  // Populate the widget
-  ];
-  */
+	/*
+	ChildSlot
+	[
+		// Populate the widget
+	];
+	*/
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION

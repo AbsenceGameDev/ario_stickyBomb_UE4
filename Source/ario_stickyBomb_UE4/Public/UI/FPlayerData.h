@@ -10,13 +10,12 @@
 
 USTRUCT()
 struct ARIO_STICKYBOMB_UE4_API FPlayerData {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
-  float Score;
+	float		Score;
+	FString Name;
 
-  FString Name;
-
-  FPlayerData(float score = 0.0f, FString name = FString("No Player Name")) : Score(score), Name(name)
-  {
-  }
+	FPlayerData(float score = 0.0f, FString name = FString("No Player Name")) : Score(score), Name(name)
+	{
+	}
 };

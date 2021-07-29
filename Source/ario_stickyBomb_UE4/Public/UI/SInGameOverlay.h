@@ -11,12 +11,12 @@
  */
 class ARIO_STICKYBOMB_UE4_API SInGameOverlay : public SCompoundWidget
 {
-  public:
-  SLATE_BEGIN_ARGS(SInGameOverlay)
-  {
-  }
-  SLATE_END_ARGS()
+	public:
+	SLATE_BEGIN_ARGS(SInGameOverlay)
+	{
+	}
+	SLATE_END_ARGS()
 
-  /** Constructs this widget with InArgs */
-  void Construct(const FArguments& InArgs);
+	/** Constructs this widget with InArgs */
+	void Construct(const FArguments& InArgs);
 };

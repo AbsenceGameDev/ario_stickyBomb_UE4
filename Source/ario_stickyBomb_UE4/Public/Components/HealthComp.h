@@ -4,74 +4,85 @@
 
 #include "Components/ActorComponent.h"
 #include "CoreMinimal.h"
+#include "Helpers/ForwardDecls.h"
 
 #include <Engine/EngineTypes.h>
 
 #include "HealthComp.generated.h"
 
 // OnHealthChanged event
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(FOnHealthChangedSignature, UHealthComp*, OwningHealthComp, float, Health, float,
-  HealthDelta, const class UDamageType*, DamageType, class AController*, InstigatedBy, AActor*, DamageCauser);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(
+	FOnHealthChangedSignature, UHealthComp*, OwningHealthComp, float, Health, float, HealthDelta, const UDamageType*, DamageType,
+	AController*, InstigatedBy, AActor*, DamageCauser);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
-  public:
-  // Sets default values for this component's properties
-  UHealthComp();
+	public:
+	// Sets default values for this component's properties
+	UHealthComp();
 
-  protected:
-  // Called when the game starts
-  virtual void BeginPlay() override;
+	protected:
+	/** ============================ **/
+	/** Inherited Methods: Overrides **/
+	virtual void BeginPlay() override;
 
-  bool bIsDead = false;
+	public:
+	/** ================================ **/
+	/** Public Methods: Client interface **/
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "HealthComponent")
+	static bool IsFriendly(AActor* left, AActor* right);
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealthComp")
-  float MaxHealth = 100.0f;
+	UFUNCTION(BlueprintCallable, Category = "Heal")
+	void TryHeal(float HealAmount);
 
-  UPROPERTY(ReplicatedUsing = OnRep_Health, BlueprintReadOnly, Category = "HealthComponent")
-  float Health = MaxHealth;
+	/** ================================ **/
+	/** Public Methods: Inline Getters **/
+	float GetHealth() const
+	{
+		return Health;
+	}
 
-  UFUNCTION()
-  void OnRep_Health(float PrevHealth);
+	bool IsDead() const
+	{
+		return bIsDead;
+	}
 
-  UFUNCTION()
-  void HandleTakeAnyDamage(
-	AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+	/** ================================ **/
+	/** Public Fields: Events/Delegates **/
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnHealthChangedSignature OnHealthChanged;
 
-  UFUNCTION()
-  void HandleRadialDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, FVector Origin,
-	FHitResult HitInfo, class AController* InstigatedBy, AActor* DamageCauser);
+	protected:
+	/** ======================================== **/
+	/** Protected Methods: Client/Server actions **/
+	UFUNCTION()
+	void OnRep_Health(float PrevHealth);
 
-  UFUNCTION()
-  void HandleDamageHit(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation,
-	class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType,
-	AActor* DamageCauser);
+	UFUNCTION()
+	void HandleTakeAnyDamage(
+		AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
-  public:
-  UPROPERTY(BlueprintAssignable, Category = "Events")
-  FOnHealthChangedSignature OnHealthChanged;
+	UFUNCTION()
+	void HandleRadialDamage(
+		AActor* DamagedActor, float Damage, const class UDamageType* DamageType, FVector Origin, FHitResult HitInfo,
+		AController* InstigatedBy, AActor* DamageCauser);
 
-  // less memory 0 - 255 \ doesn't need to be replicated, default team we spawn with
-  UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Team")
-  uint8 TeamNumber;
+	UFUNCTION()
+	void HandleDamageHit(
+		AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent,
+		FName BoneName, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser);
 
-  // no white execution pin = blueprint Pure
-  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "HealthComponent")
-  static bool IsFriendly(AActor* left, AActor* right);
+	/** ================================== **/
+	/** Protected Fields: Basic Properties **/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HealthComponent")
+	bool bIsDead = false;
 
-  UFUNCTION(BlueprintCallable, Category = "Heal")
-  void Heal(float HealAmount);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealthComponent")
+	float MaxHealth = 100.0f;
 
-  float GetHealth() const
-  {
-	return Health;
-  }
-
-  bool IsDead() const
-  {
-	return bIsDead;
-  }
+	UPROPERTY(ReplicatedUsing = OnRep_Health, BlueprintReadOnly, Category = "HealthComponent")
+	float Health = MaxHealth;
 };

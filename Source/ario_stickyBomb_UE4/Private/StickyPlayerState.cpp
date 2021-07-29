@@ -23,37 +23,38 @@
 	APlayerState
 */
 
-// Score is Replicated : Direct change to server
+/** ================================ **/
+/** Public Methods: Client interface **/
 void AStickyPlayerState::AddUserScore(float deltaScore)
 {
-  SetScore(GetScore() + deltaScore);
+	SetScore(GetScore() + deltaScore);
 }
 
 float AStickyPlayerState::GetUserScore() const
 {
-  return GetScore();
+	return GetScore();
 }
 
 void AStickyPlayerState::AddKill(int32 Kill)
 {
-  Kills += Kill;
+	Kills += Kill;
 }
 
 int32 AStickyPlayerState::GetKills() const
 {
-  return Kills;
+	return Kills;
 }
 
-// Notify HUD
+/** ======================================== **/
+/** Protected Methods: Server/Client Actions **/
 void AStickyPlayerState::OnRep_Kills()
 {
-  AStickyHUD* PlayerHud = Cast<AStickyHUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
-  if (PlayerHud)
-	PlayerHud->UpdateTotalKills();
+	AStickyHUD* PlayerHud = Cast<AStickyHUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
+	if (PlayerHud) PlayerHud->UpdateTotalKills();
 }
 
 void AStickyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-  Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-  DOREPLIFETIME(AStickyPlayerState, Kills);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AStickyPlayerState, Kills);
 }

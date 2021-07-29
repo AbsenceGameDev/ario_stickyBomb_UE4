@@ -10,36 +10,44 @@
 #include "StickyGameMode.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
-  FOnActorKilled, AActor*, VictimActor, AActor*, KillerActor, AController*, KillerController);
+	FOnActorKilled, AActor*, VictimActor, AActor*, KillerActor, AController*, KillerController);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(
-  FOnTargetHitEvent, FVector, HitLocation, FVector, ShotDirection, float, HitValue, AActor*, HitOwner);
+	FOnTargetHitEvent, FVector, HitLocation, FVector, ShotDirection, float, HitValue, AActor*, HitOwner);
 
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyGameMode : public AGameModeBase
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
-  public:
-  AStickyGameMode();
+	public:
+	AStickyGameMode();
 
-  public:
-  virtual void StartPlay() override;
-  virtual void BeginPlay() override;
-  virtual void Tick(float DeltaSeconds) override;
+	public:
+	/** ============================ **/
+	/** Inherited Methods: Overrides **/
+	virtual void StartPlay() override;
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
-  UPROPERTY(BlueprintAssignable, Category = "Events: GameMode")
-  FOnActorKilled OnActorKilled;
+	/** =============================== **/
+	/** Public Fields: Events/Delegates **/
+	UPROPERTY(BlueprintAssignable, Category = "Events: GameMode")
+	FOnActorKilled OnActorKilled;
 
-  UPROPERTY(BlueprintAssignable, Category = "Events: GameMode")
-  FOnTargetHitEvent OnHitEvent;
+	UPROPERTY(BlueprintAssignable, Category = "Events: GameMode")
+	FOnTargetHitEvent OnHitEvent;
 
-  protected:
-  bool IsAnyPlayerAlive() const;
-  void CheckAnyPlayerAlive();
-  void GameOver();
-  void RestartDeadPlayers();
+	protected:
+	/** ======================================== **/
+	/** Protected Methods: Server/Client Actions **/
+	void CheckAnyPlayerAlive();
+	bool IsAnyPlayerAlive() const;
+	void RestartDeadPlayers();
+	void GameOver();
 
-  bool bIsGameOver;
-  bool bHasGameStarted;
+	/** ================================== **/
+	/** Protected Fields: Basic properties **/
+	bool bIsGameOver;
+	bool bHasGameStarted;
 };

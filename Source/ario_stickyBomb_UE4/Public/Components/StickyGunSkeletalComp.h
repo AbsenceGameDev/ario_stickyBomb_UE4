@@ -3,8 +3,8 @@
 #pragma once
 
 #include "Characters/BaseShooter.h"
-#include "Components/AmmoComp.h"
 #include "CoreMinimal.h"
+#include "Helpers/ForwardDecls.h"
 
 #include <Components/SkeletalMeshComponent.h>
 
@@ -16,69 +16,70 @@
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshComponent
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
-  public:
-  UStickyGunSkeletalComp();
+	public:
+	UStickyGunSkeletalComp();
 
-  UFUNCTION()
-  void TryStartFire();
+	/** ================================ **/
+	/** Public Methods: Client interface **/
 
-  /** Location on gun mesh where projectiles should spawn. */
-  UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-  USceneComponent* PlacementComp;
+	void InitStickyGun(ABaseShooter* Caller, FVector GunOffset, USceneComponent* MuzzlePlacementComp);
+	/** Called after constructing StickyGunSkeletalComp as a subobject */
 
-  UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-  USkeletalMesh* MeshPtr;
+	UFUNCTION()
+	void TryStartFire();
 
-  /** Gun muzzle's offset from the characters location */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-  FVector GunOffset;
+	/** =============================== **/
+	/** Public Methods: Getters/Setters **/
+	UAmmoComp*		GetAmmoCompPtr();
+	ABaseShooter* GetOwningCharacter();
+	USoundBase*		GetFireSound();
+	UAnimMontage* GetFireAnimMontage();
 
-  /** Projectile class to spawn */
-  UPROPERTY(EditDefaultsOnly, Category = Projectile)
-  TSubclassOf<class AStickyProjectile> ProjectileClass;
+	protected:
+	/** ======================================== **/
+	/** Protected Methods: Client/Server actions **/
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerOnFire();
 
-  /** Sound to play each time we fire */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-  USoundBase* FireSound;
+	void OnFire();
 
-  /** AnimMontage to play each time we fire */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-  UAnimMontage* FireAnimation;
+	/** ================================= **/
+	/** Protected Methods: Client actions **/
+	void GenerateCurve();
 
-  /** Set-up sticky gun, should be right after called after constructing StickyGunSkeletalComp as a subobject */
-  void InitStickyGun(ABaseShooter* Caller, FVector GunOffset, USceneComponent* MuzzlePlacementComp);
+	/** =================================== **/
+	/** Protected Methods: Basic properties **/
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMesh* MeshPtr; /** Actual Skeletal Mesh asset */
 
-  UAmmoComp* GetAmmoCompPtr();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	FVector GunOffset; /** Gun muzzle's offset from the characters location */
 
-  void GenerateCurve();
-  void AddKeyToCurve(FRichCurve& InColorCurve, float Time, float Value);
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class AStickyProjectile> ProjectileClass; /** Projectile class to spawn */
 
-  ABaseShooter* GetOwningCharacter()
-  {
-	return OwningCharacter;
-  }
+	/** ========================= **/
+	/** Protected Fields: VFX/SFX **/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	USoundBase* FireSound; /** Sound to play each time we fire */
 
-  protected:
-  /**
-   * @brief Send request to host server, withValidation = ...
-   *
-   **/
-  UFUNCTION(Server, Reliable, WithValidation)
-  void ServerOnFire();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	UAnimMontage* FireAnimation; /** AnimMontage to play each time we fire */
 
-  /** Fires a projectile.
-   *   @todo clean up replication
-   **/
-  void OnFire();
+	/** ============================ **/
+	/** Protected Fields: Components **/
+	UPROPERTY(VisibleDefaultsOnly, Category = Components)
+	USceneComponent* PlacementComp; /** Spawn-point for projectiles */
 
-  // Object
-  ABaseShooter* OwningCharacter;
-  UAmmoComp* AmmoComp;
+	UPROPERTY(VisibleDefaultsOnly, Category = Components)
+	UAmmoComp* AmmoComp;
 
-  UCurveFloat* FloatCurve;
-  FRichCurve* GeneratedRichCurve;
-
-  bool bDisable = true;
+	/** ================================== **/
+	/** Protected Fields: Basic Properties **/
+	ABaseShooter* OwningCharacter;
+	UCurveFloat*	FloatCurve;
+	FRichCurve*		GeneratedRichCurve;
+	bool					bDisable = true;
 };

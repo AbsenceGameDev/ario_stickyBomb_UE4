@@ -19,13 +19,13 @@ class USoundBase;
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API ABomberman : public ABaseShooter
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
-  public:
-  ABomberman();
+	public:
+	ABomberman();
 
-  protected:
-  virtual void BeginPlay();
+	protected:
+	virtual void BeginPlay();
 
-  virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 };
