@@ -6,6 +6,7 @@
 #include "Components/HealthComp.h"
 #include "Components/StickyGunSkeletalComp.h"
 #include "Helpers/CollisionChannels.h"
+#include "StickyPlayerState.h"
 
 #include <Animation/AnimInstance.h>
 #include <Camera/CameraComponent.h>
@@ -66,12 +67,17 @@ UAmmoComp*							ABaseShooter::GetAmmoCompPtr() { return AmmoComp; }
 UCameraComponent*				ABaseShooter::GetFirstPersonCameraComponent() { return FirstPersonCameraComponent; }
 
 /** ======================= **/
+/** Public Methods: Actions **/
+void ABaseShooter::TryStartFire() { StickyGun->TryStartFire(); }
+void ABaseShooter::TryPickupRound() { AmmoComp->TryPickupRound(); }
+
+/** ======================= **/
 /** Public Methods: VFX/SFX **/
 
-void ABaseShooter::FireGunEffects(UStickyGunSkeletalComp* StickyGunPtr)
+void ABaseShooter::FireGunEffects()
 {
-	USoundBase*		LocalSoundPtr				= StickyGunPtr->GetFireSound();
-	UAnimMontage* LocalAnimMontagePtr = StickyGunPtr->GetFireAnimMontage();
+	USoundBase*		LocalSoundPtr				= StickyGun->GetFireSound();
+	UAnimMontage* LocalAnimMontagePtr = StickyGun->GetFireAnimMontage();
 
 	// try and play the sound if specified
 	if (LocalSoundPtr != nullptr) {
@@ -85,6 +91,16 @@ void ABaseShooter::FireGunEffects(UStickyGunSkeletalComp* StickyGunPtr)
 		if (AnimInstance != nullptr) {
 			AnimInstance->Montage_Play(LocalAnimMontagePtr, 1.f);
 		}
+	}
+}
+
+void ABaseShooter::TriggerPlayerStateAmmo(int LocalAmmoUpdate)
+{
+	auto LocalPlayerState = StaticCast<AStickyPlayerState*>(GetPlayerState());
+
+	if (LocalPlayerState != NULL) {
+		LocalPlayerState->SetAmmo(LocalAmmoUpdate);
+		return;
 	}
 }
 
@@ -133,6 +149,7 @@ void ABaseShooter::SetupStickyGun()
 
 	// Initializing using RootComponent for attachment and Offset for placement
 	StickyGun->InitStickyGun(this, FVector(100.0f, 0.0f, 10.0f), CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation")));
+	TriggerPlayerStateAmmo(AmmoComp->GetAmmo());
 }
 
 /** ========================= **/

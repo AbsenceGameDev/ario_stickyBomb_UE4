@@ -33,9 +33,14 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter
 	UCameraComponent*				GetFirstPersonCameraComponent();
 
 	/** ======================= **/
-	/** Public Methods: VFX/SFX **/
-	void FireGunEffects(UStickyGunSkeletalComp* StickyGunPtr);
+	/** Public Methods: Actions **/
+	void TryStartFire();
+	void TryPickupRound();
 
+	/** ======================= **/
+	/** Public Methods: VFX/SFX **/
+	void FireGunEffects();
+	void TriggerPlayerStateAmmo(int LocalAmmoUpdate);
 	/** =========================== **/
 	/** Public Fields: Rates/Limits **/
 

@@ -2,6 +2,7 @@
 
 #include "UI/Widgets/SAmmoWidget.h"
 
+#include "Helpers/Macros.h"
 #include "SlateOptMacros.h"
 
 #include <Internationalization/Internationalization.h>
@@ -18,19 +19,13 @@ void SAmmoWidget::Construct(const FArguments& InArgs)
 	OwnerHUD = InArgs._OwnerHud;
 	AmmoText = InArgs._TextToSet;
 
-	FSlateFontInfo ResultFont = FSlateFontInfo(FPaths::ProjectContentDir() / TEXT("Slate/Fonts/Roboto-Regular.ttf"), 24);
-
+	TSharedRef<STextBlock> LocalTextBlock = SNew(STextBlock)
+																						.MAKECOLOR(FLinearColor::Black, FLinearColor::Green)
+																						.MAKESHADOW_OFFSET(-1, 1)
+																						.MAKEROBOTO(68)
+																						.MAKETEXTBOUND(SAmmoWidget::GetAmmoText);
 	ChildSlot.VAlign(VAlign_Bottom)
-		.HAlign(HAlign_Left)
-			[SNew(SOverlay) + SOverlay::Slot()
-													.VAlign(VAlign_Center)
-													.HAlign(HAlign_Center)[SNew(STextBlock)
-																									 .ShadowColorAndOpacity(FLinearColor::Black)
-																									 .ColorAndOpacity(FLinearColor::Green)
-																									 .ShadowOffset(FIntPoint(-1, 1))
-																									 .Font(ResultFont)
-																									 .Text(this, &SAmmoWidget::GetAmmoText) /* Polling for Ammo updates */
-	]];
+		.HAlign(HAlign_Left)[SNew(SOverlay) + SOverlay::Slot().VAlign(VAlign_Center).HAlign(HAlign_Center)[LocalTextBlock]];
 }
 
 void	SAmmoWidget::SetAmmoText(FText Ammo) { AmmoText = Ammo; }

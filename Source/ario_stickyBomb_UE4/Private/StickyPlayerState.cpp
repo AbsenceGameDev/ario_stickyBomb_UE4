@@ -29,7 +29,14 @@ void	AStickyPlayerState::AddUserScore(float deltaScore) { SetScore(GetScore() + 
 float AStickyPlayerState::GetUserScore() const { return GetScore(); }
 void	AStickyPlayerState::AddKill(int32 Kill) { Kills += Kill; }
 int32 AStickyPlayerState::GetKills() const { return Kills; }
-void	AStickyPlayerState::ChangeKill(int32 AmmoCount) { Ammo += AmmoCount; }
+void	AStickyPlayerState::SetAmmo(int32 AmmoCount)
+{
+	Ammo									= AmmoCount;
+	AStickyHUD* PlayerHud = Cast<AStickyHUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
+	if (PlayerHud) {
+		PlayerHud->UpdateAmmo();
+	}
+}
 int32 AStickyPlayerState::GetAmmo() const { return Ammo; }
 
 /** ======================================== **/
@@ -43,7 +50,9 @@ void AStickyPlayerState::OnRep_Kills()
 void AStickyPlayerState::OnRep_Ammo()
 {
 	AStickyHUD* PlayerHud = Cast<AStickyHUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
-	if (PlayerHud) PlayerHud->UpdateAmmo();
+	if (PlayerHud) {
+		PlayerHud->UpdateAmmo();
+	}
 }
 
 void AStickyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

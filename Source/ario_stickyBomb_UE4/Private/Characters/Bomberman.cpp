@@ -17,9 +17,7 @@
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 // Sets default values
-ABomberman::ABomberman()
-{
-}
+ABomberman::ABomberman() {}
 
 void ABomberman::BeginPlay()
 {
@@ -40,7 +38,8 @@ void ABomberman::SetupPlayerInputComponent(class UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	// Bind fire event
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, StickyGun, &UStickyGunSkeletalComp::TryStartFire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABomberman::TryStartFire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABomberman::TryPickupRound);
 
 	// Bind movement events
 	PlayerInputComponent->BindAxis("MoveForward", this, &ABomberman::MoveForward);

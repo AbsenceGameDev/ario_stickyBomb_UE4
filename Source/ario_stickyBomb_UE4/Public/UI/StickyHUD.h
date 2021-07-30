@@ -4,13 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Helpers/ForwardDecls.h"
+#include "Helpers/Macros.h"
 
 #include <Components/WidgetComponent.h>
 #include <GameFramework/HUD.h>
 
 #include "StickyHUD.generated.h"
-
-#define MAKETEXT(InString) .Text(FText::FromString(InString))
 
 /**
  *

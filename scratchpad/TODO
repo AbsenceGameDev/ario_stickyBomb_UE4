@@ -3,8 +3,8 @@ TODO:
     ✔ Restructure/Reordering decl. and def. @done(21-07-29 12:27)
       Regarding cohesiveness in their placements (Not refactoring).
 
-    ☐ Refactor if needed.
-    ☐ Remove superflous UE_LOGs.
+    ☐ Refactor if needed, try to remove dead code.
+    ✔ Remove superflous UE_LOGs. @done(21-07-30 23:00)
     ☐ Doxygen compatible comment blocks in headers.
     ☐ Generate doxyblock documentation with doxygen.
 
@@ -25,15 +25,15 @@ TODO:
           b. Calculate the Movement on Client and Server (no replication yet)
           c. Let the Server replicate his Movement 
     Networking: Replicate HealthComponent:
-      ☐ -> Make TryHeal(health), OnHeal(health), and OnServerHeal(health) functions.
+      ✔ -> Make Server/client health functions.        @done(21-07-30 21:10)
     Networking: Replicate Timeline Comp. :
-      ✔ -> Crashes when switching CLient in PIE, @done(21-07-29 16:59)
+      ✔ -> Crashes when switching CLient in PIE,       @done(21-07-29 16:59)
         Seemed related to the projectiles Timeline Component when checking the callstack.
 
   COMPONENTS:
     ☐ StickyProjectile: Change Projectile color. 
-    ☐ StickyProjectile: Detect hits on BaseShooter. 
-    ☐ StickyProjectile: Set up collision channels.
+    ✔ StickyProjectile: Detect hits on BaseShooter.    @done(21-07-30 23:00)
+    ✔ StickyProjectile: Set up collision channels.     @done(21-07-30 23:00)
     ☐ StickyProjectile: Broadcast radial damage.
 
 OVERVIEW GOALS:
@@ -53,7 +53,7 @@ OVERVIEW GOALS:
   Components (Replicated):
     ✔ Component: StickyGunSkeletalComp                 @done(21-07-29 07:21)
     ✔ Component: AmmoComp                              @done(21-07-29 07:21)
-    ☐ Component: HealthComp
+    ✔ Component: HealthComp @done(21-07-30 21:10)
 
   Interfaces: 
     ☐ Interface: Events
@@ -62,7 +62,7 @@ OVERVIEW GOALS:
   UI:
     ✔ UI: StickyHUD              (HUD Override)        @done(21-07-29 07:22)
     ✔ UI: SInGameOverlay         (Overlay body)        @done(21-07-29 07:22)
-    ☐ UI: Ammo Widget            (Ammo Counter)
+    ✔ UI: Ammo Widget            (Ammo Counter)        @done(21-07-30 21:10)
     ☐ UI: Health Widget          (Health Counter)
     ✔ UI: SKillsWidget           (Kill Counter)        @done(21-07-29 07:22)
     ✔ UI: SlideInText            (Slides in at kill)   @done(21-07-29 07:22)

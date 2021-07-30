@@ -33,7 +33,7 @@ class ARIO_STICKYBOMB_UE4_API AStickyPlayerState : public APlayerState
 	int32 GetKills() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Ammo")
-	void ChangeKill(int32 AmmoCount);
+	void SetAmmo(int32 AmmoCount);
 
 	UFUNCTION(BlueprintCallable, Category = "Ammo")
 	int32 GetAmmo() const;

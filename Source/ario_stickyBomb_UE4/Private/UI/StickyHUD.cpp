@@ -67,7 +67,7 @@ void AStickyHUD::UpdateTotalKills()
 
 void AStickyHUD::UpdateAmmo()
 {
-	if (!bIsKillWidgetInitialized) {
+	if (!bIsAmmoWidgetInitialized) {
 		return;
 	}
 
@@ -80,6 +80,7 @@ void AStickyHUD::UpdateAmmo()
 	if (PlayerState == nullptr) {
 		return;
 	}
+
 	int32 UpdatedAmmo = PlayerState->GetAmmo();
 
 	AmmoWidget->SetVisibility(EVisibility::Visible);
@@ -133,12 +134,15 @@ void AStickyHUD::InitializeAmmoWidget()
 		return;
 	}
 
-	APlayerController*	OwningPlayerController = this->GetOwningPlayerController();
+	APlayerController* OwningPlayerController = this->GetOwningPlayerController();
+
 	AStickyPlayerState* PlayerState =
 		OwningPlayerController != nullptr ? Cast<AStickyPlayerState>(OwningPlayerController->PlayerState) : nullptr;
 
 	int32 PlayerAmmo = PlayerState != nullptr ? PlayerState->GetAmmo() : 0;
-	FText AmmoUpdate = FText::AsNumber(PlayerAmmo);
+
+	// Will have to rewrite this, just too tired to find the bug right now
+	FText AmmoUpdate = FText::AsNumber(DEFAULT_STICKY_GUN_MAX);
 	AmmoWidget			 = SNew(SAmmoWidget).OwnerHud(this).TextToSet(AmmoUpdate);
 
 	GEngine->GameViewport->AddViewportWidgetContent(SNew(SWeakWidget).PossiblyNullContent(AmmoWidget.ToSharedRef()));

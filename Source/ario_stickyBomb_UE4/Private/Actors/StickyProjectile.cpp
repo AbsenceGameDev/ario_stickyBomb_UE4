@@ -35,17 +35,12 @@ AStickyProjectile::AStickyProjectile()
 /** ============================ **/
 /** Inherited Methods: Overrides **/
 
-#define DEBUG_PRINT_LOC(LogType, Position) \
-	UE_LOG(LogTemp, LogType, TEXT("git commit -S -m \"LOCATION: {%f,%f,%f}!\""), Position.X, Position.Y, Position.Z);
-
 void AStickyProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (StickyTimelineComp != nullptr) {
 		StickyTimelineComp->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
 	}
-
-	DEBUG_PRINT_LOC(Warning, GetActorLocation());
 }
 
 void AStickyProjectile::BeginPlay() { Super::BeginPlay(); }
@@ -53,7 +48,6 @@ void AStickyProjectile::BeginPlay() { Super::BeginPlay(); }
 void AStickyProjectile::LifeSpanExpired()
 {
 	Super::LifeSpanExpired();
-	UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"GOODBYE!\""));
 	OnExplode();
 }
 

@@ -66,6 +66,8 @@ void UStickyGunSkeletalComp::InitStickyGun(ABaseShooter* Caller, FVector LocalGu
 	this->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Ignore);
 
 	GenerateCurve();
+
+	OwningCharacter->TriggerPlayerStateAmmo(3);
 }
 
 void UStickyGunSkeletalComp::TryStartFire() { OnFire(); }
@@ -121,6 +123,11 @@ void UStickyGunSkeletalComp::OnFire()
 	auto LocalProjectileActorPtr = World->SpawnActorDeferred<AStickyProjectile>(
 		ProjectileClass, SpawnTransform, OwningCharacter, OwningCharacter,
 		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding);
+	if (LocalProjectileActorPtr == nullptr) {
+		return;
+	}
+
+	OwningCharacter->TriggerPlayerStateAmmo(LocalAmmoPrev - 1);
 
 	PrepDeferredSpawnProjectile(LocalProjectileActorPtr);
 	FinishSpawnProjectile(LocalProjectileActorPtr, SpawnTransform);
@@ -128,17 +135,12 @@ void UStickyGunSkeletalComp::OnFire()
 
 void UStickyGunSkeletalComp::PrepDeferredSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr)
 {
-	if (LocalProjectileActorPtr == nullptr) {
-		return;
-	}
 	LocalProjectileActorPtr->SetCurve(FloatCurve);
 	LocalProjectileActorPtr->SetMaxPossibleLifetime(100.0f);
 
 	UTimelineComponent* StickyTimelineComp = LocalProjectileActorPtr->GetTimelineComp();
 
 	if (LocalProjectileActorPtr->GetCurve() != nullptr && StickyTimelineComp != nullptr) {
-		UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"GENERATED CURVE PASSED SUCCESSFULLY \""));
-
 		StickyTimelineComp->CreationMethod =
 			EComponentCreationMethod::Native;		 // Indicate it comes from source code, and is native to the actor
 		LocalProjectileActorPtr->GetReplicatedComponents().Add(StickyTimelineComp);		 // Add to array so it gets saved
@@ -166,7 +168,6 @@ void UStickyGunSkeletalComp::PrepDeferredSpawnProjectile(AStickyProjectile* Loca
 		// PlayTimeline();
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"GENERATED CURVE DID NOT PASS SUCCESSFULLY \""));
 }
 
 void UStickyGunSkeletalComp::FinishSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr, FTransform const& SpawnTransform)
@@ -176,7 +177,7 @@ void UStickyGunSkeletalComp::FinishSpawnProjectile(AStickyProjectile* LocalProje
 	}
 	LocalProjectileActorPtr =
 		StaticCast<AStickyProjectile*>(UGameplayStatics::FinishSpawningActor(LocalProjectileActorPtr, SpawnTransform));
-	OwningCharacter->FireGunEffects(this);
+	OwningCharacter->FireGunEffects();
 }
 
 void UStickyGunSkeletalComp::ServerOnFire_Implementation() { OnFire(); }
@@ -189,7 +190,6 @@ bool UStickyGunSkeletalComp::ServerOnFire_Validate() { return true; }
 
 void UStickyGunSkeletalComp::GenerateCurve()
 {
-	UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"CURVE GENERATED!\""));
 	float SignageAlternator = -1.0f;
 	float LocalTimeStep			= 0.0f;
 	float LocalMaxTime			= 8.0f;
@@ -203,11 +203,4 @@ void UStickyGunSkeletalComp::GenerateCurve()
 
 	auto CurveList = FloatCurve->GetCurves();
 	CurveList.Add(FRichCurveEditInfo(GeneratedRichCurve, FName{TEXT("GeneratedRichCurve")}));
-
-	if (GeneratedRichCurve == nullptr) {
-		UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"RICH CURVE NOT PROPERLY GENERATED!\""));
-	}
-	if (FloatCurve == nullptr) {
-		UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"FLOAT CURVE NOT PROPERLY COPIED!\""));
-	}
 }

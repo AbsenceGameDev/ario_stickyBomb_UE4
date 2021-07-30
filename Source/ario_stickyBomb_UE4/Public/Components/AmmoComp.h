@@ -5,6 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "CoreMinimal.h"
 #include "Helpers/ForwardDecls.h"
+#include "Helpers/Macros.h"
 
 #include <Engine/EngineTypes.h>
 
@@ -39,18 +40,9 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 
 	/** =============================== **/
 	/** Public Methods: Inlined Getters **/
-	float GetAmmo() const
-	{
-		return AmmoCount;
-	}
-	bool IsEmpty() const
-	{
-		return bIsEmpty;
-	}
-	bool IsFullClip() const
-	{
-		return AmmoCount >= MaxAmmo;
-	}
+	float GetAmmo() const { return AmmoCount; }
+	bool	IsEmpty() const { return bIsEmpty; }
+	bool	IsFullClip() const { return AmmoCount >= MaxAmmo; }
 
 	/** =============================== **/
 	/** Public Fields: Events/Delegates **/
@@ -80,8 +72,8 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 	bool bIsEmpty;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AmmoComp")
-	int MaxAmmo;
+	int MaxAmmo = DEFAULT_STICKY_GUN_MAX;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Ammo, BlueprintReadOnly, Category = "AmmoComp")
-	int AmmoCount;
+	int AmmoCount = MaxAmmo;
 };
