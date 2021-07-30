@@ -54,13 +54,13 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 	/** =================================== **/
 	/** Protected Methods: Basic properties **/
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMesh* MeshPtr; /** Actual Skeletal Mesh asset */
+	USkeletalMesh* MeshPtr = nullptr; /** Actual Skeletal Mesh asset */
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	FVector GunOffset; /** Gun muzzle's offset from the characters location */
 
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class AStickyProjectile> ProjectileClass; /** Projectile class to spawn */
+	TSubclassOf<AStickyProjectile> ProjectileClass; /** Projectile class to spawn */
 
 	/** ========================= **/
 	/** Protected Fields: VFX/SFX **/

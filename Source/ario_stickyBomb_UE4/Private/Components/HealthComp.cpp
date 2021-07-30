@@ -40,27 +40,6 @@ void UHealthComp::BeginPlay()
 
 /** ================================ **/
 /** Public Methods: Client interface **/
-bool UHealthComp::IsFriendly(AActor* LeftActor, AActor* RightActor)
-{
-	/** @todo Make call to server, write a server function for this and and call only the server function from inside the interface */
-	if (LeftActor == nullptr || RightActor == nullptr) {
-		return false;
-	}
-
-	UHealthComp* HealthLeft	 = Cast<UHealthComp>(LeftActor->GetComponentByClass(UHealthComp::StaticClass()));
-	UHealthComp* HealthRight = Cast<UHealthComp>(RightActor->GetComponentByClass(UHealthComp::StaticClass()));
-
-	if (HealthLeft == nullptr || HealthRight == nullptr) {
-		return true;
-	}
-
-	// if (HealthLeft->TeamNumber == HealthRight->TeamNumber){
-	//   return true;
-	// }
-
-	return false;
-}
-
 void UHealthComp::TryHeal(float HealAmount)
 {
 	if (HealAmount <= 0.0f || Health <= 0.0f) {
@@ -105,12 +84,16 @@ void UHealthComp::HandleRadialDamage(
 	AActor* DamagedActor, float Damage, const class UDamageType* DamageType, FVector Origin, FHitResult HitInfo,
 	class AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (Damage <= 0.0f || bIsDead) return;
+	if (Damage <= 0.0f || bIsDead) {
+		return;
+	}
 
 	AController* InstigatorController =
 		DamageCauser && DamageCauser->GetOwner() != nullptr ? DamageCauser->GetOwner()->GetInstigatorController() : nullptr;
 
-	if (DamageCauser && DamageCauser != DamagedActor && IsFriendly(DamagedActor, DamageCauser->GetOwner())) return;
+	if (DamageCauser && DamageCauser != DamagedActor) {
+		return;
+	}
 
 	Health	= FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
 	bIsDead = Health <= 0.0f;
@@ -129,9 +112,6 @@ void UHealthComp::HandleDamageHit(
 	FName BoneName, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser)
 {
 	if (Damage <= 0.0f || bIsDead || DamageCauser == DamagedActor) {
-		return;
-	}
-	if (IsFriendly(DamagedActor, DamageCauser)) {
 		return;
 	}
 

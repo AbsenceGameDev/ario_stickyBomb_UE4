@@ -34,25 +34,16 @@ AStickyGameMode::AStickyGameMode() : Super()
 /** ============================ **/
 /** Inherited Methods: Overrides **/
 
-void AStickyGameMode::StartPlay()
-{
-	Super::StartPlay();
-}
-
-void AStickyGameMode::BeginPlay()
-{
-	Super::BeginPlay();
-}
+void AStickyGameMode::StartPlay() { Super::StartPlay(); }
+void AStickyGameMode::BeginPlay() { Super::BeginPlay(); }
 
 // Tick Runs 60 times per sec / 1 for each frame
 void AStickyGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
 	if (bIsGameOver) {
 		return;
 	}
-
 	if (bHasGameStarted && !IsAnyPlayerAlive()) {
 		GameOver();
 	}
@@ -62,10 +53,11 @@ void AStickyGameMode::Tick(float DeltaSeconds)
 /** Protected Methods: Server/Client Actions **/
 void AStickyGameMode::CheckAnyPlayerAlive()
 {
+	// Switch to timer based perhaps, so players can respawn
 	if (IsAnyPlayerAlive()) {
-		// Switch to timer based perhaps, so players can respawn
 		return;
 	}
+
 	// No player alive
 	GameOver();
 }

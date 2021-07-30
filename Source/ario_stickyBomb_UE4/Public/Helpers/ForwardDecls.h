@@ -17,6 +17,7 @@ class UAnimMontage;
 class USoundBase;
 
 class AStickyProjectile;
+class ABaseShooter;
 
 class UHealthComp;
 class UAmmoComp;
@@ -30,6 +31,7 @@ class SHealthWidget;
 
 /** Forward decl. UI */
 class AStickyHUD;
+class SAmmoWidget;
 class SKillWidget;
 class SSlideInText;
 class SKillContentContainer;

@@ -32,23 +32,13 @@ class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
 	public:
 	/** ================================ **/
 	/** Public Methods: Client interface **/
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "HealthComponent")
-	static bool IsFriendly(AActor* left, AActor* right);
-
 	UFUNCTION(BlueprintCallable, Category = "Heal")
 	void TryHeal(float HealAmount);
 
 	/** ================================ **/
 	/** Public Methods: Inline Getters **/
-	float GetHealth() const
-	{
-		return Health;
-	}
-
-	bool IsDead() const
-	{
-		return bIsDead;
-	}
+	float GetHealth() const { return Health; }
+	bool	IsDead() const { return bIsDead; }
 
 	/** ================================ **/
 	/** Public Fields: Events/Delegates **/

@@ -24,6 +24,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 	virtual void Tick(float DeltaTime) final;
 	virtual void BeginPlay() final;
 	virtual void LifeSpanExpired() final;
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) final;
+	virtual void NotifyActorEndOverlap(AActor* OtherActor) final;
 
 	public:
 	/** =============================== **/
@@ -48,6 +50,9 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 	void SetDamageAmount(float InDamage);
 
 	UFUNCTION()
+	void SetMaxPossibleLifetime(float MaxLifetime);
+
+	UFUNCTION()
 	void SetCurve(UCurveFloat* InCurve);
 
 	UFUNCTION()
@@ -57,7 +62,7 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 	/** Public Methods: Conditionals **/
 
 	UFUNCTION()
-	bool DidPickUp(AActor* OtherActor);
+	bool DidPickup(AActor* OtherActor);
 
 	protected:
 	/** ======================================== **/
@@ -70,6 +75,9 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 
 	UFUNCTION()
 	void OnExplode();
+
+	UFUNCTION()
+	void OnPickup(ABaseShooter* CallerBaseShooterActor);
 
 	/** ========================== **/
 	/** Protected Methods: VFX/SFX **/
@@ -84,22 +92,22 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 	/** Protected Fields: Components **/
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	USphereComponent* CollisionComp;
+	USphereComponent* CollisionComp = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	UProjectileMovementComponent* ProjectileMovement;
+	UProjectileMovementComponent* ProjectileMovement = nullptr;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	UStaticMeshComponent* MeshComponentPtr;
+	UStaticMeshComponent* MeshComponentPtr = nullptr;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	UTimelineComponent* StickyTimelineComp;
+	UTimelineComponent* StickyTimelineComp = nullptr;
 
 	/** ================================== **/
 	/** Protected Fields: Timeline-Members **/
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	UCurveFloat* StickyTimelineCurve;
+	UCurveFloat* StickyTimelineCurve = nullptr;
 
 	UPROPERTY()
 	TEnumAsByte<ETimelineDirection::Type> TimelineDirection = ETimelineDirection::Type::Forward;
@@ -126,6 +134,10 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 	// Projectile damage-radius
 	UPROPERTY(VisibleDefaultsOnly, Category = Damage)
 	float DamageRadius;
+
+	// Projectile damage-radius
+	UPROPERTY(VisibleDefaultsOnly, Category = Interaction)
+	ABaseShooter* AttachedToActor;
 
 	float MaxPossibleLifetime = 8.0f;
 	float MaxCurrentLifetime	= MaxPossibleLifetime;

@@ -32,14 +32,26 @@ class ARIO_STICKYBOMB_UE4_API AStickyPlayerState : public APlayerState
 	UFUNCTION(BlueprintCallable, Category = "Kills")
 	int32 GetKills() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Ammo")
+	void ChangeKill(int32 AmmoCount);
+
+	UFUNCTION(BlueprintCallable, Category = "Ammo")
+	int32 GetAmmo() const;
+
 	protected:
 	/** ======================================== **/
 	/** Protected Methods: Server/Client Actions **/
 	UFUNCTION()
 	void OnRep_Kills();
 
+	UFUNCTION()
+	void OnRep_Ammo();
+
 	/** ================================== **/
 	/** Protected Fields: Basic properties **/
 	UPROPERTY(ReplicatedUsing = OnRep_Kills, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Kills")
 	int32 Kills;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Ammo, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Ammo")
+	int32 Ammo;
 };

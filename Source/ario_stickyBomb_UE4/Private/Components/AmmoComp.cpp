@@ -39,15 +39,9 @@ void UAmmoComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 /** ================================ **/
 /** Public Methods: Client interface **/
 
-void UAmmoComp::TryFire()
-{
-	OnFire();
-}
+void UAmmoComp::TryFire() { OnFire(); }
 
-void UAmmoComp::TryPickupRound()
-{
-	OnFire();
-}
+void UAmmoComp::TryPickupRound() { OnPickupRound(); }
 
 /** ======================================== **/
 /** Protected Methods: Client/Server actions **/
@@ -85,10 +79,7 @@ void UAmmoComp::ServerOnFire_Implementation()
 }
 
 // intended for anti-cheat, validates code
-bool UAmmoComp::ServerOnFire_Validate()
-{
-	return true;
-}
+bool UAmmoComp::ServerOnFire_Validate() { return true; }
 
 void UAmmoComp::OnPickupRound()
 {
@@ -109,15 +100,9 @@ void UAmmoComp::OnPickupRound()
 	// OnAmmoChanged.Broadcast(this, AmmoCount, RoundsOfAmmo, nullptr);
 }
 
-void UAmmoComp::ServerOnPickupRound_Implementation()
-{
-	OnPickupRound();
-}
+void UAmmoComp::ServerOnPickupRound_Implementation() { OnPickupRound(); }
 
-bool UAmmoComp::ServerOnPickupRound_Validate()
-{
-	return true;
-}
+bool UAmmoComp::ServerOnPickupRound_Validate() { return true; }
 
 void UAmmoComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

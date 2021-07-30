@@ -5,6 +5,7 @@
 #include "Components/AmmoComp.h"
 #include "Components/HealthComp.h"
 #include "Components/StickyGunSkeletalComp.h"
+#include "Helpers/CollisionChannels.h"
 
 #include <Animation/AnimInstance.h>
 #include <Camera/CameraComponent.h>
@@ -32,6 +33,9 @@ ABaseShooter::ABaseShooter()
 	InitActorComponents();
 	SetupStickyGun();
 
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Ignore);
+	MeshPtr->SetCollisionObjectType(ECC_CharacterMesh);
+	MeshPtr->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Block);
 	// set our turn rates for input
 	BaseTurnRate	 = 45.f;
 	BaseLookUpRate = 45.f;

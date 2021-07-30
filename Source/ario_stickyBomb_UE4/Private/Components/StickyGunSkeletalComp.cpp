@@ -4,6 +4,7 @@
 
 #include "Actors/StickyProjectile.h"
 #include "Components/AmmoComp.h"
+#include "Helpers/CollisionChannels.h"
 
 #include <Components/SkeletalMeshComponent.h>
 #include <Kismet/GameplayStatics.h>
@@ -61,6 +62,9 @@ void UStickyGunSkeletalComp::InitStickyGun(ABaseShooter* Caller, FVector LocalGu
 	}
 
 	GunOffset = LocalGunOffset;
+	this->SetCollisionObjectType(ECC_StickyGun);
+	this->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Ignore);
+
 	GenerateCurve();
 }
 
@@ -118,13 +122,6 @@ void UStickyGunSkeletalComp::OnFire()
 		ProjectileClass, SpawnTransform, OwningCharacter, OwningCharacter,
 		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding);
 
-	// if (LocalProjectileActorPtr != nullptr) {		 // If did spawn
-	// 	LocalProjectileActorPtr->SetCurve(FloatCurve);
-	// 	LocalProjectileActorPtr =
-	// 		StaticCast<AStickyProjectile*>(UGameplayStatics::FinishSpawningActor(LocalProjectileActorPtr, SpawnTransform));
-	// 	OwningCharacter->FireGunEffects(this);
-	// }
-
 	PrepDeferredSpawnProjectile(LocalProjectileActorPtr);
 	FinishSpawnProjectile(LocalProjectileActorPtr, SpawnTransform);
 }
@@ -135,6 +132,7 @@ void UStickyGunSkeletalComp::PrepDeferredSpawnProjectile(AStickyProjectile* Loca
 		return;
 	}
 	LocalProjectileActorPtr->SetCurve(FloatCurve);
+	LocalProjectileActorPtr->SetMaxPossibleLifetime(100.0f);
 
 	UTimelineComponent* StickyTimelineComp = LocalProjectileActorPtr->GetTimelineComp();
 

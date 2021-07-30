@@ -10,6 +10,8 @@
 
 #include "StickyHUD.generated.h"
 
+#define MAKETEXT(InString) .Text(FText::FromString(InString))
+
 /**
  *
  */
@@ -36,8 +38,12 @@ class ARIO_STICKYBOMB_UE4_API AStickyHUD : public AHUD
 	UFUNCTION(BlueprintCallable, Category = "UIActions")
 	void UpdateTotalKills();
 
-	// UFUNCTION()
-	// void UpdateAmmoWidget(int AmmoCount);
+	/**
+	 * @brief Reflect value to textbox
+	 * @details Reflects value from ABaseShooter->StickyGun->AmmoComp->GetAmmoCount(),e
+	 **/
+	UFUNCTION(BlueprintCallable, Category = "UIActions")
+	void UpdateAmmo();
 
 	void ToggleGameMenu();
 	// void AppendReloadPrompt();
@@ -48,17 +54,20 @@ class ARIO_STICKYBOMB_UE4_API AStickyHUD : public AHUD
 	/** Protected Methods: Init Widgets **/
 	void InitializeKillOverlayWidget();
 	void InitializeTotalKillsWidget();
-	// void InitializeAmmoWidget();
+	void InitializeAmmoWidget();
 
 	/** ========================= **/
 	/** Protected Fields: Widgets **/
 	TSharedPtr<SKillWidget>						TotalKillsWidget;
+	TSharedPtr<SAmmoWidget>						AmmoWidget;
 	TSharedPtr<SSlideInText>					OverlayMenu;
 	TSharedPtr<SKillContentContainer> KillList;
+	TSharedPtr<AStickyHUD>						StickyHUD;
 
 	/** ================================== **/
 	/** Protected Fields: Basic properties **/
 	bool bIsTitleVisible;
-	bool bisKillWidgetInitialized;
-	bool bisOverlayMenuVisible;
+	bool bIsKillWidgetInitialized;
+	bool bIsAmmoWidgetInitialized;
+	bool bIsOverlayMenuVisible;
 };

@@ -7,7 +7,7 @@ Everything should be in C++, with variables (if and where necessary) exposed in 
 * Use the UE4 first person shooter template
 
 * The default weapon should shoot exactly where you are aiming at
-  Conclusion -- Linetrace, no projectile class (Maybe? not sure)
+  Conclusion -- Projectile class with moon gravity
 
 * The player starts with 3 ammo
     * Ammo count should be visible on screen (UI)

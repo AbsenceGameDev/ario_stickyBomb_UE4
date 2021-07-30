@@ -6,6 +6,7 @@
 #include "Components/AmmoComp.h"
 #include "Components/HealthComp.h"
 #include "Components/StickyGunSkeletalComp.h"
+#include "Helpers/CollisionChannels.h"
 #include "Helpers/Macros.h"
 
 #include <Components/SphereComponent.h>
@@ -21,7 +22,7 @@ AStickyProjectile::AStickyProjectile()
 	StickyTimelineComp = CreateDefaultSubobject<UTimelineComponent>(TEXT("StickyTimelineComp"));
 
 	// Die after 'MaxCurrentLifetime' seconds by default
-	InitialLifeSpan								= MaxCurrentLifetime;
+	InitialLifeSpan								= MaxCurrentLifetime * 2;
 	PrimaryActorTick.bCanEverTick = true;
 
 	bReplicates = true;		 // Correct procedure for pre-init actors
@@ -34,13 +35,17 @@ AStickyProjectile::AStickyProjectile()
 /** ============================ **/
 /** Inherited Methods: Overrides **/
 
+#define DEBUG_PRINT_LOC(LogType, Position) \
+	UE_LOG(LogTemp, LogType, TEXT("git commit -S -m \"LOCATION: {%f,%f,%f}!\""), Position.X, Position.Y, Position.Z);
+
 void AStickyProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	if (StickyTimelineComp != nullptr) {
 		StickyTimelineComp->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
 	}
+
+	DEBUG_PRINT_LOC(Warning, GetActorLocation());
 }
 
 void AStickyProjectile::BeginPlay() { Super::BeginPlay(); }
@@ -48,7 +53,55 @@ void AStickyProjectile::BeginPlay() { Super::BeginPlay(); }
 void AStickyProjectile::LifeSpanExpired()
 {
 	Super::LifeSpanExpired();
+	UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"GOODBYE!\""));
 	OnExplode();
+}
+
+// Function Only Run On Server = Only Called on Server
+void AStickyProjectile::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	if (GetLocalRole() == ROLE_Authority) {
+		ABaseShooter* CastOtherBaseShooter		= StaticCast<ABaseShooter*>(OtherActor);
+		bool					bSkipAttachedComparison = (AttachedToActor == NULL);
+
+		/** TODO: FIX THIS HORRIBLE NESTED IF */
+		// Attached Player can't pick it up
+		if (bSkipAttachedComparison) {
+			if (CastOtherBaseShooter == NULL) {
+				return;
+			}
+		}
+		else {
+			if ((CastOtherBaseShooter == NULL) || (AttachedToActor == CastOtherBaseShooter)) {
+				return;
+			}
+		}
+
+		/*
+		CastOtherBaseShooter->SetCanPickup(false);
+		CastOtherBaseShooter->SetPickupDelegate(this, OnPickup);
+		Set a delegate in CastOtherBaseShooter, unset the same delegate when EndingOverlap */
+	}
+}
+
+// Function Only Run On Server = Only Called on Server
+void AStickyProjectile::NotifyActorEndOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	if (GetLocalRole() == ROLE_Authority) {
+		ABaseShooter* CastOtherBaseShooter = StaticCast<ABaseShooter*>(OtherActor);
+		if (CastOtherBaseShooter == NULL) {
+			return;
+		}
+
+		/*
+		CastOtherBaseShooter->SetCanPickup(false);
+		CastOtherBaseShooter->UnsetPickupDelegate();
+		Unset delegate and state in CastOtherBaseShooter, the same delegate that was set in BeginOverlap */
+	}
 }
 
 /** =============================== **/
@@ -66,12 +119,13 @@ void	AStickyProjectile::SetDamageRadius(float InRadius) { DamageRadius = InRadiu
 float AStickyProjectile::GetDamageAmount() const { return DamageValue; }
 void	AStickyProjectile::SetDamageAmount(float InDamage) { DamageValue = InDamage; }
 
+void				 AStickyProjectile::SetMaxPossibleLifetime(float MaxLifetime) { MaxPossibleLifetime = MaxLifetime; }
 void				 AStickyProjectile::SetCurve(UCurveFloat* InCurve) { StickyTimelineCurve = InCurve; }
 UCurveFloat* AStickyProjectile::GetCurve() { return StickyTimelineCurve; }
 
 /** ============================ **/
 /** Public Methods: Conditionals **/
-bool AStickyProjectile::DidPickUp(AActor* OtherActor)
+bool AStickyProjectile::DidPickup(AActor* OtherActor)
 {
 	if (OtherActor != nullptr) {
 		auto BaseCharacter = StaticCast<ABaseShooter*>(OtherActor);
@@ -103,24 +157,38 @@ void AStickyProjectile::OnHit(
 	if (GetLocalRole() != ROLE_Authority) {
 		return;
 	}
+
 	// Only add impulse and attach projectile if we hit a player/character that is not the object causing the hit
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr)) {
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-		auto* CastOtherBaseShooter = StaticCast<ABaseShooter*>(OtherActor);
-		auto* CastOwnerBaseShooter = StaticCast<ABaseShooter*>(this->GetOwner());
+		USkeletalMeshComponent* CastOtherSkelMesh		 = StaticCast<USkeletalMeshComponent*>(OtherComp);
+		ABaseShooter*						CastOtherBaseShooter = StaticCast<ABaseShooter*>(CastOtherSkelMesh->GetOwner());
+		ABaseShooter*						CastOwnerBaseShooter = StaticCast<ABaseShooter*>(this->GetOwner());
 
-		if (CastOwnerBaseShooter == nullptr || CastOtherBaseShooter == nullptr) {
+		// Don't spawn if it doesn't have a owner or if it doesn't hit another ABaseShooter derived char
+		if (CastOtherBaseShooter == NULL || CastOwnerBaseShooter == NULL || CastOtherSkelMesh == NULL) {
 			return;
 		}
-		if (CastOwnerBaseShooter->GetUniqueID() != OtherActor->GetUniqueID()) {
-			bool bLocalIsDead = CastOtherBaseShooter->GetHealthCompPtr()->IsDead();
-			UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"HIT YOU!\""));
-			// Stick to other character skeleton here, at impact point.
-			// AttachToComponent(CastOtherBaseShooter->GetMeshPtr(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
-
-			// Seems to crash the timeline component, not using a timelinecomp seems less errorprone
-			// StickyTimelineComp->SetPlayRate(2.0f);
+		if (CastOwnerBaseShooter->GetUniqueID() == CastOtherBaseShooter->GetUniqueID()) {
+			return;
 		}
+		FAttachmentTransformRules AttachRules =
+			FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::SnapToTarget, false);
+		SetActorEnableCollision(false);
+		ProjectileMovement->LimitVelocity(FVector(0.1f, 0.1f, 0.1f));
+		bool bLocalIsDead = CastOtherBaseShooter->GetHealthCompPtr()->IsDead();
+		UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"HIT BONE: %s!\""), *Hit.BoneName.ToString());
+
+		if (Hit.BoneName.ToString() == FString("None")) {
+			SetActorEnableCollision(true);
+			return;
+		}
+		UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"TRY ATTACH BONE: %s!\""), *Hit.BoneName.ToString());
+		// Stick to other character skeleton here, at impact point.
+		AttachToComponent(CastOtherSkelMesh, AttachRules, Hit.BoneName);
+
+		// Seems to crash the timeline component, not using a timelinecomp seems less errorprone
+		// StickyTimelineComp->SetPlayRate(2.0f);
 	}
 }
 
@@ -132,6 +200,18 @@ void AStickyProjectile::OnExplode()
 			this->GetInstigatorController(), true, ECC_Visibility);
 	}
 	TriggerExplosionFX();
+	Destroy();
+}
+
+void AStickyProjectile::OnPickup(ABaseShooter* CallerBaseShooterActor)
+{
+	/*
+	CallerBaseShooterActor->->SetCanPickup(false);
+	CallerBaseShooterActor->GetAmmoComp()->TryPickupRound();
+	Destroy();
+	Call Ammo Component, add Ammo */
+
+	return;
 }
 
 /** ========================== **/
@@ -186,6 +266,11 @@ void AStickyProjectile::ConstructCollisionComponent()
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 
+	// SetChannel
+	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_StickyGun, ECollisionResponse::ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Block);
+
 	// Set as root component
 	RootComponent = CollisionComp;
 }
@@ -194,6 +279,7 @@ void AStickyProjectile::ConstructProjectileMovementComponent()
 {
 	ProjectileMovement													 = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent				 = CollisionComp;
+	ProjectileMovement->ProjectileGravityScale	 = 0.2f;
 	ProjectileMovement->InitialSpeed						 = 3000.f;
 	ProjectileMovement->MaxSpeed								 = 3000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;

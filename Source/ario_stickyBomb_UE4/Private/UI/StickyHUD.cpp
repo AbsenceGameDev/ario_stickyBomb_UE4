@@ -2,8 +2,10 @@
 
 #include "UI/StickyHUD.h"
 
+#include "Helpers/Macros.h"
 #include "StickyGameMode.h"
 #include "StickyPlayerState.h"
+#include "UI/Widgets/SAmmoWidget.h"
 #include "UI/Widgets/SKillContentContainer.h"
 #include "UI/Widgets/SKillWidget.h"
 #include "UI/Widgets/SSlideInText.h"
@@ -18,84 +20,81 @@ AStickyHUD::AStickyHUD()
 	// HealthWidgetClass = UHealthWidget::StaticClass();
 
 	bIsTitleVisible					 = false;
-	bisKillWidgetInitialized = false;
-	bisOverlayMenuVisible		 = false;
+	bIsKillWidgetInitialized = false;
+	bIsAmmoWidgetInitialized = false;
+	bIsOverlayMenuVisible		 = false;
 }
 
 /** ============================ **/
 /** Inherited Methods: Overrides **/
 
-void AStickyHUD::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-}
+void AStickyHUD::PostInitializeComponents() { Super::PostInitializeComponents(); }
 
 void AStickyHUD::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// if (AmmoWidget == nullptr) {
-	//   AmmoWidget = NewObject<UAmmoWidget>();
-	// }
-	// if (HealthWidget == nullptr) {
-	//   HealthWidget = NewObject<UHealthWidget>();
-	// }
-	// AmmoWidget->InitWidget();
-
 	InitializeTotalKillsWidget();
+	InitializeAmmoWidget();
 	InitializeKillOverlayWidget();
 }
 
-void AStickyHUD::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-void AStickyHUD::DrawHUD()
-{
-	Super::DrawHUD();
-}
+void AStickyHUD::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
+void AStickyHUD::DrawHUD() { Super::DrawHUD(); }
 
 /** ================================ **/
 /** Public Methods: Client interface **/
 
 void AStickyHUD::UpdateTotalKills()
 {
-	if (!bisKillWidgetInitialized) return;
-
+	if (!bIsKillWidgetInitialized) {
+		return;
+	}
 	APlayerController* OwningPlayerController = this->GetOwningPlayerController();
-	if (OwningPlayerController == nullptr) return;
+	if (OwningPlayerController == nullptr) {
+		return;
+	}
 
-	AStickyPlayerState* PlayerState	 = Cast<AStickyPlayerState>(OwningPlayerController->PlayerState);
-	int32								UpdatedKills = PlayerState != nullptr ? PlayerState->GetKills() : -1;
-	if (UpdatedKills == -1) return;
+	AStickyPlayerState* PlayerState = Cast<AStickyPlayerState>(OwningPlayerController->PlayerState);
+	if (PlayerState != nullptr) {
+		return;
+	}
+	int32 UpdatedKills = PlayerState->GetKills();
 
 	TotalKillsWidget->SetVisibility(EVisibility::Visible);
-	FText ScoreUpdate = FText::Format(NSLOCTEXT("GameFlow", "KillNr", "Kills {0}"), FText::AsNumber(UpdatedKills));
+	FText ScoreUpdate = FText::FromString(FString("Kills: ") + FString::FromInt(UpdatedKills));
 	TotalKillsWidget->SetScoreText(ScoreUpdate);
 }
 
-// void AStickyHUD::UpdateAmmoWidget(int AmmoCount)
-// {
-// 	if (AmmoWidget != nullptr) {
-// 	  AmmoWidget->UpdateAmmoCount(AmmoCount);
-// 	}
-// }
+void AStickyHUD::UpdateAmmo()
+{
+	if (!bIsKillWidgetInitialized) {
+		return;
+	}
+
+	APlayerController* OwningPlayerController = this->GetOwningPlayerController();
+	if (OwningPlayerController == nullptr) {
+		return;
+	}
+
+	AStickyPlayerState* PlayerState = Cast<AStickyPlayerState>(OwningPlayerController->PlayerState);
+	if (PlayerState == nullptr) {
+		return;
+	}
+	int32 UpdatedAmmo = PlayerState->GetAmmo();
+
+	AmmoWidget->SetVisibility(EVisibility::Visible);
+	FText AmmoUpdate = FText::AsNumber(UpdatedAmmo);
+	AmmoWidget->SetAmmoText(AmmoUpdate);
+}
 
 void AStickyHUD::ToggleGameMenu()
 {
 	// @todo this will be the game menu to hold all in game inventory, char, weapons
 }
 
-// void AStickyHUD::AppendReloadPrompt()
-// {
-// 	if (AmmoWidget != nullptr) {
-// 	  AmmoWidget->AppendReloadPrompt();
-// 	}
-// }
-
 void AStickyHUD::AddKillToWidget(FString Kill)
 {
-	/* Should be for example: "Erik Killed Enemy #1 */
+	/* Should be for example: "Player_X Killed Player_Y */
 	KillList->AddSlot(Kill);
 }
 
@@ -103,19 +102,21 @@ void AStickyHUD::AddKillToWidget(FString Kill)
 /** Protected Methods: Init Widgets **/
 void AStickyHUD::InitializeTotalKillsWidget()
 {
-	if (bisKillWidgetInitialized) return;
+	if (bIsKillWidgetInitialized) {
+		return;
+	}
 
 	APlayerController*	OwningPlayerController = this->GetOwningPlayerController();
 	AStickyPlayerState* PlayerState =
 		OwningPlayerController != nullptr ? Cast<AStickyPlayerState>(OwningPlayerController->PlayerState) : nullptr;
-	int32 PlayerKills = PlayerState != nullptr ? PlayerState->GetKills() : 0;
 
+	int32 PlayerKills = PlayerState != nullptr ? PlayerState->GetKills() : 0;
 	FText ScoreUpdate = FText::Format(NSLOCTEXT("GameFlow", "KillNr", "Kills {0}"), FText::AsNumber(PlayerKills));
 	TotalKillsWidget	= SNew(SKillWidget).OwnerHud(this).TextToSet(ScoreUpdate);
-	GEngine->GameViewport->AddViewportWidgetContent(SNew(SWeakWidget).PossiblyNullContent(TotalKillsWidget.ToSharedRef()));
-	bisKillWidgetInitialized = true;
 
-	if (PlayerKills == 0) TotalKillsWidget->SetVisibility(EVisibility::Hidden);
+	GEngine->GameViewport->AddViewportWidgetContent(SNew(SWeakWidget).PossiblyNullContent(TotalKillsWidget.ToSharedRef()));
+	TotalKillsWidget->SetVisibility(EVisibility::Visible);
+	bIsKillWidgetInitialized = true;
 }
 
 void AStickyHUD::InitializeKillOverlayWidget()
@@ -124,4 +125,23 @@ void AStickyHUD::InitializeKillOverlayWidget()
 	if (KillList != nullptr) {
 		GEngine->GameViewport->AddViewportWidgetContent(SNew(SWeakWidget).PossiblyNullContent(KillList.ToSharedRef()));
 	}
+}
+
+void AStickyHUD::InitializeAmmoWidget()
+{
+	if (bIsAmmoWidgetInitialized) {
+		return;
+	}
+
+	APlayerController*	OwningPlayerController = this->GetOwningPlayerController();
+	AStickyPlayerState* PlayerState =
+		OwningPlayerController != nullptr ? Cast<AStickyPlayerState>(OwningPlayerController->PlayerState) : nullptr;
+
+	int32 PlayerAmmo = PlayerState != nullptr ? PlayerState->GetAmmo() : 0;
+	FText AmmoUpdate = FText::AsNumber(PlayerAmmo);
+	AmmoWidget			 = SNew(SAmmoWidget).OwnerHud(this).TextToSet(AmmoUpdate);
+
+	GEngine->GameViewport->AddViewportWidgetContent(SNew(SWeakWidget).PossiblyNullContent(AmmoWidget.ToSharedRef()));
+	AmmoWidget->SetVisibility(EVisibility::Visible);
+	bIsAmmoWidgetInitialized = true;
 }

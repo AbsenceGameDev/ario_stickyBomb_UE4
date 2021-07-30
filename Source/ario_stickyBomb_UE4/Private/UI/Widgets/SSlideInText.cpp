@@ -50,7 +50,9 @@ END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 void SSlideInText::TransitionIn()
 {
-	if (CurrentState == EVisibleState::VS_Visible) return;
+	if (CurrentState == EVisibleState::VS_Visible) {
+		return;
+	}
 	this->SetVisibility(EVisibility::Visible);
 	VisibleAnimation.Play(this->AsShared());
 	CurrentState = EVisibleState::VS_Animating_To_Show;
@@ -58,15 +60,14 @@ void SSlideInText::TransitionIn()
 
 void SSlideInText::TransitionOut()
 {
-	if (CurrentState == EVisibleState::VS_Hidden) return;
+	if (CurrentState == EVisibleState::VS_Hidden) {
+		return;
+	}
 	CurrentState = EVisibleState::VS_Animating_To_Hide;
 	FadeAnimation.PlayReverse(this->AsShared());
 }
 
-FVector2D SSlideInText::GetItemScale() const
-{
-	return FVector2D(ScaleCurveX.GetLerp(), ScaleCurveY.GetLerp());
-}
+FVector2D SSlideInText::GetItemScale() const { return FVector2D(ScaleCurveX.GetLerp(), ScaleCurveY.GetLerp()); }
 
 FLinearColor SSlideInText::GetColor() const
 {
