@@ -2,6 +2,7 @@
 
 #include "Characters/BaseShooter.h"
 
+#include "Actors/StickyProjectile.h"
 #include "Components/AmmoComp.h"
 #include "Components/HealthComp.h"
 #include "Components/StickyGunSkeletalComp.h"
@@ -16,6 +17,7 @@
 #include <HeadMountedDisplayFunctionLibrary.h>
 #include <Kismet/GameplayStatics.h>
 #include <MotionControllerComponent.h>
+#include <Net/UnrealNetwork.h>
 #include <UObject/ConstructorHelpers.h>
 #include <XRMotionControllerBase.h>		 // for FXRMotionControllerBase::RightHandSourceId
 
@@ -36,7 +38,7 @@ ABaseShooter::ABaseShooter()
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Ignore);
 	MeshPtr->SetCollisionObjectType(ECC_CharacterMesh);
-	MeshPtr->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Block);
+	MeshPtr->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Overlap);
 	// set our turn rates for input
 	BaseTurnRate	 = 45.f;
 	BaseLookUpRate = 45.f;
@@ -56,6 +58,8 @@ void ABaseShooter::BeginPlay()
 }
 
 void ABaseShooter::SetupPlayerInputComponent(UInputComponent* InputComponent) {}
+void ABaseShooter::BeginInteractItem() { bCanInteract = true; }
+void ABaseShooter::EndInteractItem() { bCanInteract = false; }
 
 /** ======================= **/
 /** Public Methods: Getters **/
@@ -68,8 +72,38 @@ UCameraComponent*				ABaseShooter::GetFirstPersonCameraComponent() { return Firs
 
 /** ======================= **/
 /** Public Methods: Actions **/
+void ABaseShooter::SetClosestInteractItem(AStickyProjectile* PickupActor) { ClosestProjectile = PickupActor; }
 void ABaseShooter::TryStartFire() { StickyGun->TryStartFire(); }
-void ABaseShooter::TryPickupRound() { AmmoComp->TryPickupRound(); }
+void ABaseShooter::TryInteractItem()
+{
+	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"CHECK IF AUTH FOR PICKUP!\""));
+	if (GetLocalRole() < ROLE_Authority) {
+		ServerTryInteractItem();
+	}
+	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"CHECK IF CAN INTERACT NAD PROJECTILE VALID!\""));
+	if (!bCanInteract || ClosestProjectile == NULL) {
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"TRY DIDPICKUP()!\""));
+	if (ClosestProjectile->DidPickup(this)) {
+		UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"SUCCESS DIDPICKUP()!\""));
+		bCanInteract = false;
+	}
+}
+
+/** ====================== **/
+/** Public Methods: UI/HUD **/
+
+void ABaseShooter::TriggerPlayerStateAmmo(int LocalAmmoUpdate)
+{
+	auto LocalPlayerState = StaticCast<AStickyPlayerState*>(GetPlayerState());
+
+	if (LocalPlayerState != NULL) {
+		LocalPlayerState->SetAmmo(LocalAmmoUpdate);
+		return;
+	}
+}
 
 /** ======================= **/
 /** Public Methods: VFX/SFX **/
@@ -94,15 +128,11 @@ void ABaseShooter::FireGunEffects()
 	}
 }
 
-void ABaseShooter::TriggerPlayerStateAmmo(int LocalAmmoUpdate)
-{
-	auto LocalPlayerState = StaticCast<AStickyPlayerState*>(GetPlayerState());
+/** ================================ **/
+/** Protected Methods: Server/Client **/
 
-	if (LocalPlayerState != NULL) {
-		LocalPlayerState->SetAmmo(LocalAmmoUpdate);
-		return;
-	}
-}
+void ABaseShooter::ServerTryInteractItem_Implementation() { TryInteractItem(); }
+bool ABaseShooter::ServerTryInteractItem_Validate() { return true; }
 
 /** ================================== **/
 /** Protected Methods: Component Setup **/
@@ -172,3 +202,21 @@ void ABaseShooter::MoveRight(float Value)
 // calculate delta for this frame from the rate information
 void ABaseShooter::TurnAtRate(float Rate) { AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds()); }
 void ABaseShooter::LookUpAtRate(float Rate) { AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds()); }
+
+void ABaseShooter::CreateNewAxisMapping(FName DesiredAxisName, FKey DesiredAxisKey)
+{
+	const auto AxisMapping = FInputAxisKeyMapping(DesiredAxisName, DesiredAxisKey, 1);
+
+	const UInputSettings* InputSettings = GetDefault<UInputSettings>();
+	((UInputSettings*) InputSettings)->AddAxisMapping(AxisMapping);
+	((UInputSettings*) InputSettings)->SaveKeyMappings();
+}
+
+void ABaseShooter::CreateNewActionMapping(FName DesiredActionName, FKey DesiredActionKey)
+{
+	const auto ActionMapping = FInputActionKeyMapping(DesiredActionName, DesiredActionKey, false, false, false, false);
+
+	const UInputSettings* InputSettings = GetDefault<UInputSettings>();
+	((UInputSettings*) InputSettings)->AddActionMapping(ActionMapping);
+	((UInputSettings*) InputSettings)->SaveKeyMappings();
+}

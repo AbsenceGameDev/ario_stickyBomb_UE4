@@ -8,6 +8,10 @@ TODO:
     ☐ Doxygen compatible comment blocks in headers.
     ☐ Generate doxyblock documentation with doxygen.
 
+  INTERACTION INTERFACE:
+    -> Currently it is a very naive and bugprone implementation, 
+      It is likely that I won't have time to implement something somewhat sophisticated
+
   NETWORKING: 
     Networking: Replicate Movement:
       ☐ -> Pitch is not replicated, should be.

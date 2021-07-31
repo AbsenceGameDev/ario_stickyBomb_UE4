@@ -172,9 +172,6 @@ void UStickyGunSkeletalComp::PrepDeferredSpawnProjectile(AStickyProjectile* Loca
 
 void UStickyGunSkeletalComp::FinishSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr, FTransform const& SpawnTransform)
 {
-	if (LocalProjectileActorPtr == nullptr) {
-		return;
-	}
 	LocalProjectileActorPtr =
 		StaticCast<AStickyProjectile*>(UGameplayStatics::FinishSpawningActor(LocalProjectileActorPtr, SpawnTransform));
 	OwningCharacter->FireGunEffects();

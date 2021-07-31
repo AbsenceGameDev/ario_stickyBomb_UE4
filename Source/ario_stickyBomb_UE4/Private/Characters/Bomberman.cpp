@@ -7,12 +7,16 @@
 #include <Animation/AnimInstance.h>
 #include <Camera/CameraComponent.h>
 #include <Components/CapsuleComponent.h>
-#include <Components/InputComponent.h>
-#include <GameFramework/InputSettings.h>
 #include <HeadMountedDisplayFunctionLibrary.h>
 #include <Kismet/GameplayStatics.h>
 #include <MotionControllerComponent.h>
 #include <XRMotionControllerBase.h>		 // for FXRMotionControllerBase::RightHandSourceId
+
+// Input
+#include <Components/InputComponent.h>
+#include <GameFramework/InputSettings.h>
+#include <GameFramework/PlayerInput.h>
+#include <UObject/UObjectGlobals.h>
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -33,13 +37,16 @@ void ABomberman::SetupPlayerInputComponent(class UInputComponent* PlayerInputCom
 	// set up gameplay key bindings
 	check(PlayerInputComponent);
 
+	// Implemented in parent-class
+	CreateNewActionMapping(FName("Interact"), FKey(FName("F")));
+
 	// Bind jump events
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABomberman::TryStartFire);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABomberman::TryPickupRound);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ABomberman::TryInteractItem);
 
 	// Bind movement events
 	PlayerInputComponent->BindAxis("MoveForward", this, &ABomberman::MoveForward);

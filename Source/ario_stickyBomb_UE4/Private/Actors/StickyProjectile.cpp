@@ -8,6 +8,7 @@
 #include "Components/StickyGunSkeletalComp.h"
 #include "Helpers/CollisionChannels.h"
 #include "Helpers/Macros.h"
+#include "Interfaces/InteractionUOI.h"
 
 #include <Components/SphereComponent.h>
 #include <GameFramework/ProjectileMovementComponent.h>
@@ -55,28 +56,18 @@ void AStickyProjectile::LifeSpanExpired()
 void AStickyProjectile::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
-
+	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"PROJECTILE BEGIN_OVERLAP!\""));
 	if (GetLocalRole() == ROLE_Authority) {
-		ABaseShooter* CastOtherBaseShooter		= StaticCast<ABaseShooter*>(OtherActor);
-		bool					bSkipAttachedComparison = (AttachedToActor == NULL);
+		ABaseShooter* CastOtherBaseShooter = StaticCast<ABaseShooter*>(OtherActor);
 
-		/** TODO: FIX THIS HORRIBLE NESTED IF */
 		// Attached Player can't pick it up
-		if (bSkipAttachedComparison) {
-			if (CastOtherBaseShooter == NULL) {
-				return;
-			}
-		}
-		else {
-			if ((CastOtherBaseShooter == NULL) || (AttachedToActor == CastOtherBaseShooter)) {
-				return;
-			}
+		if ((CastOtherBaseShooter == NULL) || (AttachedToActor == CastOtherBaseShooter)) {
+			return;
 		}
 
-		/*
-		CastOtherBaseShooter->SetCanPickup(false);
-		CastOtherBaseShooter->SetPickupDelegate(this, OnPickup);
-		Set a delegate in CastOtherBaseShooter, unset the same delegate when EndingOverlap */
+		if (CastOtherBaseShooter->GetClass()->ImplementsInterface(UInteractionUOI::StaticClass())) {
+			Cast<IInteractionUOI>(CastOtherBaseShooter)->BeginInteractItem();
+		}
 	}
 }
 
@@ -84,6 +75,7 @@ void AStickyProjectile::NotifyActorBeginOverlap(AActor* OtherActor)
 void AStickyProjectile::NotifyActorEndOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
+	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"PROJECTILE END_OVERLAP!\""));
 
 	if (GetLocalRole() == ROLE_Authority) {
 		ABaseShooter* CastOtherBaseShooter = StaticCast<ABaseShooter*>(OtherActor);
@@ -91,10 +83,9 @@ void AStickyProjectile::NotifyActorEndOverlap(AActor* OtherActor)
 			return;
 		}
 
-		/*
-		CastOtherBaseShooter->SetCanPickup(false);
-		CastOtherBaseShooter->UnsetPickupDelegate();
-		Unset delegate and state in CastOtherBaseShooter, the same delegate that was set in BeginOverlap */
+		if (CastOtherBaseShooter->GetClass()->ImplementsInterface(UInteractionUOI::StaticClass())) {
+			Cast<IInteractionUOI>(CastOtherBaseShooter)->EndInteractItem();
+		}
 	}
 }
 
@@ -121,16 +112,20 @@ UCurveFloat* AStickyProjectile::GetCurve() { return StickyTimelineCurve; }
 /** Public Methods: Conditionals **/
 bool AStickyProjectile::DidPickup(AActor* OtherActor)
 {
-	if (OtherActor != nullptr) {
+	if (GetLocalRole() == ROLE_Authority) {
 		auto BaseCharacter = StaticCast<ABaseShooter*>(OtherActor);
-		// TODO: MAKE ABaseShooter::GetStickyGunPtr , StickyGun::GetAmmoCompPtr
-		UAmmoComp* AmmoCompPtr = BaseCharacter->GetStickyGunPtr()->GetAmmoCompPtr();
+		if (BaseCharacter != NULL) {
+			UAmmoComp* AmmoCompPtr = BaseCharacter->GetStickyGunPtr()->GetAmmoCompPtr();
 
-		// Destroy projectile if ammo can be picked up
-		if (!AmmoCompPtr->IsFullClip()) {
-			AmmoCompPtr->TryPickupRound();
-			Destroy();
-			return true;
+			// Destroy projectile if ammo can be picked up
+			if (!AmmoCompPtr->IsFullClip()) {
+				AmmoCompPtr->TryPickupRound();
+
+				// Maybe should return a bool on TryPickUpRound?
+				BaseCharacter->TriggerPlayerStateAmmo(AmmoCompPtr->GetAmmo());
+				Destroy();
+				return true;
+			}
 		}
 	}
 	return false;
@@ -263,7 +258,7 @@ void AStickyProjectile::ConstructCollisionComponent()
 	// SetChannel
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(ECC_StickyGun, ECollisionResponse::ECR_Ignore);
-	CollisionComp->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Block);
+	CollisionComp->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Overlap);
 
 	// Set as root component
 	RootComponent = CollisionComp;

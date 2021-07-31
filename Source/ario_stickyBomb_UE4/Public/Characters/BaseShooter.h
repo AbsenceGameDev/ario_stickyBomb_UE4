@@ -4,28 +4,31 @@
 
 #include "CoreMinimal.h"
 #include "Helpers/ForwardDecls.h"
+#include "Interfaces/InteractionUOI.h"
 
 #include <GameFramework/Character.h>
 
 #include "BaseShooter.generated.h"
 
 UCLASS()
-class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter
+class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteractionUOI
 {
 	GENERATED_BODY()
 
 	public:
 	ABaseShooter();
 
+	protected:
 	/** ============================ **/
 	/** Inherited Methods: Overrides **/
-	protected:
 	virtual void BeginPlay();
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+	virtual void BeginInteractItem() override;
+	virtual void EndInteractItem() override;
 
+	public:
 	/** ======================= **/
 	/** Public Methods: Getters **/
-	public:
 	UStickyGunSkeletalComp* GetStickyGunPtr();
 	USkeletalMeshComponent* GetMeshPtr();
 	UHealthComp*						GetHealthCompPtr();
@@ -34,25 +37,34 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter
 
 	/** ======================= **/
 	/** Public Methods: Actions **/
+	void SetClosestInteractItem(AStickyProjectile* PickupActor);
 	void TryStartFire();
-	void TryPickupRound();
+	void TryInteractItem();
+
+	/** ====================== **/
+	/** Public Methods: UI/HUD **/
+	void TriggerPlayerStateAmmo(int LocalAmmoUpdate);
 
 	/** ======================= **/
 	/** Public Methods: VFX/SFX **/
 	void FireGunEffects();
-	void TriggerPlayerStateAmmo(int LocalAmmoUpdate);
+
 	/** =========================== **/
 	/** Public Fields: Rates/Limits **/
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float BaseTurnRate; /** In deg/sec. Other scaling may affect final turn rate. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float BaseLookUpRate; /** In deg/sec. Other scaling may affect final rate. */
 
+	protected:
+	/** ================================= **/
+	/** Protected Methods: Server/Client **/
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerTryInteractItem();
+
 	/** ================================== **/
 	/** Protected Methods: Component Setup **/
-	protected:
 	void InitSkeletalBody();
 	void InitCamera();
 	void InitActorComponents();
@@ -77,6 +89,10 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter
 	 */
 	void LookUpAtRate(float Rate);
 
+	// Move to a inherited controller class perhaps?
+	void CreateNewAxisMapping(FName DesiredAxisName, FKey DesiredAxisKey);
+	void CreateNewActionMapping(FName DesiredActionName, FKey DesiredActionKey);
+
 	/** ============================ **/
 	/** Protected Fields: Components **/
 
@@ -95,4 +111,9 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammo, meta = (AllowPrivateAccess = "true"))
 	UAmmoComp* AmmoComp; /** Generic ammo component */
+
+	/** ================================== **/
+	/** Protected Fields: Basic properties **/
+	AStickyProjectile* ClosestProjectile = nullptr;		 // replace with custom Pickup actor type if I have time
+	bool							 bCanInteract			 = false;
 };
