@@ -1,3 +1,10 @@
+TOP PRIO: 
+  - 1. Finish the Attach on hit Code
+  ✔ 2. Finish the Pickup Actor Code // Remake, press bound Interact button to linetrace camera normal, resulting hit, if has interact interface gets interacted with @done(21-07-31 15:16)
+  ✔ 3. Fix VFX/SFX Not playing @done(21-07-31 04:58)
+  - 4. Replicated pitch from player movement
+  - 5. ordered map of all live players {int ID, ABaseShooter* BaseChar}, fetch correct Character from the map 
+
 TODO:
   GENERAL:
     ✔ Restructure/Reordering decl. and def. @done(21-07-29 12:27)
@@ -16,7 +23,7 @@ TODO:
     Networking: Replicate Movement:
       ☐ -> Pitch is not replicated, should be.
     Networking: Replicate VFX/SFX:          
-      ☐ -> VFX/SFX should be run on client only.  
+      ✔ -> VFX/SFX should be run on client only. @done(21-07-31 04:58) (Multicasted)
     Networking: Replicate ProjectileActor:  
       ☐ -> In OnHit function, Attach to bone of hit character
       ☐ -> Smoothen Movement
@@ -38,7 +45,7 @@ TODO:
     ☐ StickyProjectile: Change Projectile color. 
     ✔ StickyProjectile: Detect hits on BaseShooter.    @done(21-07-30 23:00)
     ✔ StickyProjectile: Set up collision channels.     @done(21-07-30 23:00)
-    ☐ StickyProjectile: Broadcast radial damage.
+    ✔ StickyProjectile: Broadcast radial damage. @done(21-07-31 04:09)
 
 OVERVIEW GOALS:
   General:

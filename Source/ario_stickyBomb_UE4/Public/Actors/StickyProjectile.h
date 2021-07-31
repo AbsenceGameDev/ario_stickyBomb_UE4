@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Helpers/ForwardDecls.h"
+#include "Interfaces/InteractionUOI.h"
 
 #include <Components/TimelineComponent.h>
 #include <GameFramework/Actor.h>
@@ -11,7 +12,7 @@
 #include "StickyProjectile.generated.h"
 
 UCLASS()
-class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
+class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInteractionUOI
 {
 	GENERATED_BODY()
 
@@ -24,8 +25,10 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 	virtual void Tick(float DeltaTime) final;
 	virtual void BeginPlay() final;
 	virtual void LifeSpanExpired() final;
-	virtual void NotifyActorBeginOverlap(AActor* OtherActor) final;
-	virtual void NotifyActorEndOverlap(AActor* OtherActor) final;
+
+	public:
+	virtual void TryInteractItem() override;
+	virtual void EndInteractItem() override;
 
 	public:
 	/** =============================== **/
@@ -137,7 +140,7 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor
 
 	// Projectile damage-radius
 	UPROPERTY(VisibleDefaultsOnly, Category = Interaction)
-	ABaseShooter* AttachedToActor;
+	ABaseShooter* AttachedToActor = nullptr;
 
 	float MaxPossibleLifetime = 8.0f;
 	float MaxCurrentLifetime	= MaxPossibleLifetime;

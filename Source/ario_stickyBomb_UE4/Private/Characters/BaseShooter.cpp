@@ -3,22 +3,30 @@
 #include "Characters/BaseShooter.h"
 
 #include "Actors/StickyProjectile.h"
-#include "Components/AmmoComp.h"
-#include "Components/HealthComp.h"
-#include "Components/StickyGunSkeletalComp.h"
 #include "Helpers/CollisionChannels.h"
 #include "StickyPlayerState.h"
 
-#include <Animation/AnimInstance.h>
+// Components
+#include "Components/AmmoComp.h"
+#include "Components/HealthComp.h"
+#include "Components/StickyGunSkeletalComp.h"
+#include "Components/StickyLinetraceComp.h"
+
+// Engine Component
 #include <Camera/CameraComponent.h>
 #include <Components/CapsuleComponent.h>
 #include <Components/InputComponent.h>
-#include <GameFramework/InputSettings.h>
-#include <HeadMountedDisplayFunctionLibrary.h>
-#include <Kismet/GameplayStatics.h>
 #include <MotionControllerComponent.h>
+
+// Engine Helpers
+#include <Animation/AnimInstance.h>
+#include <GameFramework/InputSettings.h>
+#include <Kismet/GameplayStatics.h>
 #include <Net/UnrealNetwork.h>
 #include <UObject/ConstructorHelpers.h>
+
+// Probabl not needed
+#include <HeadMountedDisplayFunctionLibrary.h>
 #include <XRMotionControllerBase.h>		 // for FXRMotionControllerBase::RightHandSourceId
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
@@ -38,7 +46,7 @@ ABaseShooter::ABaseShooter()
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Ignore);
 	MeshPtr->SetCollisionObjectType(ECC_CharacterMesh);
-	MeshPtr->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Overlap);
+	MeshPtr->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Block);
 	// set our turn rates for input
 	BaseTurnRate	 = 45.f;
 	BaseLookUpRate = 45.f;
@@ -58,39 +66,29 @@ void ABaseShooter::BeginPlay()
 }
 
 void ABaseShooter::SetupPlayerInputComponent(UInputComponent* InputComponent) {}
-void ABaseShooter::BeginInteractItem() { bCanInteract = true; }
-void ABaseShooter::EndInteractItem() { bCanInteract = false; }
+
+void ABaseShooter::TryInteractItem()
+{
+	if (GetLocalRole() < ROLE_Authority) {
+		ServerTryInteractItem();
+		return;
+	}
+	LinetraceComp->SetComponentTickEnabled(true);
+}
+void ABaseShooter::EndInteractItem() { LinetraceComp->SetComponentTickEnabled(false); }
 
 /** ======================= **/
 /** Public Methods: Getters **/
 
-UStickyGunSkeletalComp* ABaseShooter::GetStickyGunPtr() { return StickyGun; }
-USkeletalMeshComponent* ABaseShooter::GetMeshPtr() { return MeshPtr; }
-UHealthComp*						ABaseShooter::GetHealthCompPtr() { return HealthComponent; }
-UAmmoComp*							ABaseShooter::GetAmmoCompPtr() { return AmmoComp; }
+UStickyGunSkeletalComp* ABaseShooter::GetStickyGun() { return StickyGun; }
+USkeletalMeshComponent* ABaseShooter::GetCharMesh() { return MeshPtr; }
+UHealthComp*						ABaseShooter::GetHealthComp() { return HealthComponent; }
+UAmmoComp*							ABaseShooter::GetAmmoComp() { return AmmoComp; }
 UCameraComponent*				ABaseShooter::GetFirstPersonCameraComponent() { return FirstPersonCameraComponent; }
 
 /** ======================= **/
 /** Public Methods: Actions **/
-void ABaseShooter::SetClosestInteractItem(AStickyProjectile* PickupActor) { ClosestProjectile = PickupActor; }
 void ABaseShooter::TryStartFire() { StickyGun->TryStartFire(); }
-void ABaseShooter::TryInteractItem()
-{
-	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"CHECK IF AUTH FOR PICKUP!\""));
-	if (GetLocalRole() < ROLE_Authority) {
-		ServerTryInteractItem();
-	}
-	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"CHECK IF CAN INTERACT NAD PROJECTILE VALID!\""));
-	if (!bCanInteract || ClosestProjectile == NULL) {
-		return;
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"TRY DIDPICKUP()!\""));
-	if (ClosestProjectile->DidPickup(this)) {
-		UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"SUCCESS DIDPICKUP()!\""));
-		bCanInteract = false;
-	}
-}
 
 /** ====================== **/
 /** Public Methods: UI/HUD **/
@@ -105,34 +103,13 @@ void ABaseShooter::TriggerPlayerStateAmmo(int LocalAmmoUpdate)
 	}
 }
 
-/** ======================= **/
-/** Public Methods: VFX/SFX **/
-
-void ABaseShooter::FireGunEffects()
-{
-	USoundBase*		LocalSoundPtr				= StickyGun->GetFireSound();
-	UAnimMontage* LocalAnimMontagePtr = StickyGun->GetFireAnimMontage();
-
-	// try and play the sound if specified
-	if (LocalSoundPtr != nullptr) {
-		UGameplayStatics::PlaySoundAtLocation(this, LocalSoundPtr, GetActorLocation());
-	}
-
-	// try and play a firing animation if specified
-	if (LocalAnimMontagePtr != nullptr) {
-		// Get the animation object for the arms mesh
-		UAnimInstance* AnimInstance = MeshPtr->GetAnimInstance();
-		if (AnimInstance != nullptr) {
-			AnimInstance->Montage_Play(LocalAnimMontagePtr, 1.f);
-		}
-	}
-}
-
 /** ================================ **/
 /** Protected Methods: Server/Client **/
-
 void ABaseShooter::ServerTryInteractItem_Implementation() { TryInteractItem(); }
 bool ABaseShooter::ServerTryInteractItem_Validate() { return true; }
+
+void ABaseShooter::ServerEndInteractItem_Implementation() { EndInteractItem(); }
+bool ABaseShooter::ServerEndInteractItem_Validate() { return true; }
 
 /** ================================== **/
 /** Protected Methods: Component Setup **/
@@ -169,7 +146,11 @@ void ABaseShooter::InitCamera()
 void ABaseShooter::InitActorComponents()
 {
 	HealthComponent = CreateDefaultSubobject<UHealthComp>(TEXT("HealthSystem"));
-	// HealthComponent->InitHealthComponent();
+	LinetraceComp		= CreateDefaultSubobject<UStickyLinetraceComp>(TEXT("LinetraceInteractComponent"));
+
+	LinetraceComp->SetupAttachment(FirstPersonCameraComponent);
+	LinetraceComp->SetComponentTickEnabled(false);
+	// LinetraceComp->SetRelativeLocation(FVector(-39.56f, 1.75f, 64.f));	// Position the same as camera
 }
 
 void ABaseShooter::SetupStickyGun()

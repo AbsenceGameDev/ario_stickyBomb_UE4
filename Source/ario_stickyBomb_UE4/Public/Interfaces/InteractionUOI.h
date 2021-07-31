@@ -25,7 +25,7 @@ class ARIO_STICKYBOMB_UE4_API IInteractionUOI
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 	public:
 	UFUNCTION()
-	virtual void BeginInteractItem() = 0;
+	virtual void TryInteractItem() = 0;
 
 	UFUNCTION()
 	virtual void EndInteractItem() = 0;

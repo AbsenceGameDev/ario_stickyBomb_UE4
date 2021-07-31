@@ -23,31 +23,30 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	/** Inherited Methods: Overrides **/
 	virtual void BeginPlay();
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-	virtual void BeginInteractItem() override;
-	virtual void EndInteractItem() override;
 
 	public:
+	/** ================================== **/
+	/** Interface Methods: IInteractionOUI **/
+	// template <int IDX>
+	// void				 TryInteractItem();
+	virtual void TryInteractItem() override;
+	virtual void EndInteractItem() override;
+
 	/** ======================= **/
 	/** Public Methods: Getters **/
-	UStickyGunSkeletalComp* GetStickyGunPtr();
-	USkeletalMeshComponent* GetMeshPtr();
-	UHealthComp*						GetHealthCompPtr();
-	UAmmoComp*							GetAmmoCompPtr();
+	UStickyGunSkeletalComp* GetStickyGun();
+	USkeletalMeshComponent* GetCharMesh();
+	UHealthComp*						GetHealthComp();
+	UAmmoComp*							GetAmmoComp();
 	UCameraComponent*				GetFirstPersonCameraComponent();
 
 	/** ======================= **/
 	/** Public Methods: Actions **/
-	void SetClosestInteractItem(AStickyProjectile* PickupActor);
 	void TryStartFire();
-	void TryInteractItem();
 
 	/** ====================== **/
 	/** Public Methods: UI/HUD **/
 	void TriggerPlayerStateAmmo(int LocalAmmoUpdate);
-
-	/** ======================= **/
-	/** Public Methods: VFX/SFX **/
-	void FireGunEffects();
 
 	/** =========================== **/
 	/** Public Fields: Rates/Limits **/
@@ -62,6 +61,9 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	/** Protected Methods: Server/Client **/
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTryInteractItem();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerEndInteractItem();
 
 	/** ================================== **/
 	/** Protected Methods: Component Setup **/
@@ -97,20 +99,23 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	/** Protected Fields: Components **/
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* MeshPtr; /** SkelMesh: 1st person view arms */
+	USkeletalMeshComponent* MeshPtr = nullptr; /** SkelMesh: 1st person view arms */
 
 	/** Gun mesh: 1st person view (seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	UStickyGunSkeletalComp* StickyGun; /** SkelMesh: Skeletal Gun mesh */
+	UStickyGunSkeletalComp* StickyGun = nullptr; /** SkelMesh: Skeletal Gun mesh */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FirstPersonCameraComponent; /** First person camera */
+	UCameraComponent* FirstPersonCameraComponent = nullptr; /** First person camera */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-	UHealthComp* HealthComponent; /** Generic health component */
+	UHealthComp* HealthComponent = nullptr; /** Generic health component */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammo, meta = (AllowPrivateAccess = "true"))
-	UAmmoComp* AmmoComp; /** Generic ammo component */
+	UAmmoComp* AmmoComp = nullptr; /** Generic ammo component */
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammo, meta = (AllowPrivateAccess = "true"))
+	UStickyLinetraceComp* LinetraceComp = nullptr; /** Interact detection linetrace comp */
 
 	/** ================================== **/
 	/** Protected Fields: Basic properties **/

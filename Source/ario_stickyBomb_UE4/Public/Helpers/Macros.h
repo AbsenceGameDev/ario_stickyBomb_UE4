@@ -13,7 +13,7 @@
 /**
  * @brief Branchless Arithmetic Clamp
  **/
-#define LL_CLAMP(Value, Min, Max) (0 * (Value < Min)) + (Max * (Value > Max)) + (Value * (Value > Min && Value < Max))
+#define LL_CLAMP(Value, Min, Max) (0 * (Value < Min)) + (Max * (Value > Max)) + (Value * (Value >= Min && Value <= Max))
 
 /**
  * @brief Print Location

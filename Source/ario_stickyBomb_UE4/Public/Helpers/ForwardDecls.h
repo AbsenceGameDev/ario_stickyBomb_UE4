@@ -19,9 +19,11 @@ class USoundBase;
 class AStickyProjectile;
 class ABaseShooter;
 
+/** Components **/
 class UHealthComp;
 class UAmmoComp;
 class UStickyGunSkeletalComp;
+class UStickyLinetraceComp;
 
 /** Forward decl. UI
  * @todo Have not made this widget yet, mid-priority

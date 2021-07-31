@@ -52,42 +52,13 @@ void AStickyProjectile::LifeSpanExpired()
 	OnExplode();
 }
 
-// Function Only Run On Server = Only Called on Server
-void AStickyProjectile::NotifyActorBeginOverlap(AActor* OtherActor)
+void AStickyProjectile::TryInteractItem()
 {
-	Super::NotifyActorBeginOverlap(OtherActor);
-	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"PROJECTILE BEGIN_OVERLAP!\""));
-	if (GetLocalRole() == ROLE_Authority) {
-		ABaseShooter* CastOtherBaseShooter = StaticCast<ABaseShooter*>(OtherActor);
-
-		// Attached Player can't pick it up
-		if ((CastOtherBaseShooter == NULL) || (AttachedToActor == CastOtherBaseShooter)) {
-			return;
-		}
-
-		if (CastOtherBaseShooter->GetClass()->ImplementsInterface(UInteractionUOI::StaticClass())) {
-			Cast<IInteractionUOI>(CastOtherBaseShooter)->BeginInteractItem();
-		}
-	}
+	SetActorEnableCollision(false);
+	SetActorHiddenInGame(false);
+	Destroy();
 }
-
-// Function Only Run On Server = Only Called on Server
-void AStickyProjectile::NotifyActorEndOverlap(AActor* OtherActor)
-{
-	Super::NotifyActorBeginOverlap(OtherActor);
-	UE_LOG(LogTemp, Warning, TEXT("git commit -S -m \"PROJECTILE END_OVERLAP!\""));
-
-	if (GetLocalRole() == ROLE_Authority) {
-		ABaseShooter* CastOtherBaseShooter = StaticCast<ABaseShooter*>(OtherActor);
-		if (CastOtherBaseShooter == NULL) {
-			return;
-		}
-
-		if (CastOtherBaseShooter->GetClass()->ImplementsInterface(UInteractionUOI::StaticClass())) {
-			Cast<IInteractionUOI>(CastOtherBaseShooter)->EndInteractItem();
-		}
-	}
-}
+void AStickyProjectile::EndInteractItem() {}
 
 /** =============================== **/
 /** Public Methods: Getters/Setters **/
@@ -115,7 +86,7 @@ bool AStickyProjectile::DidPickup(AActor* OtherActor)
 	if (GetLocalRole() == ROLE_Authority) {
 		auto BaseCharacter = StaticCast<ABaseShooter*>(OtherActor);
 		if (BaseCharacter != NULL) {
-			UAmmoComp* AmmoCompPtr = BaseCharacter->GetStickyGunPtr()->GetAmmoCompPtr();
+			UAmmoComp* AmmoCompPtr = BaseCharacter->GetStickyGun()->GetAmmoComp();
 
 			// Destroy projectile if ammo can be picked up
 			if (!AmmoCompPtr->IsFullClip()) {
@@ -149,34 +120,31 @@ void AStickyProjectile::OnHit(
 
 	// Only add impulse and attach projectile if we hit a player/character that is not the object causing the hit
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr)) {
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
 		USkeletalMeshComponent* CastOtherSkelMesh		 = StaticCast<USkeletalMeshComponent*>(OtherComp);
 		ABaseShooter*						CastOtherBaseShooter = StaticCast<ABaseShooter*>(CastOtherSkelMesh->GetOwner());
 		ABaseShooter*						CastOwnerBaseShooter = StaticCast<ABaseShooter*>(this->GetOwner());
 
-		// Don't spawn if it doesn't have a owner or if it doesn't hit another ABaseShooter derived char
-		if (CastOtherBaseShooter == NULL || CastOwnerBaseShooter == NULL || CastOtherSkelMesh == NULL) {
+		// Don't attach if it doesn't have a owner or if it doesn't hit another ABaseShooter derived char
+		if (
+			CastOtherBaseShooter == NULL || CastOwnerBaseShooter == NULL || CastOtherSkelMesh == NULL ||
+			(CastOwnerBaseShooter == CastOtherBaseShooter)) {
 			return;
 		}
-		if (CastOwnerBaseShooter->GetUniqueID() == CastOtherBaseShooter->GetUniqueID()) {
-			return;
-		}
+
 		FAttachmentTransformRules AttachRules =
-			FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::SnapToTarget, false);
+			FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::SnapToTarget, true);
 		SetActorEnableCollision(false);
-		ProjectileMovement->LimitVelocity(FVector(0.1f, 0.1f, 0.1f));
-		bool bLocalIsDead = CastOtherBaseShooter->GetHealthCompPtr()->IsDead();
-		UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"HIT BONE: %s!\""), *Hit.BoneName.ToString());
+		bool bLocalIsDead = CastOtherBaseShooter->GetHealthComp()->IsDead();
 
 		if (Hit.BoneName.ToString() == FString("None")) {
 			SetActorEnableCollision(true);
 			return;
 		}
-		UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"TRY ATTACH BONE: %s!\""), *Hit.BoneName.ToString());
+
 		// Stick to other character skeleton here, at impact point.
 		AttachToComponent(CastOtherSkelMesh, AttachRules, Hit.BoneName);
 
-		// Seems to crash the timeline component, not using a timelinecomp seems less errorprone
 		// StickyTimelineComp->SetPlayRate(2.0f);
 	}
 }
@@ -234,7 +202,6 @@ void AStickyProjectile::ModulateColor(const float InterpValue)
 
 void AStickyProjectile::TriggerExplosionFX()
 {
-	UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"COLOR MODULATION: SUCCESS??\""));
 	// Kill or Damage actor, trigger HealthComponent OnDamage
 	// at the very least on any BaseShooter derived character within DamageRadius
 }

@@ -4,17 +4,9 @@
 
 #include "Characters/BaseShooter.h"
 #include "CoreMinimal.h"
+#include "Helpers/ForwardDecls.h"
 
 #include "Bomberman.generated.h"
-
-class UInputComponent;
-class USkeletalMeshComponent;
-class UStickyGunSkeletalComp;
-class USceneComponent;
-class UCameraComponent;
-class UMotionControllerComponent;
-class UAnimMontage;
-class USoundBase;
 
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API ABomberman : public ABaseShooter

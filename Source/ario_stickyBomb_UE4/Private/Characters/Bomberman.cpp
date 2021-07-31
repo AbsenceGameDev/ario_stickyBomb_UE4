@@ -3,6 +3,7 @@
 #include "Characters/Bomberman.h"
 
 #include "Components/StickyGunSkeletalComp.h"
+#include "Interfaces/InteractionUOI.h"
 
 #include <Animation/AnimInstance.h>
 #include <Camera/CameraComponent.h>
@@ -38,7 +39,7 @@ void ABomberman::SetupPlayerInputComponent(class UInputComponent* PlayerInputCom
 	check(PlayerInputComponent);
 
 	// Implemented in parent-class
-	CreateNewActionMapping(FName("Interact"), FKey(FName("F")));
+	CreateNewActionMapping(FName("TryInteract"), FKey(FName("F")));
 
 	// Bind jump events
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
@@ -46,7 +47,10 @@ void ABomberman::SetupPlayerInputComponent(class UInputComponent* PlayerInputCom
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABomberman::TryStartFire);
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ABomberman::TryInteractItem);
+
+	// Bind interact event
+	PlayerInputComponent->BindAction("TryInteract", IE_Pressed, this, &ABomberman::TryInteractItem);
+	PlayerInputComponent->BindAction("TryInteract", IE_Released, this, &ABomberman::EndInteractItem);
 
 	// Bind movement events
 	PlayerInputComponent->BindAxis("MoveForward", this, &ABomberman::MoveForward);

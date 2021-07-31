@@ -32,10 +32,15 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 
 	/** =============================== **/
 	/** Public Methods: Getters/Setters **/
-	UAmmoComp*		GetAmmoCompPtr();
+	UAmmoComp*		GetAmmoComp();
 	ABaseShooter* GetOwningCharacter();
 	USoundBase*		GetFireSound();
 	UAnimMontage* GetFireAnimMontage();
+
+	/** ================================= **/
+	/** Public Methods: Networked VFX/SFX **/
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastFireGunEffects();
 
 	protected:
 	/** ======================================== **/

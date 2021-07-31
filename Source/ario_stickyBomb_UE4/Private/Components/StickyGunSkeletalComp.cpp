@@ -52,7 +52,7 @@ void UStickyGunSkeletalComp::InitStickyGun(ABaseShooter* Caller, FVector LocalGu
 		bDisable = false;
 		SetupAttachment(Caller->GetRootComponent());
 		OwningCharacter = Caller;
-		AmmoComp				= OwningCharacter->GetAmmoCompPtr();
+		AmmoComp				= OwningCharacter->GetAmmoComp();
 	}
 
 	if (MuzzlePlacementComp != nullptr) {
@@ -72,9 +72,29 @@ void UStickyGunSkeletalComp::InitStickyGun(ABaseShooter* Caller, FVector LocalGu
 
 void UStickyGunSkeletalComp::TryStartFire() { OnFire(); }
 
+/** ================================= **/
+/** Public Methods: Networked VFX/SFX **/
+
+void UStickyGunSkeletalComp::MulticastFireGunEffects_Implementation()
+{
+	// try and play the sound if specified
+	if (FireSound != nullptr) {
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetComponentLocation());
+	}
+
+	// try and play a firing animation if specified
+	if (FireAnimation != nullptr) {
+		// Get the animation object for the arms mesh
+		UAnimInstance* AnimInstance = GetAnimInstance();
+		if (AnimInstance != nullptr) {
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
+	}
+}
+
 /** =============================== **/
 /** Public Methods: Getters/Setters **/
-UAmmoComp*		UStickyGunSkeletalComp::GetAmmoCompPtr() { return AmmoComp; }
+UAmmoComp*		UStickyGunSkeletalComp::GetAmmoComp() { return AmmoComp; }
 ABaseShooter* UStickyGunSkeletalComp::GetOwningCharacter() { return OwningCharacter; }
 USoundBase*		UStickyGunSkeletalComp::GetFireSound() { return FireSound; }
 UAnimMontage* UStickyGunSkeletalComp::GetFireAnimMontage() { return FireAnimation; }
@@ -174,7 +194,7 @@ void UStickyGunSkeletalComp::FinishSpawnProjectile(AStickyProjectile* LocalProje
 {
 	LocalProjectileActorPtr =
 		StaticCast<AStickyProjectile*>(UGameplayStatics::FinishSpawningActor(LocalProjectileActorPtr, SpawnTransform));
-	OwningCharacter->FireGunEffects();
+	MulticastFireGunEffects();
 }
 
 void UStickyGunSkeletalComp::ServerOnFire_Implementation() { OnFire(); }

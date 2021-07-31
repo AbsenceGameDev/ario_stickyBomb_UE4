@@ -2,10 +2,12 @@
 
 #include "Components/AmmoComp.h"
 
+#include "Characters/BaseShooter.h"
 #include "Helpers/Macros.h"
 #include "StickyGameMode.h"
 
 #include <Net/UnrealNetwork.h>
+
 
 // Sets default values for this component's properties
 UAmmoComp::UAmmoComp()
@@ -87,6 +89,7 @@ void UAmmoComp::OnPickupRound()
 
 	AmmoCount++;
 	bIsEmpty = (AmmoCount = LL_CLAMP(AmmoCount, 0, MaxAmmo)) < 1;
+	StaticCast<ABaseShooter*>(GetOwner())->TriggerPlayerStateAmmo(AmmoCount);
 
 	// OnAmmoChanged.Broadcast(this, AmmoCount, RoundsOfAmmo, nullptr);
 }
