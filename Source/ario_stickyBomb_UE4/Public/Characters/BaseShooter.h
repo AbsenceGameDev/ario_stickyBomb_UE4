@@ -121,4 +121,5 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	/** Protected Fields: Basic properties **/
 	AStickyProjectile* ClosestProjectile = nullptr;		 // replace with custom Pickup actor type if I have time
 	bool							 bCanInteract			 = false;
+	// AStickyPlayerController* StickyPC					 = nullptr;
 };

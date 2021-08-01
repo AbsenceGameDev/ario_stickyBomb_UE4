@@ -44,17 +44,19 @@ ABaseShooter::ABaseShooter()
 	InitActorComponents();
 	SetupStickyGun();
 
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Visibility, ECollisionResponse::ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Ignore);
 	MeshPtr->SetCollisionObjectType(ECC_CharacterMesh);
 	MeshPtr->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Block);
 	// set our turn rates for input
 	BaseTurnRate	 = 45.f;
 	BaseLookUpRate = 45.f;
+
+	bUseControllerRotationPitch = true;
 }
 
 /** ============================ **/
 /** Inherited Methods: Overrides **/
-
 void ABaseShooter::BeginPlay()
 {
 	// Call the base class
@@ -63,10 +65,11 @@ void ABaseShooter::BeginPlay()
 	// Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	StickyGun->AttachToComponent(MeshPtr, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 	MeshPtr->SetHiddenInGame(false, true);
+	// StickyPC = UGameplayStatics::GetPlayerController(this, 0);
+	//->SetControlRotation();
 }
 
 void ABaseShooter::SetupPlayerInputComponent(UInputComponent* InputComponent) {}
-
 void ABaseShooter::TryInteractItem()
 {
 	if (GetLocalRole() < ROLE_Authority) {
@@ -75,7 +78,14 @@ void ABaseShooter::TryInteractItem()
 	}
 	LinetraceComp->SetComponentTickEnabled(true);
 }
-void ABaseShooter::EndInteractItem() { LinetraceComp->SetComponentTickEnabled(false); }
+void ABaseShooter::EndInteractItem()
+{
+	if (GetLocalRole() < ROLE_Authority) {
+		ServerEndInteractItem();
+		return;
+	}
+	LinetraceComp->SetComponentTickEnabled(false);
+}
 
 /** ======================= **/
 /** Public Methods: Getters **/
@@ -165,7 +175,6 @@ void ABaseShooter::SetupStickyGun()
 
 /** ========================= **/
 /** Protected Methods: Inputs **/
-
 void ABaseShooter::MoveForward(float Value)
 {
 	if (Value != 0.0f) {

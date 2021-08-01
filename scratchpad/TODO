@@ -2,7 +2,7 @@ TOP PRIO:
   - 1. Finish the Attach on hit Code
   ✔ 2. Finish the Pickup Actor Code // Remake, press bound Interact button to linetrace camera normal, resulting hit, if has interact interface gets interacted with @done(21-07-31 15:16)
   ✔ 3. Fix VFX/SFX Not playing @done(21-07-31 04:58)
-  - 4. Replicated pitch from player movement
+  ✔ 4. Replicated pitch from player movement @done(21-08-01 16:23)
   - 5. ordered map of all live players {int ID, ABaseShooter* BaseChar}, fetch correct Character from the map 
 
 TODO:
@@ -21,7 +21,7 @@ TODO:
 
   NETWORKING: 
     Networking: Replicate Movement:
-      ☐ -> Pitch is not replicated, should be.
+      ✔ -> Pitch is not replicated, should be. @done(21-08-01 16:23)
     Networking: Replicate VFX/SFX:          
       ✔ -> VFX/SFX should be run on client only. @done(21-07-31 04:58) (Multicasted)
     Networking: Replicate ProjectileActor:  

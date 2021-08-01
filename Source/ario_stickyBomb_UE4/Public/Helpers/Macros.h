@@ -1,5 +1,7 @@
 #pragma once
 
+// #define STICKY_DEBUG
+
 /**
  * @brief Branchless Numeric If
  **/

@@ -26,8 +26,8 @@ UStickyGunSkeletalComp::UStickyGunSkeletalComp()
 		FireAnimation = AnimMontageObj.Object;
 	}
 
-	GeneratedRichCurve = new FRichCurve();
-	FloatCurve				 = NewObject<UCurveFloat>();
+	// GeneratedRichCurve = new FRichCurve();
+	FloatCurve = NewObject<UCurveFloat>();
 	SetIsReplicatedByDefault(true);
 	SetIsReplicated(true);
 }
@@ -75,9 +75,21 @@ void UStickyGunSkeletalComp::TryStartFire() { OnFire(); }
 /** ================================= **/
 /** Public Methods: Networked VFX/SFX **/
 
-void UStickyGunSkeletalComp::MulticastFireGunEffects_Implementation()
+void UStickyGunSkeletalComp::MulticastFireGunEffects_Implementation(AStickyProjectile* LocalProjectileActorPtr)
 {
+	SuccessFireEffects();
 	// try and play the sound if specified
+	// if (LocalProjectileActorPtr == NULL) {
+	// 	FailFireEffects();
+	// 	return;
+	// }
+	// SuccessFireEffects();
+}
+
+/** ========================== **/
+/** Protected Methods: VFX/SFX **/
+void UStickyGunSkeletalComp::SuccessFireEffects()
+{
 	if (FireSound != nullptr) {
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetComponentLocation());
 	}
@@ -90,6 +102,23 @@ void UStickyGunSkeletalComp::MulticastFireGunEffects_Implementation()
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
+}
+void UStickyGunSkeletalComp::FailFireEffects()
+{
+	UE_LOG(LogTemp, Warning, TEXT("FAILED FIRE FX!"));
+	// if (FireSound != nullptr) {
+	//   // FireSound->
+	// 	UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetComponentLocation());
+	// }
+	//
+	// // try and play a firing animation if specified
+	// if (FireAnimation != nullptr) {
+	// 	// Get the animation object for the arms mesh
+	// 	UAnimInstance* AnimInstance = GetAnimInstance();
+	// 	if (AnimInstance != nullptr) {
+	// 		AnimInstance->Montage_Play(FireAnimation, 1.f);
+	// 	}
+	// }
 }
 
 /** =============================== **/
@@ -116,14 +145,7 @@ void UStickyGunSkeletalComp::OnFire()
 
 	// try and fire a projectile
 	UWorld* const World = GetWorld();
-	if (World == nullptr) {
-		return;
-	}
-
-	int LocalAmmoPrev = AmmoComp->GetAmmo();
-	AmmoComp->TryFire();
-	int LocalAmmoDiff = LocalAmmoPrev - AmmoComp->GetAmmo();
-	if (LocalAmmoDiff == 0) {
+	if (World == nullptr || AmmoComp->IsEmpty()) {
 		return;
 	}
 
@@ -147,10 +169,11 @@ void UStickyGunSkeletalComp::OnFire()
 		return;
 	}
 
-	OwningCharacter->TriggerPlayerStateAmmo(LocalAmmoPrev - 1);
-
 	PrepDeferredSpawnProjectile(LocalProjectileActorPtr);
-	FinishSpawnProjectile(LocalProjectileActorPtr, SpawnTransform);
+	if (FinishSpawnProjectile(LocalProjectileActorPtr, SpawnTransform)) {
+		AmmoComp->TryFire();
+		OwningCharacter->TriggerPlayerStateAmmo(AmmoComp->GetAmmo());
+	}
 }
 
 void UStickyGunSkeletalComp::PrepDeferredSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr)
@@ -161,19 +184,19 @@ void UStickyGunSkeletalComp::PrepDeferredSpawnProjectile(AStickyProjectile* Loca
 	UTimelineComponent* StickyTimelineComp = LocalProjectileActorPtr->GetTimelineComp();
 
 	if (LocalProjectileActorPtr->GetCurve() != nullptr && StickyTimelineComp != nullptr) {
-		StickyTimelineComp->CreationMethod =
-			EComponentCreationMethod::Native;		 // Indicate it comes from source code, and is native to the actor
+		// Indicate it comes from source code, and is native to the actor
+		StickyTimelineComp->CreationMethod = EComponentCreationMethod::Native;
+
 		LocalProjectileActorPtr->GetReplicatedComponents().Add(StickyTimelineComp);		 // Add to array so it gets saved
 		StickyTimelineComp->SetNetAddressable();		// This component has a stable name that can be referenced for replication
 
-		StickyTimelineComp->SetPropertySetObject(
-			LocalProjectileActorPtr);		 // Set which object the timeline should drive properties on
-		StickyTimelineComp->SetDirectionPropertyName(FName("TimelineDirection"));
+		// Set which object the timeline should drive properties on
+		StickyTimelineComp->SetPropertySetObject(LocalProjectileActorPtr);
 
+		StickyTimelineComp->SetDirectionPropertyName(FName("TimelineDirection"));
 		StickyTimelineComp->SetLooping(false);
 		StickyTimelineComp->SetTimelineLength(LocalProjectileActorPtr->GetMaxLifetime());
 		StickyTimelineComp->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
-
 		StickyTimelineComp->SetPlaybackPosition(0.0f, false);
 
 		// Add the float curve to the timeline and connect it to your timelines's interpolation function
@@ -190,11 +213,15 @@ void UStickyGunSkeletalComp::PrepDeferredSpawnProjectile(AStickyProjectile* Loca
 	}
 }
 
-void UStickyGunSkeletalComp::FinishSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr, FTransform const& SpawnTransform)
+bool UStickyGunSkeletalComp::FinishSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr, FTransform const& SpawnTransform)
 {
 	LocalProjectileActorPtr =
 		StaticCast<AStickyProjectile*>(UGameplayStatics::FinishSpawningActor(LocalProjectileActorPtr, SpawnTransform));
-	MulticastFireGunEffects();
+	if (IsValid(LocalProjectileActorPtr)) {
+		MulticastFireGunEffects(LocalProjectileActorPtr);
+		return true;
+	}
+	return false;
 }
 
 void UStickyGunSkeletalComp::ServerOnFire_Implementation() { OnFire(); }
@@ -212,12 +239,12 @@ void UStickyGunSkeletalComp::GenerateCurve()
 	float LocalMaxTime			= 8.0f;
 	float LocalValue				= 0.0f;		 // Clamp between [ -1, +1 ]
 	for (; LocalTimeStep < LocalMaxTime;) {
-		GeneratedRichCurve->AddKey(LocalTimeStep, LocalValue);
+		GeneratedRichCurve.AddKey(LocalTimeStep, LocalValue);
 		LocalTimeStep += 0.05f;
 		SignageAlternator *= -1.0f;
 		LocalValue = SignageAlternator * (LocalTimeStep / LocalMaxTime);
 	}
 
 	auto CurveList = FloatCurve->GetCurves();
-	CurveList.Add(FRichCurveEditInfo(GeneratedRichCurve, FName{TEXT("GeneratedRichCurve")}));
+	CurveList.Add(FRichCurveEditInfo(&GeneratedRichCurve, FName{TEXT("GeneratedRichCurve")}));
 }

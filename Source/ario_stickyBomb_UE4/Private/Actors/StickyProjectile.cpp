@@ -39,9 +39,9 @@ AStickyProjectile::AStickyProjectile()
 void AStickyProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (StickyTimelineComp != nullptr) {
-		StickyTimelineComp->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
-	}
+	// if (StickyTimelineComp != nullptr) {
+	// 	StickyTimelineComp->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	// }
 }
 
 void AStickyProjectile::BeginPlay() { Super::BeginPlay(); }
@@ -104,12 +104,7 @@ bool AStickyProjectile::DidPickup(AActor* OtherActor)
 
 /** ================================= **/
 /** Protected Methods: Actions/Events **/
-void AStickyProjectile::PlayTimeline()
-{
-	if (StickyTimelineComp != nullptr) {
-		StickyTimelineComp->PlayFromStart();
-	}
-}
+void AStickyProjectile::PlayTimeline() {}
 
 void AStickyProjectile::OnHit(
 	UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -118,8 +113,8 @@ void AStickyProjectile::OnHit(
 		return;
 	}
 
-	// Only add impulse and attach projectile if we hit a player/character that is not the object causing the hit
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr)) {
+		SetActorEnableCollision(false);
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
 		USkeletalMeshComponent* CastOtherSkelMesh		 = StaticCast<USkeletalMeshComponent*>(OtherComp);
 		ABaseShooter*						CastOtherBaseShooter = StaticCast<ABaseShooter*>(CastOtherSkelMesh->GetOwner());
@@ -129,21 +124,24 @@ void AStickyProjectile::OnHit(
 		if (
 			CastOtherBaseShooter == NULL || CastOwnerBaseShooter == NULL || CastOtherSkelMesh == NULL ||
 			(CastOwnerBaseShooter == CastOtherBaseShooter)) {
+			SetActorEnableCollision(true);
 			return;
 		}
 
 		FAttachmentTransformRules AttachRules =
 			FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::SnapToTarget, true);
-		SetActorEnableCollision(false);
-		bool bLocalIsDead = CastOtherBaseShooter->GetHealthComp()->IsDead();
+		// bool bLocalIsDead = CastOtherBaseShooter->GetHealthComp()->IsDead();
 
 		if (Hit.BoneName.ToString() == FString("None")) {
 			SetActorEnableCollision(true);
 			return;
 		}
-
+		SetActorTickEnabled(false);
+		ProjectileMovement->ClearPendingForce(true);
+		ProjectileMovement->StopSimulating(Hit);
 		// Stick to other character skeleton here, at impact point.
-		AttachToComponent(CastOtherSkelMesh, AttachRules, Hit.BoneName);
+		AttachToActor(CastOtherBaseShooter, AttachRules, Hit.BoneName);
+		return;
 
 		// StickyTimelineComp->SetPlayRate(2.0f);
 	}
@@ -225,7 +223,7 @@ void AStickyProjectile::ConstructCollisionComponent()
 	// SetChannel
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(ECC_StickyGun, ECollisionResponse::ECR_Ignore);
-	CollisionComp->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Overlap);
+	CollisionComp->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Block);
 
 	// Set as root component
 	RootComponent = CollisionComp;
@@ -233,13 +231,14 @@ void AStickyProjectile::ConstructCollisionComponent()
 
 void AStickyProjectile::ConstructProjectileMovementComponent()
 {
-	ProjectileMovement													 = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
-	ProjectileMovement->UpdatedComponent				 = CollisionComp;
-	ProjectileMovement->ProjectileGravityScale	 = 0.2f;
-	ProjectileMovement->InitialSpeed						 = 3000.f;
-	ProjectileMovement->MaxSpeed								 = 3000.f;
-	ProjectileMovement->bRotationFollowsVelocity = true;
-	ProjectileMovement->bShouldBounce						 = true;
+	ProjectileMovement															= CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
+	ProjectileMovement->UpdatedComponent						= CollisionComp;
+	ProjectileMovement->ProjectileGravityScale			= 0.2f;
+	ProjectileMovement->InitialSpeed								= 3000.f;
+	ProjectileMovement->MaxSpeed										= 3000.f;
+	ProjectileMovement->bRotationFollowsVelocity		= true;
+	ProjectileMovement->bShouldBounce								= true;
+	ProjectileMovement->bAutoUpdateTickRegistration = true;
 }
 
 void AStickyProjectile::ConstructStaticMeshComponent()

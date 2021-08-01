@@ -5,6 +5,7 @@
 #include "Characters/Bomberman.h"
 #include "Components/AmmoComp.h"
 #include "Components/HealthComp.h"
+#include "StickyPlayerController.h"
 #include "StickyPlayerState.h"
 #include "UI/StickyHUD.h"
 
@@ -15,11 +16,13 @@
 #include <UObject/ConstructorHelpers.h>
 #include <Widgets/DeclarativeSyntaxSupport.h>
 
+
 AStickyGameMode::AStickyGameMode() : Super()
 {
 	// set default pawn class to our ABomberman
-	DefaultPawnClass = ABomberman::StaticClass();
-	PlayerStateClass = AStickyPlayerState::StaticClass();
+	DefaultPawnClass			= ABomberman::StaticClass();
+	PlayerStateClass			= AStickyPlayerState::StaticClass();
+	PlayerControllerClass = AStickyPlayerController::StaticClass();
 
 	// use our custom HUD class
 	HUDClass = AStickyHUD::StaticClass();

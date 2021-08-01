@@ -40,9 +40,14 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 	/** ================================= **/
 	/** Public Methods: Networked VFX/SFX **/
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastFireGunEffects();
+	void MulticastFireGunEffects(AStickyProjectile* LocalProjectileActorPtr);
 
 	protected:
+	/** ========================== **/
+	/** Protected Methods: VFX/SFX **/
+	void SuccessFireEffects();
+	void FailFireEffects();
+
 	/** ======================================== **/
 	/** Protected Methods: Client/Server actions **/
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -50,7 +55,7 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 
 	void OnFire();
 	void PrepDeferredSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr);
-	void FinishSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr, FTransform const& SpawnTransform);
+	bool FinishSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr, FTransform const& SpawnTransform);
 
 	/** ================================= **/
 	/** Protected Methods: Client actions **/
@@ -86,7 +91,12 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 	/** ================================== **/
 	/** Protected Fields: Basic Properties **/
 	ABaseShooter* OwningCharacter;
-	UCurveFloat*	FloatCurve;
-	FRichCurve*		GeneratedRichCurve;
-	bool					bDisable = true;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Curves)
+	UCurveFloat* FloatCurve;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Curves)
+	FRichCurve GeneratedRichCurve;
+
+	bool bDisable = true;
 };
