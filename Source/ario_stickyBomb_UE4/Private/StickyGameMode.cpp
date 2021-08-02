@@ -5,6 +5,7 @@
 #include "Characters/Bomberman.h"
 #include "Components/AmmoComp.h"
 #include "Components/HealthComp.h"
+#include "StickyGameState.h"
 #include "StickyPlayerController.h"
 #include "StickyPlayerState.h"
 #include "UI/StickyHUD.h"
@@ -16,12 +17,12 @@
 #include <UObject/ConstructorHelpers.h>
 #include <Widgets/DeclarativeSyntaxSupport.h>
 
-
 AStickyGameMode::AStickyGameMode() : Super()
 {
 	// set default pawn class to our ABomberman
 	DefaultPawnClass			= ABomberman::StaticClass();
 	PlayerStateClass			= AStickyPlayerState::StaticClass();
+	GameStateClass				= AStickyGameState::StaticClass();
 	PlayerControllerClass = AStickyPlayerController::StaticClass();
 
 	// use our custom HUD class
@@ -52,8 +53,60 @@ void AStickyGameMode::Tick(float DeltaSeconds)
 	}
 }
 
+void AStickyGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+	auto NewBaseShooter = StaticCast<ABaseShooter*>(NewPlayer->GetPawn());
+	if (NewBaseShooter) {
+		if (GEngine) {
+			// Register player
+			RegisterNewPlayer(NewBaseShooter);
+		}
+	}
+}
+
+void AStickyGameMode::Logout(AController* ExitingPlayer)
+{
+	Super::Logout(ExitingPlayer);
+	auto ExitingBaseShooter = StaticCast<ABaseShooter*>(ExitingPlayer->GetPawn());
+	if (ExitingBaseShooter) {
+		if (GEngine) {
+			// De-register player
+			DeregisterExitingPlayer(ExitingBaseShooter);
+		}
+	}
+}
+
+ABaseShooter* AStickyGameMode::FindPlayer(int32 LocalPlayerId)
+{
+	int Steps = 0;
+
+	for (auto& PlayerState : GetGameState<AStickyGameState>()->PlayerArray) {
+		int32 _LocalId = PlayerState->GetPlayerId();
+		if (LocalPlayerId == _LocalId) {
+			return PlayerState->GetPawn<ABaseShooter>();
+		}
+
+		Steps++;
+	}
+	return nullptr;
+}
 /** ======================================== **/
 /** Protected Methods: Server/Client Actions **/
+void AStickyGameMode::RegisterNewPlayer(ABaseShooter* NewPlayer)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Player Unique ID on Server: %i"), NewPlayer->GetUniqueID());
+	int Steps = 0;
+	for (auto& PlayerState : GetGameState<AStickyGameState>()->PlayerArray) {
+		UE_LOG(LogTemp, Warning, TEXT("PlayerState#%i PlayerID: %i"), Steps, PlayerState->GetPlayerId());
+		Steps++;
+	}
+	// Access gamestate, do something with player-state array?
+}
+void AStickyGameMode::DeregisterExitingPlayer(ABaseShooter* ExitingPlayer)
+{
+	// Access gamestate, do something with player-state array?
+}
 void AStickyGameMode::CheckAnyPlayerAlive()
 {
 	// Switch to timer based perhaps, so players can respawn

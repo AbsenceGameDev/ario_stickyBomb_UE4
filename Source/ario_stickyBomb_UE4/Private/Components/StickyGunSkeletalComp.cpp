@@ -163,8 +163,7 @@ void UStickyGunSkeletalComp::OnFire()
 
 	// spawn the projectile at the muzzle and passing Curve into spawned projectile
 	auto LocalProjectileActorPtr = World->SpawnActorDeferred<AStickyProjectile>(
-		ProjectileClass, SpawnTransform, OwningCharacter, OwningCharacter,
-		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding);
+		ProjectileClass, SpawnTransform, OwningCharacter, OwningCharacter, ActorSpawnParams.SpawnCollisionHandlingOverride);
 	if (LocalProjectileActorPtr == nullptr) {
 		return;
 	}

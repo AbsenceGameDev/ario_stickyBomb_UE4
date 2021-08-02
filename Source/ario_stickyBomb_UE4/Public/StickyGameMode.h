@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Helpers/ForwardDecls.h"
 
 #include <Delegates/Delegate.h>
 #include <GameFramework/GameModeBase.h>
@@ -29,6 +30,12 @@ class ARIO_STICKYBOMB_UE4_API AStickyGameMode : public AGameModeBase
 	virtual void StartPlay() override;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void Logout(AController* ExitingPlayer) override;
+
+	/** ================================ **/
+	/** Public Methods: Client Interface **/
+	ABaseShooter* FindPlayer(int32 LocalPlayerId);
 
 	/** =============================== **/
 	/** Public Fields: Events/Delegates **/
@@ -41,6 +48,9 @@ class ARIO_STICKYBOMB_UE4_API AStickyGameMode : public AGameModeBase
 	protected:
 	/** ======================================== **/
 	/** Protected Methods: Server/Client Actions **/
+	void RegisterNewPlayer(ABaseShooter* NewPlayer);
+	void DeregisterExitingPlayer(ABaseShooter* ExitingPlayer);
+
 	void CheckAnyPlayerAlive();
 	bool IsAnyPlayerAlive() const;
 	void RestartDeadPlayers();

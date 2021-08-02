@@ -8,7 +8,6 @@
 
 #include <Net/UnrealNetwork.h>
 
-
 // Sets default values for this component's properties
 UAmmoComp::UAmmoComp()
 {
@@ -16,8 +15,8 @@ UAmmoComp::UAmmoComp()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	AmmoCount = MaxAmmo = 3;
-	bIsEmpty						= false;
+	AmmoCount = MaxAmmo;
+	bIsEmpty	= false;
 
 	SetIsReplicatedByDefault(true);
 	SetIsReplicated(true);

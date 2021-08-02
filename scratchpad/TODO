@@ -1,9 +1,14 @@
 TOP PRIO: 
-  - 1. Finish the Attach on hit Code
-  ✔ 2. Finish the Pickup Actor Code // Remake, press bound Interact button to linetrace camera normal, resulting hit, if has interact interface gets interacted with @done(21-07-31 15:16)
-  ✔ 3. Fix VFX/SFX Not playing @done(21-07-31 04:58)
-  ✔ 4. Replicated pitch from player movement @done(21-08-01 16:23)
-  - 5. ordered map of all live players {int ID, ABaseShooter* BaseChar}, fetch correct Character from the map 
+  ✔ 1. Finish the Attach on hit Code @done(21-08-02 16:58) 
+  - 2. ^ Write logic in gamemode to fetch correct UniqueID for any object regarding the client in question. 
+      Clients will view same objects as different due to local UniqueID is not the same as Server,
+      In gamemode, fetch gamestate, and player array? This is an offshoot of 7. in this list.
+
+  ✔ 3. Finish the Pickup Actor Code // Remake, press bound Interact button to linetrace camera normal, resulting hit, if has interact interface gets interacted with @done(21-07-31 15:16)
+  ✔ 4. Fix VFX/SFX Not playing @done(21-07-31 04:58)
+  ✔ 5. Replicated pitch from player movement @done(21-08-01 16:23)
+  - 6. Make sure StickyLineTraceComponent passes a linetrace through the player-capsule
+  - 7. ordered map of all live players {int ID, ABaseShooter* BaseChar}, fetch correct Character from the map 
 
 TODO:
   GENERAL:
@@ -25,7 +30,7 @@ TODO:
     Networking: Replicate VFX/SFX:          
       ✔ -> VFX/SFX should be run on client only. @done(21-07-31 04:58) (Multicasted)
     Networking: Replicate ProjectileActor:  
-      ☐ -> In OnHit function, Attach to bone of hit character
+      ✔ -> In OnHit function, Attach to relative hit-location on character* @done(21-08-02 16:59)
       ☐ -> Smoothen Movement
         1. Set as default to smoothen movement
         Location Quantization: Round to two decimals

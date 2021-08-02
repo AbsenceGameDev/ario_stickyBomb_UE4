@@ -119,6 +119,9 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 
 	/** ================================== **/
 	/** Protected Fields: Basic properties **/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammo, meta = (AllowPrivateAccess = "true"))
+	int PlayerID = 0; /** Interact detection linetrace comp */
+
 	AStickyProjectile* ClosestProjectile = nullptr;		 // replace with custom Pickup actor type if I have time
 	bool							 bCanInteract			 = false;
 	// AStickyPlayerController* StickyPC					 = nullptr;

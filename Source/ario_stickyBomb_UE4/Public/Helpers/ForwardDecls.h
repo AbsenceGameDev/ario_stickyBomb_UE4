@@ -1,5 +1,6 @@
 #pragma once
 
+// Engine classes
 class AController;
 class UDamageType;
 class UPrimitiveComponent;
@@ -16,7 +17,13 @@ class USkeletalMeshComponent;
 class UAnimMontage;
 class USoundBase;
 
+struct FAttachmentTransformRules;
+
+/** Actors **/
 class AStickyProjectile;
+class AStickyGameMode;
+class AStickyGameState;
+class AStickyPlayerState;
 class ABaseShooter;
 
 /** Components **/

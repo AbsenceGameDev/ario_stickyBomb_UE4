@@ -9,6 +9,8 @@
 #include "Helpers/CollisionChannels.h"
 #include "Helpers/Macros.h"
 #include "Interfaces/InteractionUOI.h"
+#include "StickyGameMode.h"
+#include "StickyPlayerState.h"
 
 #include <Components/SphereComponent.h>
 #include <GameFramework/ProjectileMovementComponent.h>
@@ -23,14 +25,17 @@ AStickyProjectile::AStickyProjectile()
 	StickyTimelineComp = CreateDefaultSubobject<UTimelineComponent>(TEXT("StickyTimelineComp"));
 
 	// Die after 'MaxCurrentLifetime' seconds by default
-	InitialLifeSpan								= MaxCurrentLifetime * 2;
-	PrimaryActorTick.bCanEverTick = true;
+	InitialLifeSpan												 = MaxCurrentLifetime * 2;
+	PrimaryActorTick.bCanEverTick					 = true;
+	PrimaryActorTick.bStartWithTickEnabled = false;
+	PrimaryActorTick.TickInterval					 = 1.0f;
 
 	bReplicates = true;		 // Correct procedure for pre-init actors
 	SetActorHiddenInGame(false);
 	SetReplicateMovement(true);
 
-	SetActorTickEnabled(true);
+	// Tick will be disabled at start, enabled when registering hit, disabled after pickup
+	SetActorTickEnabled(false);
 }
 
 /** ============================ **/
@@ -39,12 +44,38 @@ AStickyProjectile::AStickyProjectile()
 void AStickyProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	ProjectileMovement->bShouldBounce = false;
+	ProjectileMovement->ClearPendingForce(true);
+	// ProjectileMovement->StopSimulating(Hit);
+	ProjectileMovement->StopMovementImmediately();
+	ProjectileMovement->ProjectileGravityScale = 0;
+
+	CollisionComp->SetEnableGravity(false);
+	MeshComponentPtr->SetEnableGravity(false);
+
+	// ProjectileMovement->ClearPendingForce(true);
+	// ProjectileMovement->StopMovementImmediately();
+	// ProjectileMovement->ProjectileGravityScale = 0;
+	// CollisionComp->SetEnableGravity(false);
+	// MeshComponentPtr->SetEnableGravity(false);
+
+	// if (AttachedToActor != nullptr) {
+	// 	SetActorTickEnabled(false);
+	// 	SetActorEnableCollision(true);
+	// 	// CollisionComp->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Ignore);
+	// }
+
 	// if (StickyTimelineComp != nullptr) {
 	// 	StickyTimelineComp->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
 	// }
 }
 
-void AStickyProjectile::BeginPlay() { Super::BeginPlay(); }
+void AStickyProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+	CurrentGameMode = StaticCast<AStickyGameMode*>(UGameplayStatics::GetGameMode(this));
+}
 
 void AStickyProjectile::LifeSpanExpired()
 {
@@ -109,10 +140,6 @@ void AStickyProjectile::PlayTimeline() {}
 void AStickyProjectile::OnHit(
 	UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (GetLocalRole() != ROLE_Authority) {
-		return;
-	}
-
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr)) {
 		SetActorEnableCollision(false);
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
@@ -128,24 +155,64 @@ void AStickyProjectile::OnHit(
 			return;
 		}
 
-		FAttachmentTransformRules AttachRules =
-			FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::SnapToTarget, true);
-		// bool bLocalIsDead = CastOtherBaseShooter->GetHealthComp()->IsDead();
-
 		if (Hit.BoneName.ToString() == FString("None")) {
 			SetActorEnableCollision(true);
 			return;
 		}
-		SetActorTickEnabled(false);
+		// SetActorTickEnabled(false);
+		ProjectileMovement->bShouldBounce = false;
 		ProjectileMovement->ClearPendingForce(true);
-		ProjectileMovement->StopSimulating(Hit);
-		// Stick to other character skeleton here, at impact point.
-		AttachToActor(CastOtherBaseShooter, AttachRules, Hit.BoneName);
-		return;
+		// ProjectileMovement->StopSimulating(Hit);
+		ProjectileMovement->StopMovementImmediately();
+		ProjectileMovement->ProjectileGravityScale = 0;
 
+		// ProjectileMovement->UpdatedComponent = nullptr;
+		CollisionComp->SetEnableGravity(false);
+		MeshComponentPtr->SetEnableGravity(false);
+		AttachedToActor = CastOtherBaseShooter;
+		SetActorTickEnabled(true);		// disable again after registering the changes to collision?
+		//
+		// Stick to other character skeleton here, at impact point.
 		// StickyTimelineComp->SetPlayRate(2.0f);
+
+		FAttachmentTransformRules AttachRules =
+			FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+		AttachToActor(AttachedToActor, AttachRules);
+		// MulticastAttachToPlayer(AttachedToActor->GetPlayerState()->GetPlayerId());
+		return;
 	}
 }
+
+// void AStickyProjectile::MulticastAttachToPlayer_Implementation(int32 LocalPlayerId)
+// {
+// 	FAttachmentTransformRules AttachRules =
+// 		FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+//
+// 	ServerFetchPlayer(LocalPlayerId);		 //  have it trigger a callback function
+// 	if (GetLocalRole() == ROLE_Authority) {
+// 		UE_LOG(LogTemp, Warning, TEXT("SERVER: ATTACHED ACTOR ID - %i "), LocalPlayerId);
+// 	}
+// 	else {
+// 		UE_LOG(LogTemp, Warning, TEXT("CLIENT: ATTACHED ACTOR ID - %i "), LocalPlayerId);
+// 	}
+//
+// 	if (AttachedToActor == nullptr && (GetLocalRole() < ROLE_Authority)) {
+// 		UE_LOG(LogTemp, Warning, TEXT("CLIENT FAILED FETCHING ACTOR FROM ID: "), LocalPlayerId);
+// 		return;
+// 	}
+// 	if (AttachedToActor == nullptr && (GetLocalRole() == ROLE_Authority)) {
+// 		UE_LOG(LogTemp, Warning, TEXT("SERVER FAILED FETCHING ACTOR FROM ID: "), LocalPlayerId);
+// 		return;
+// 	}
+//
+// 	AttachToActor(AttachedToActor, AttachRules);
+// }
+//
+// void AStickyProjectile::ServerFetchPlayer_Implementation(int32 LocalPlayerId)
+// {
+// 	AttachedToActor = CurrentGameMode->FindPlayer(LocalPlayerId);
+// }
+// bool AStickyProjectile::ServerFetchPlayer_Validate(int32 LocalPlayerId) { return true; }
 
 void AStickyProjectile::OnExplode()
 {
@@ -168,6 +235,8 @@ void AStickyProjectile::OnPickup(ABaseShooter* CallerBaseShooterActor)
 
 	return;
 }
+
+// void AStickyProjectile::OnRep_TryAttachToActor(ABaseShooter* TryAttachActor) { AttachedToActor = TryAttachActor; }
 
 /** ========================== **/
 /** Protected Methods: VFX/SFX **/
@@ -220,13 +289,19 @@ void AStickyProjectile::ConstructCollisionComponent()
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 
-	// SetChannel
-	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
-	CollisionComp->SetCollisionResponseToChannel(ECC_StickyGun, ECollisionResponse::ECR_Ignore);
-	CollisionComp->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Block);
+	CollisionComp->SetCollisionObjectType(ECC_StickyProjectile);
+	SetCollisionResponses();
 
 	// Set as root component
 	RootComponent = CollisionComp;
+}
+
+void AStickyProjectile::SetCollisionResponses()
+{
+	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_StickyGun, ECollisionResponse::ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_Visibility, ECollisionResponse::ECR_Block);
+	CollisionComp->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Block);
 }
 
 void AStickyProjectile::ConstructProjectileMovementComponent()
@@ -239,7 +314,10 @@ void AStickyProjectile::ConstructProjectileMovementComponent()
 	ProjectileMovement->bRotationFollowsVelocity		= true;
 	ProjectileMovement->bShouldBounce								= true;
 	ProjectileMovement->bAutoUpdateTickRegistration = true;
+	// ProjectileMovement->OnProjectileBounce.AddDynamic(this,&AStickyProjectile::OnBounce);
 }
+
+// AStickyProjectile::OnBounce()
 
 void AStickyProjectile::ConstructStaticMeshComponent()
 {
@@ -262,4 +340,14 @@ void AStickyProjectile::ConstructStaticMeshComponent()
 	}
 	MeshComponentPtr->SetRelativeScale3D(FVector(0.12f, 0.12f, 0.12f));
 	MeshComponentPtr->SetupAttachment(RootComponent);
+
+	// MeshComponentPtr->SetCollisionResponseToChannel(ECC_Visibility, ECollisionResponse::ECR_Ignore);
+}
+
+/*
+ */
+void AStickyProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AStickyProjectile, AttachedToActor);
 }

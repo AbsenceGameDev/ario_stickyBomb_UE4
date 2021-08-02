@@ -56,6 +56,7 @@ void UStickyLinetraceComp::TickComponent(float DeltaTime, ELevelTick TickType, F
 // STICKY_DEBUG is set in Helpers/Macros.h
 #ifdef STICKY_DEBUG
 			UKismetSystemLibrary::DrawDebugLine(WorldPtr, StartPosition, HitResult->Location, FColor(100, 0, 0), true, 0.25f);
+			UKismetSystemLibrary::DrawDebugLine(WorldPtr, StartPosition, HitResult->Location, FColor(100, 0, 0), true, 0.25f);
 			UKismetSystemLibrary::DrawDebugSphere(WorldPtr, HitResult->Location, 25.0f, 12, FColor(100, 0, 0), true, 0.5f);
 #endif
 			return;

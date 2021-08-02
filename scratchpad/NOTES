@@ -72,8 +72,3 @@ Conclusion:
       -- "Press E to Pickup"
       -- "Press H to grab and hold"
 
-
-A little bit of explanation: Basically i replicated the client control rotation to the server and all other clients (except itself) with:
-- "Has Authority" and "Is Locally Controlled" conditions 
-- "ControlRotation_Rep" variable is set to replicated and "Skip Owner"
-because there's no point in replicate the control rotation to its own instance which could cause lagging (jittering) issue :v

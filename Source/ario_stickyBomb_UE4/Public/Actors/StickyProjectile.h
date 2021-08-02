@@ -27,13 +27,13 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInterac
 	virtual void LifeSpanExpired() final;
 
 	public:
+	/** ============================== **/
+	/** Interface Methods: Interaction **/
 	virtual void TryInteractItem() override;
 	virtual void EndInteractItem() override;
 
-	public:
 	/** =============================== **/
 	/** Public Methods: Getters/Setters **/
-
 	float													GetMaxLifetime() const;
 	USphereComponent*							GetCollisionComp() const;
 	UProjectileMovementComponent* GetProjectileMovement() const;
@@ -76,11 +76,19 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInterac
 	void OnHit(
 		UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	// UFUNCTION(NetMulticast, Reliable)
+	// void MulticastAttachToPlayer(int32 LocalPlayerId);
+	// UFUNCTION(Server, Reliable, WithValidation)
+	// void ServerFetchPlayer(int32 LocalPlayerId);
+
 	UFUNCTION()
 	void OnExplode();
 
 	UFUNCTION()
 	void OnPickup(ABaseShooter* CallerBaseShooterActor);
+
+	// UFUNCTION()
+	// void OnRep_TryAttachToActor(ABaseShooter* TryAttachActor);
 
 	/** ========================== **/
 	/** Protected Methods: VFX/SFX **/
@@ -119,6 +127,7 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInterac
 	/** Private Methods: Component Initializers **/
 	private:
 	void ConstructCollisionComponent();
+	void SetCollisionResponses();
 	void ConstructProjectileMovementComponent();
 	void ConstructStaticMeshComponent();
 
@@ -139,8 +148,11 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInterac
 	float DamageRadius;
 
 	// Projectile damage-radius
-	UPROPERTY(VisibleDefaultsOnly, Category = Interaction)
+	UPROPERTY(Replicated /* Using = OnRep_TryAttachToActor */, VisibleDefaultsOnly, Category = Interaction)
 	ABaseShooter* AttachedToActor = nullptr;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Interaction)
+	AStickyGameMode* CurrentGameMode = nullptr;
 
 	float MaxPossibleLifetime = 8.0f;
 	float MaxCurrentLifetime	= MaxPossibleLifetime;
