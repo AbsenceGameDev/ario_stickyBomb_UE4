@@ -8,6 +8,7 @@
 
 #include <Components/TimelineComponent.h>
 #include <GameFramework/Actor.h>
+#include <Templates/SharedPointer.h>
 
 #include "StickyProjectile.generated.h"
 
@@ -70,7 +71,6 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInterac
 	protected:
 	/** ======================================== **/
 	/** Protected Methods: Client/Server actions **/
-	void PlayTimeline();
 
 	UFUNCTION()
 	void OnHit(
@@ -87,12 +87,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInterac
 	UFUNCTION()
 	void OnPickup(ABaseShooter* CallerBaseShooterActor);
 
-	// UFUNCTION()
-	// void OnRep_TryAttachToActor(ABaseShooter* TryAttachActor);
-
 	/** ========================== **/
 	/** Protected Methods: VFX/SFX **/
-
 	UFUNCTION()
 	void ModulateColor(const float InterpValue);
 
@@ -117,8 +113,17 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInterac
 	/** ================================== **/
 	/** Protected Fields: Timeline-Members **/
 
+	// UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	// TSharedPtr<UCurveFloat> StickyTimelineCurve = nullptr;
+
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	UCurveFloat* StickyTimelineCurve = nullptr;
+
+	// Delegate signature for the function which will handle our Finished event.
+	FOnTimelineEvent TimelineFinishedEvent;
+
+	// Delegate signature for the function which will handle our timeline loop.
+	FOnTimelineFloat InterpTimelineEvent;
 
 	UPROPERTY()
 	TEnumAsByte<ETimelineDirection::Type> TimelineDirection = ETimelineDirection::Type::Forward;

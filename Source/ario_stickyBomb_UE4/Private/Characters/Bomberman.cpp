@@ -2,21 +2,25 @@
 
 #include "Characters/Bomberman.h"
 
+// Components
 #include "Components/StickyGunSkeletalComp.h"
 #include "Interfaces/InteractionUOI.h"
 
-#include <Animation/AnimInstance.h>
+// Engine Components
 #include <Camera/CameraComponent.h>
 #include <Components/CapsuleComponent.h>
-#include <HeadMountedDisplayFunctionLibrary.h>
-#include <Kismet/GameplayStatics.h>
-#include <MotionControllerComponent.h>
-#include <XRMotionControllerBase.h>		 // for FXRMotionControllerBase::RightHandSourceId
-
-// Input
 #include <Components/InputComponent.h>
+#include <MotionControllerComponent.h>
+
+// Engine Framework
+#include <Animation/AnimInstance.h>
 #include <GameFramework/InputSettings.h>
 #include <GameFramework/PlayerInput.h>
+#include <HeadMountedDisplayFunctionLibrary.h>
+#include <XRMotionControllerBase.h>		 // for FXRMotionControllerBase::RightHandSourceId
+
+// Engine Helpers
+#include <Kismet/GameplayStatics.h>
 #include <UObject/UObjectGlobals.h>
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);

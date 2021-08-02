@@ -2,20 +2,28 @@
 
 #include "Actors/StickyProjectile.h"
 
+// General
 #include "Characters/BaseShooter.h"
-#include "Components/AmmoComp.h"
-#include "Components/HealthComp.h"
-#include "Components/StickyGunSkeletalComp.h"
-#include "Helpers/CollisionChannels.h"
-#include "Helpers/Macros.h"
 #include "Interfaces/InteractionUOI.h"
 #include "StickyGameMode.h"
 #include "StickyPlayerState.h"
 
-#include <Components/SphereComponent.h>
-#include <GameFramework/ProjectileMovementComponent.h>
+// Component
+#include "Components/AmmoComp.h"
+#include "Components/HealthComp.h"
+#include "Components/StickyGunSkeletalComp.h"
+
+// Helpers
+#include "Helpers/CollisionChannels.h"
+#include "Helpers/Macros.h"
+
+// Engine General
 #include <Kismet/GameplayStatics.h>
 #include <Net/UnrealNetwork.h>
+
+// Engine Components
+#include <Components/SphereComponent.h>
+#include <GameFramework/ProjectileMovementComponent.h>
 
 AStickyProjectile::AStickyProjectile()
 {
@@ -25,9 +33,9 @@ AStickyProjectile::AStickyProjectile()
 	StickyTimelineComp = CreateDefaultSubobject<UTimelineComponent>(TEXT("StickyTimelineComp"));
 
 	// Die after 'MaxCurrentLifetime' seconds by default
-	InitialLifeSpan												 = MaxCurrentLifetime * 2;
+	InitialLifeSpan												 = MaxCurrentLifetime;
 	PrimaryActorTick.bCanEverTick					 = true;
-	PrimaryActorTick.bStartWithTickEnabled = false;
+	PrimaryActorTick.bStartWithTickEnabled = true;
 	PrimaryActorTick.TickInterval					 = 1.0f;
 
 	bReplicates = true;		 // Correct procedure for pre-init actors
@@ -35,7 +43,10 @@ AStickyProjectile::AStickyProjectile()
 	SetReplicateMovement(true);
 
 	// Tick will be disabled at start, enabled when registering hit, disabled after pickup
-	SetActorTickEnabled(false);
+	// SetActorTickEnabled(false);
+
+	InterpTimelineEvent.BindUFunction(this, FName{TEXT("ModulateColor")});
+	TimelineFinishedEvent.BindUFunction(this, FName{TEXT("TriggerExplosionFX")});
 }
 
 /** ============================ **/
@@ -45,36 +56,26 @@ void AStickyProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	ProjectileMovement->bShouldBounce = false;
-	ProjectileMovement->ClearPendingForce(true);
-	// ProjectileMovement->StopSimulating(Hit);
-	ProjectileMovement->StopMovementImmediately();
-	ProjectileMovement->ProjectileGravityScale = 0;
-
-	CollisionComp->SetEnableGravity(false);
-	MeshComponentPtr->SetEnableGravity(false);
-
+	// ProjectileMovement->bShouldBounce = false;
 	// ProjectileMovement->ClearPendingForce(true);
+	// // ProjectileMovement->StopSimulating(Hit);
 	// ProjectileMovement->StopMovementImmediately();
 	// ProjectileMovement->ProjectileGravityScale = 0;
+	//
 	// CollisionComp->SetEnableGravity(false);
 	// MeshComponentPtr->SetEnableGravity(false);
-
-	// if (AttachedToActor != nullptr) {
-	// 	SetActorTickEnabled(false);
-	// 	SetActorEnableCollision(true);
-	// 	// CollisionComp->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Ignore);
-	// }
-
-	// if (StickyTimelineComp != nullptr) {
-	// 	StickyTimelineComp->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
-	// }
 }
 
 void AStickyProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentGameMode = StaticCast<AStickyGameMode*>(UGameplayStatics::GetGameMode(this));
+
+	if (IsValid(StickyTimelineCurve)) {
+		StickyTimelineComp->AddInterpFloat(GetCurve(), InterpTimelineEvent);
+		StickyTimelineComp->SetTimelineFinishedFunc(TimelineFinishedEvent);
+		StickyTimelineComp->PlayFromStart();
+	}
 }
 
 void AStickyProjectile::LifeSpanExpired()
@@ -135,8 +136,6 @@ bool AStickyProjectile::DidPickup(AActor* OtherActor)
 
 /** ================================= **/
 /** Protected Methods: Actions/Events **/
-void AStickyProjectile::PlayTimeline() {}
-
 void AStickyProjectile::OnHit(
 	UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -182,38 +181,6 @@ void AStickyProjectile::OnHit(
 		return;
 	}
 }
-
-// void AStickyProjectile::MulticastAttachToPlayer_Implementation(int32 LocalPlayerId)
-// {
-// 	FAttachmentTransformRules AttachRules =
-// 		FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
-//
-// 	ServerFetchPlayer(LocalPlayerId);		 //  have it trigger a callback function
-// 	if (GetLocalRole() == ROLE_Authority) {
-// 		UE_LOG(LogTemp, Warning, TEXT("SERVER: ATTACHED ACTOR ID - %i "), LocalPlayerId);
-// 	}
-// 	else {
-// 		UE_LOG(LogTemp, Warning, TEXT("CLIENT: ATTACHED ACTOR ID - %i "), LocalPlayerId);
-// 	}
-//
-// 	if (AttachedToActor == nullptr && (GetLocalRole() < ROLE_Authority)) {
-// 		UE_LOG(LogTemp, Warning, TEXT("CLIENT FAILED FETCHING ACTOR FROM ID: "), LocalPlayerId);
-// 		return;
-// 	}
-// 	if (AttachedToActor == nullptr && (GetLocalRole() == ROLE_Authority)) {
-// 		UE_LOG(LogTemp, Warning, TEXT("SERVER FAILED FETCHING ACTOR FROM ID: "), LocalPlayerId);
-// 		return;
-// 	}
-//
-// 	AttachToActor(AttachedToActor, AttachRules);
-// }
-//
-// void AStickyProjectile::ServerFetchPlayer_Implementation(int32 LocalPlayerId)
-// {
-// 	AttachedToActor = CurrentGameMode->FindPlayer(LocalPlayerId);
-// }
-// bool AStickyProjectile::ServerFetchPlayer_Validate(int32 LocalPlayerId) { return true; }
-
 void AStickyProjectile::OnExplode()
 {
 	if (GetLocalRole() == ROLE_Authority) {
@@ -236,19 +203,17 @@ void AStickyProjectile::OnPickup(ABaseShooter* CallerBaseShooterActor)
 	return;
 }
 
-// void AStickyProjectile::OnRep_TryAttachToActor(ABaseShooter* TryAttachActor) { AttachedToActor = TryAttachActor; }
-
 /** ========================== **/
 /** Protected Methods: VFX/SFX **/
 
 void AStickyProjectile::ModulateColor(const float InterpValue)
 {
 	static int TestModulator = 1;		 // Only sets once per object
-	TestModulator *= -1;						 // Flip value
+	// TestModulator *= -1;						 // Flip value
 
 	float TimelinePosition = StickyTimelineComp->GetPlaybackPosition() / MaxPossibleLifetime;
 	auto	Fmodifier				 = StickyTimelineCurve->GetFloatValue(TimelinePosition);
-	auto	ValMod					 = TestModulator + Fmodifier;
+	auto	ValMod					 = Fmodifier;		 // + TestModulator;
 	auto	ColorAdditive		 = (FLinearColor(ValMod, ValMod, ValMod, 0.0f));
 	BaseColor += ColorAdditive;
 	// MeshMaterialInstance->SetVectorParameterValue("DiffuseColor", BaseColor);
@@ -269,6 +234,7 @@ void AStickyProjectile::ModulateColor(const float InterpValue)
 
 void AStickyProjectile::TriggerExplosionFX()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Finished Event Called."));
 	// Kill or Damage actor, trigger HealthComponent OnDamage
 	// at the very least on any BaseShooter derived character within DamageRadius
 }

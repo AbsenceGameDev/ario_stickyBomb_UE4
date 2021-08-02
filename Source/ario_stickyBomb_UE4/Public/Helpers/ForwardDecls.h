@@ -1,19 +1,24 @@
 #pragma once
 
-// Engine classes
-class AController;
-class UDamageType;
+// Engine Components
 class UPrimitiveComponent;
-
 class USphereComponent;
-class UProjectileMovementComponent;
-
 class USceneComponent;
+class UProjectileMovementComponent;
 class UCameraComponent;
 class UInputComponent;
 class UMotionControllerComponent;
-
 class USkeletalMeshComponent;
+class UTimelineComponent;
+
+// Engine event types
+class FOnTimelineEvent;
+class FOnTimelineFloat;
+
+class AController;
+
+class UDamageType;
+
 class UAnimMontage;
 class USoundBase;
 

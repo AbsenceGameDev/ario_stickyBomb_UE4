@@ -2,6 +2,7 @@
 
 #include "Characters/BaseShooter.h"
 
+// General
 #include "Actors/StickyProjectile.h"
 #include "Helpers/CollisionChannels.h"
 #include "StickyPlayerState.h"
@@ -18,14 +19,16 @@
 #include <Components/InputComponent.h>
 #include <MotionControllerComponent.h>
 
-// Engine Helpers
+// Engine Frameworks
 #include <Animation/AnimInstance.h>
 #include <GameFramework/InputSettings.h>
-#include <Kismet/GameplayStatics.h>
 #include <Net/UnrealNetwork.h>
+
+// Engine Helpers
+#include <Kismet/GameplayStatics.h>
 #include <UObject/ConstructorHelpers.h>
 
-// Probabl not needed
+// Probably not needed
 #include <HeadMountedDisplayFunctionLibrary.h>
 #include <XRMotionControllerBase.h>		 // for FXRMotionControllerBase::RightHandSourceId
 

@@ -26,8 +26,8 @@ UStickyGunSkeletalComp::UStickyGunSkeletalComp()
 		FireAnimation = AnimMontageObj.Object;
 	}
 
-	// GeneratedRichCurve = new FRichCurve();
-	FloatCurve = NewObject<UCurveFloat>();
+	GeneratedRichCurve = new FRichCurve();
+	FloatCurve				 = NewObject<UCurveFloat>();
 	SetIsReplicatedByDefault(true);
 	SetIsReplicated(true);
 }
@@ -178,10 +178,8 @@ void UStickyGunSkeletalComp::OnFire()
 void UStickyGunSkeletalComp::PrepDeferredSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr)
 {
 	LocalProjectileActorPtr->SetCurve(FloatCurve);
-	LocalProjectileActorPtr->SetMaxPossibleLifetime(100.0f);
 
 	UTimelineComponent* StickyTimelineComp = LocalProjectileActorPtr->GetTimelineComp();
-
 	if (LocalProjectileActorPtr->GetCurve() != nullptr && StickyTimelineComp != nullptr) {
 		// Indicate it comes from source code, and is native to the actor
 		StickyTimelineComp->CreationMethod = EComponentCreationMethod::Native;
@@ -198,16 +196,7 @@ void UStickyGunSkeletalComp::PrepDeferredSpawnProjectile(AStickyProjectile* Loca
 		StickyTimelineComp->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 		StickyTimelineComp->SetPlaybackPosition(0.0f, false);
 
-		// Add the float curve to the timeline and connect it to your timelines's interpolation function
-		FOnTimelineFloat			 OnTimelineTickDelegate;
-		FOnTimelineEventStatic OnTimelineFinishedCallback;
-		OnTimelineTickDelegate.BindUFunction(LocalProjectileActorPtr, FName{TEXT("ModulateColor")});
-		OnTimelineFinishedCallback.BindUFunction(LocalProjectileActorPtr, FName{TEXT("TriggerExplosionFX")});
-		StickyTimelineComp->AddInterpFloat(LocalProjectileActorPtr->GetCurve(), OnTimelineTickDelegate);
-		StickyTimelineComp->SetTimelineFinishedFunc(OnTimelineFinishedCallback);
-
 		// StickyTimelineComp->RegisterComponent();
-		// PlayTimeline();
 		return;
 	}
 }
@@ -235,15 +224,15 @@ void UStickyGunSkeletalComp::GenerateCurve()
 {
 	float SignageAlternator = -1.0f;
 	float LocalTimeStep			= 0.0f;
+	float LocalStepModifier = 1.0f;
 	float LocalMaxTime			= 8.0f;
 	float LocalValue				= 0.0f;		 // Clamp between [ -1, +1 ]
 	for (; LocalTimeStep < LocalMaxTime;) {
-		GeneratedRichCurve.AddKey(LocalTimeStep, LocalValue);
-		LocalTimeStep += 0.05f;
+		GeneratedRichCurve->AddKey(LocalTimeStep, LocalValue);
+		LocalTimeStep += LL_IF(LocalStepModifier, 0.175, (LocalStepModifier > 0.2));
+		LocalStepModifier /= 1.5f;
 		SignageAlternator *= -1.0f;
 		LocalValue = SignageAlternator * (LocalTimeStep / LocalMaxTime);
 	}
-
-	auto CurveList = FloatCurve->GetCurves();
-	CurveList.Add(FRichCurveEditInfo(&GeneratedRichCurve, FName{TEXT("GeneratedRichCurve")}));
+	FloatCurve->FloatCurve = *GeneratedRichCurve;
 }

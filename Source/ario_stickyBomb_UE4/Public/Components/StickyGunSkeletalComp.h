@@ -7,6 +7,7 @@
 #include "Helpers/ForwardDecls.h"
 
 #include <Components/SkeletalMeshComponent.h>
+#include <Templates/SharedPointer.h>
 
 #include "StickyGunSkeletalComp.generated.h"
 
@@ -92,11 +93,14 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 	/** Protected Fields: Basic Properties **/
 	ABaseShooter* OwningCharacter;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = Curves)
-	UCurveFloat* FloatCurve;
+	// UPROPERTY(VisibleDefaultsOnly, Category = Curves)
+	// TSharedPtr<UCurveFloat> FloatCurve = nullptr;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Curves)
-	FRichCurve GeneratedRichCurve;
+	UCurveFloat* FloatCurve = nullptr;
+
+	// UPROPERTY(VisibleDefaultsOnly, Category = Curves)
+	FRichCurve* GeneratedRichCurve;
 
 	bool bDisable = true;
 };

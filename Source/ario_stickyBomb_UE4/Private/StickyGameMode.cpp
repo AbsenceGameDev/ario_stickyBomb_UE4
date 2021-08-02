@@ -2,18 +2,26 @@
 
 #include "StickyGameMode.h"
 
+// Player
 #include "Characters/Bomberman.h"
-#include "Components/AmmoComp.h"
-#include "Components/HealthComp.h"
 #include "StickyGameState.h"
 #include "StickyPlayerController.h"
 #include "StickyPlayerState.h"
+
+// Components
+#include "Components/AmmoComp.h"
+#include "Components/HealthComp.h"
+
+// UI
 #include "UI/StickyHUD.h"
 
+// Engine
 #include <Engine/World.h>
 #include <EngineUtils.h>
 #include <GameFramework/Actor.h>
 #include <TimerManager.h>
+
+// Engine Helpers
 #include <UObject/ConstructorHelpers.h>
 #include <Widgets/DeclarativeSyntaxSupport.h>
 
