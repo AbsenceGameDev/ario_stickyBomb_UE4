@@ -89,7 +89,7 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInterac
 
 	/** ========================== **/
 	/** Protected Methods: VFX/SFX **/
-	UFUNCTION()
+	UFUNCTION(NetMulticast, Reliable)
 	void ModulateColor(const float InterpValue);
 
 	UFUNCTION()

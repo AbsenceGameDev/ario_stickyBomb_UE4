@@ -17,13 +17,20 @@
 #include "Helpers/CollisionChannels.h"
 #include "Helpers/Macros.h"
 
-// Engine General
+// Engine Frameworks
 #include <Kismet/GameplayStatics.h>
 #include <Net/UnrealNetwork.h>
+
+// Engine Helpers
+#include <UObject/ConstructorHelpers.h>
 
 // Engine Components
 #include <Components/SphereComponent.h>
 #include <GameFramework/ProjectileMovementComponent.h>
+
+// Engine Classes/Types
+#include <GameFramework/DamageType.h>
+#include <Materials/MaterialInstanceDynamic.h>
 
 AStickyProjectile::AStickyProjectile()
 {
@@ -52,19 +59,7 @@ AStickyProjectile::AStickyProjectile()
 /** ============================ **/
 /** Inherited Methods: Overrides **/
 
-void AStickyProjectile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	// ProjectileMovement->bShouldBounce = false;
-	// ProjectileMovement->ClearPendingForce(true);
-	// // ProjectileMovement->StopSimulating(Hit);
-	// ProjectileMovement->StopMovementImmediately();
-	// ProjectileMovement->ProjectileGravityScale = 0;
-	//
-	// CollisionComp->SetEnableGravity(false);
-	// MeshComponentPtr->SetEnableGravity(false);
-}
+void AStickyProjectile::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
 
 void AStickyProjectile::BeginPlay()
 {
@@ -110,6 +105,7 @@ void	AStickyProjectile::SetDamageAmount(float InDamage) { DamageValue = InDamage
 void				 AStickyProjectile::SetMaxPossibleLifetime(float MaxLifetime) { MaxPossibleLifetime = MaxLifetime; }
 void				 AStickyProjectile::SetCurve(UCurveFloat* InCurve) { StickyTimelineCurve = InCurve; }
 UCurveFloat* AStickyProjectile::GetCurve() { return StickyTimelineCurve; }
+// void AStickyProjectile::MulticastSetCurve(UCurveFloat InCurve) { *StickyTimelineCurve = InCurve; }
 
 /** ============================ **/
 /** Public Methods: Conditionals **/
@@ -140,7 +136,7 @@ void AStickyProjectile::OnHit(
 	UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr)) {
-		SetActorEnableCollision(false);
+		CollisionComp->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Ignore);
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
 		USkeletalMeshComponent* CastOtherSkelMesh		 = StaticCast<USkeletalMeshComponent*>(OtherComp);
 		ABaseShooter*						CastOtherBaseShooter = StaticCast<ABaseShooter*>(CastOtherSkelMesh->GetOwner());
@@ -150,34 +146,26 @@ void AStickyProjectile::OnHit(
 		if (
 			CastOtherBaseShooter == NULL || CastOwnerBaseShooter == NULL || CastOtherSkelMesh == NULL ||
 			(CastOwnerBaseShooter == CastOtherBaseShooter)) {
-			SetActorEnableCollision(true);
+			CollisionComp->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Block);
 			return;
 		}
 
 		if (Hit.BoneName.ToString() == FString("None")) {
-			SetActorEnableCollision(true);
+			CollisionComp->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Block);
 			return;
 		}
-		// SetActorTickEnabled(false);
+
 		ProjectileMovement->bShouldBounce = false;
 		ProjectileMovement->ClearPendingForce(true);
-		// ProjectileMovement->StopSimulating(Hit);
 		ProjectileMovement->StopMovementImmediately();
 		ProjectileMovement->ProjectileGravityScale = 0;
-
-		// ProjectileMovement->UpdatedComponent = nullptr;
 		CollisionComp->SetEnableGravity(false);
 		MeshComponentPtr->SetEnableGravity(false);
 		AttachedToActor = CastOtherBaseShooter;
-		SetActorTickEnabled(true);		// disable again after registering the changes to collision?
-		//
-		// Stick to other character skeleton here, at impact point.
-		// StickyTimelineComp->SetPlayRate(2.0f);
 
 		FAttachmentTransformRules AttachRules =
 			FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
 		AttachToActor(AttachedToActor, AttachRules);
-		// MulticastAttachToPlayer(AttachedToActor->GetPlayerState()->GetPlayerId());
 		return;
 	}
 }
@@ -206,30 +194,19 @@ void AStickyProjectile::OnPickup(ABaseShooter* CallerBaseShooterActor)
 /** ========================== **/
 /** Protected Methods: VFX/SFX **/
 
-void AStickyProjectile::ModulateColor(const float InterpValue)
+void AStickyProjectile::ModulateColor_Implementation(const float InterpValue)
 {
-	static int TestModulator = 1;		 // Only sets once per object
-	// TestModulator *= -1;						 // Flip value
-
+	// Timeline position normalized in regards to max lifetime
 	float TimelinePosition = StickyTimelineComp->GetPlaybackPosition() / MaxPossibleLifetime;
-	auto	Fmodifier				 = StickyTimelineCurve->GetFloatValue(TimelinePosition);
-	auto	ValMod					 = Fmodifier;		 // + TestModulator;
-	auto	ColorAdditive		 = (FLinearColor(ValMod, ValMod, ValMod, 0.0f));
+	auto	ColorAdditive		 = (FLinearColor(InterpValue, InterpValue, InterpValue, 0.0f));
 	BaseColor += ColorAdditive;
-	// MeshMaterialInstance->SetVectorParameterValue("DiffuseColor", BaseColor);
-
-	//
-	// MeshComponentPtr->GetMaterial(0)
-	// ->GetMaterialResource(ERHIFeatureLevel::Type::Num, EMaterialQualityLevel::Type::Num)
 
 	auto DynamicMaterialInstance = MeshComponentPtr->CreateDynamicMaterialInstance(0);
 	DynamicMaterialInstance->SetVectorParameterValue("DiffuseColor", BaseColor);
+	UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"TimelinePosition: %f -- InterpValue: %f \""), TimelinePosition, InterpValue);
 	UE_LOG(
-		LogTemp, Log, TEXT("git commit -S -m \"TimelinePosition: %f -- Fmodifier: %f -- ValMod: %f \""), TimelinePosition, Fmodifier,
-		ValMod);
-	UE_LOG(
-		LogTemp, Log, TEXT("git commit -S -m \"COLOR.R: %f -- COLOR.G: %f -- COLOR.B: %f \""), ColorAdditive.R, ColorAdditive.G,
-		ColorAdditive.B);
+		LogTemp, Log, TEXT("git commit -S -m \"COLORADD.R: %f \n-- COLORADD.G: %f \n-- COLORADD.B: %f \n\""), ColorAdditive.R,
+		ColorAdditive.G, ColorAdditive.B);
 }
 
 void AStickyProjectile::TriggerExplosionFX()

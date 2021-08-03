@@ -24,6 +24,9 @@ class USoundBase;
 
 struct FAttachmentTransformRules;
 
+/** Non-engine types **/
+class FMaterialGenerator;
+
 /** Actors **/
 class AStickyProjectile;
 class AStickyGameMode;

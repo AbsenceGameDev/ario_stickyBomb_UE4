@@ -25,6 +25,7 @@
 #include <Net/UnrealNetwork.h>
 
 // Engine Helpers
+#include <Animation/AnimBlueprint.h>
 #include <Kismet/GameplayStatics.h>
 #include <UObject/ConstructorHelpers.h>
 

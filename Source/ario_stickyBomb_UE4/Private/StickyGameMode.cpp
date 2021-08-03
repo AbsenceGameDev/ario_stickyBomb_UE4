@@ -15,6 +15,9 @@
 // UI
 #include "UI/StickyHUD.h"
 
+// Custom
+#include "Effects/MaterialGenerator.h"
+
 // Engine
 #include <Engine/World.h>
 #include <EngineUtils.h>
@@ -32,6 +35,10 @@ AStickyGameMode::AStickyGameMode() : Super()
 	PlayerStateClass			= AStickyPlayerState::StaticClass();
 	GameStateClass				= AStickyGameState::StaticClass();
 	PlayerControllerClass = AStickyPlayerController::StaticClass();
+
+	/* Generate Material during compilation, doing it in the gamemode was an arbitrary decision.
+	 * Anywhere where it can compile into an object would have worked */
+	MatGen = FMaterialGenerator::CreateObject();
 
 	// use our custom HUD class
 	HUDClass = AStickyHUD::StaticClass();

@@ -7,7 +7,6 @@
 #include "Helpers/ForwardDecls.h"
 
 #include <Components/SkeletalMeshComponent.h>
-#include <Templates/SharedPointer.h>
 
 #include "StickyGunSkeletalComp.generated.h"
 

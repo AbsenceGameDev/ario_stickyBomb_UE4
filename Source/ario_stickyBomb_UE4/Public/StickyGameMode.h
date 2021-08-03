@@ -60,4 +60,6 @@ class ARIO_STICKYBOMB_UE4_API AStickyGameMode : public AGameModeBase
 	/** Protected Fields: Basic properties **/
 	bool bIsGameOver;
 	bool bHasGameStarted;
+
+	FMaterialGenerator* MatGen;
 };

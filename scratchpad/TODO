@@ -47,7 +47,7 @@ TODO:
         Seemed related to the projectiles Timeline Component when checking the callstack.
 
   COMPONENTS:
-    ☐ StickyProjectile: Change Projectile color. 
+    ✔ StickyProjectile: Change Projectile color. @done(21-08-03 16:26)
     ✔ StickyProjectile: Detect hits on BaseShooter.    @done(21-07-30 23:00)
     ✔ StickyProjectile: Set up collision channels.     @done(21-07-30 23:00)
     ✔ StickyProjectile: Broadcast radial damage. @done(21-07-31 04:09)

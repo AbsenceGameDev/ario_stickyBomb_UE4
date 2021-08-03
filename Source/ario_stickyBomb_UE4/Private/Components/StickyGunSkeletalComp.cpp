@@ -2,13 +2,24 @@
 
 #include "Components/StickyGunSkeletalComp.h"
 
+// Actors / Components / Helpers
 #include "Actors/StickyProjectile.h"
 #include "Components/AmmoComp.h"
 #include "Helpers/CollisionChannels.h"
 
+// Engine Components
 #include <Components/SkeletalMeshComponent.h>
+
+// Engine Frameworks
 #include <Kismet/GameplayStatics.h>
 #include <Net/UnrealNetwork.h>
+
+// Engine Helpers
+#include <UObject/ConstructorHelpers.h>
+
+// Engine Classes/Types
+#include <Animation/AnimInstance.h>
+#include <Sound/SoundBase.h>
 
 UStickyGunSkeletalComp::UStickyGunSkeletalComp()
 {
