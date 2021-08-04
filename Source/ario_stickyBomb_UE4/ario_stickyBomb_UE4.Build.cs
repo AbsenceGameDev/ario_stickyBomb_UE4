@@ -13,6 +13,6 @@ public class ario_stickyBomb_UE4 : ModuleRules
     PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
     
     PublicDependencyModuleNames.AddRange(new string[] {"UnrealEd"});
-    PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd" });
+    PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd", "Engine" });
 	}
 }

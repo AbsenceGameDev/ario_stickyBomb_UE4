@@ -18,7 +18,7 @@ class ARIO_STICKYBOMB_UE4_API FMaterialGenerator
 	TParamType* MakeParam(FString ParamName, UMaterial* UnrealMaterial);
 
 	template <class TParamType>
-	TParamType* FMaterialGenerator::MakeArrayParam(TArray<FString> ParamNames, UMaterial* UnrealMaterial);
+	TParamType* MakeArrayParam(TArray<FString> ParamNames, UMaterial* UnrealMaterial);
 
 	template <class TExpressionType>
 	TExpressionType* AddExpression(UMaterial* UnrealMaterial);
@@ -28,6 +28,7 @@ class ARIO_STICKYBOMB_UE4_API FMaterialGenerator
 
 	public:
 	static FMaterialGenerator* CreateObject();
-	void											 CreateBasicMaterial(FString MaterialBaseName = "M_Material", FString PackageName = "/Game/");
-	void CreateCelShadedExplosionMat(FString MaterialBaseName = "M_CelMaterial", FString PackageName = "/Game/");
+	void CreateBasicMaterial(FString MaterialBaseName = "M_Material", FString PackageName = "/Game/GenMaterials/");
+	void CreateCelShadedExplosionMat(
+		FString MaterialBaseName = FString("M_CelExplosionMat"), FString PackageName = FString("/Game/GenMaterials/"));
 };

@@ -212,6 +212,10 @@ void AStickyProjectile::ModulateColor_Implementation(const float InterpValue)
 void AStickyProjectile::TriggerExplosionFX()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Finished Event Called."));
+
+	// UParticleSystemComponent* TempComponent = UGameplayStatics::SpawnEmitterAttached(
+	// 	UParticleSystem * EmitterTemplate, USceneComponent * AttachToComponent, FName AttachPointName, FVector Location,
+	// 	FRotator Rotation, EAttachLocation::Type LocationType, bool bAutoDestroy);
 	// Kill or Damage actor, trigger HealthComponent OnDamage
 	// at the very least on any BaseShooter derived character within DamageRadius
 }

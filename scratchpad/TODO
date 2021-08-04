@@ -9,6 +9,7 @@ TOP PRIO:
   ✔ 5. Replicated pitch from player movement @done(21-08-01 16:23)
   - 6. Make sure StickyLineTraceComponent passes a linetrace through the player-capsule
   - 7. ordered map of all live players {int ID, ABaseShooter* BaseChar}, fetch correct Character from the map 
+  - 8. Trigger GenerateBasicMaterial function AFTER the editor has finished loading. Crash on load due to subsytems not being loaded yet at boot.
 
 TODO:
   GENERAL:

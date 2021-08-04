@@ -53,7 +53,15 @@ AStickyGameMode::AStickyGameMode() : Super()
 /** ============================ **/
 /** Inherited Methods: Overrides **/
 
-void AStickyGameMode::StartPlay() { Super::StartPlay(); }
+void AStickyGameMode::StartPlay()
+{
+	Super::StartPlay();
+
+	if (!bTriggerOnce) {
+		MatGen->CreateCelShadedExplosionMat();
+		bTriggerOnce = true;
+	}
+}
 void AStickyGameMode::BeginPlay() { Super::BeginPlay(); }
 
 // Tick Runs 60 times per sec / 1 for each frame
