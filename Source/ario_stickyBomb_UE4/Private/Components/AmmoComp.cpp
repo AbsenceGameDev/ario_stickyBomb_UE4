@@ -1,11 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "Components/AmmoComp.h"
 
 #include "Characters/BaseShooter.h"
-#include "Helpers/Macros.h"
 #include "StickyGameMode.h"
 
+// Helpers
+#include "Helpers/Macros.h"
+
+// Engine Frameworks
 #include <Net/UnrealNetwork.h>
 
 // Sets default values for this component's properties

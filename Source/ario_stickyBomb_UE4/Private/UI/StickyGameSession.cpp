@@ -1,3 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "UI/StickyGameSession.h"

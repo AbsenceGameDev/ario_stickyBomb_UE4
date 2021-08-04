@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "Characters/BaseShooter.h"
 
@@ -13,14 +13,16 @@
 #include "Components/StickyGunSkeletalComp.h"
 #include "Components/StickyLinetraceComp.h"
 
-// Engine Component
+// Engine Components
 #include <Camera/CameraComponent.h>
 #include <Components/CapsuleComponent.h>
 #include <Components/InputComponent.h>
+#include <GameFramework/CharacterMovementComponent.h>
 #include <MotionControllerComponent.h>
 
 // Engine Frameworks
 #include <Animation/AnimInstance.h>
+#include <GameFramework/DamageType.h>
 #include <GameFramework/InputSettings.h>
 #include <Net/UnrealNetwork.h>
 
@@ -48,16 +50,21 @@ ABaseShooter::ABaseShooter()
 	InitActorComponents();
 	SetupStickyGun();
 
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Visibility, ECollisionResponse::ECR_Ignore);
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Ignore);
-	MeshPtr->SetCollisionObjectType(ECC_CharacterMesh);
-	MeshPtr->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Block);
+	SetupCollision();
 	// set our turn rates for input
 	BaseTurnRate	 = 45.f;
 	BaseLookUpRate = 45.f;
 
 	bUseControllerRotationPitch = true;
+
+	// this->OnTakeAnyDamage.AddDynamic(this, &ABaseShooter::ServerTakeDamage);
+	// this->OnTakeRadialDamage.AddDynamic(this, &ABaseShooter::ServerTakeDamage);
 }
+
+// no known conversion from
+// 'void (ABaseShooter::*)(AActor *, float, const UDamageType *, AController *, AActor *)'
+// to
+// 'void (ABaseShooter::*)(AActor *, float, const UDamageType *, FVector, FHitResult, AController *, AActor *)' for 2nd argument
 
 /** ============================ **/
 /** Inherited Methods: Overrides **/
@@ -69,8 +76,6 @@ void ABaseShooter::BeginPlay()
 	// Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	StickyGun->AttachToComponent(MeshPtr, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 	MeshPtr->SetHiddenInGame(false, true);
-	// StickyPC = UGameplayStatics::GetPlayerController(this, 0);
-	//->SetControlRotation();
 }
 
 void ABaseShooter::SetupPlayerInputComponent(UInputComponent* InputComponent) {}
@@ -89,6 +94,26 @@ void ABaseShooter::EndInteractItem()
 		return;
 	}
 	LinetraceComp->SetComponentTickEnabled(false);
+}
+
+float ABaseShooter::TakeDamage(
+	float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+#ifdef STICKY_DEBUG
+	UE_LOG(LogTemp, Warning, TEXT("Damage Received %f"), DamageAmount);
+#endif		// STICKY_DEBUG
+	auto DamageType = DamageEvent.DamageTypeClass->GetDefaultObject<UDamageType>();
+	ServerTakeDamage(this, DamageAmount, DamageType, EventInstigator, DamageCauser);
+	return 0.0f;
+}
+
+void ABaseShooter::ServerTakeDamage_Implementation(
+	AActor* ThisActor, float DamageAmount, const UDamageType* DamageType, AController* EventInstigator, AActor* DamageCauser)
+{
+#ifdef STICKY_DEBUG
+	UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"PLAYER HIT!\""));
+#endif		// STICKY_DEBUG
+	HealthComponent->TryTakeDamage(ThisActor, DamageAmount, DamageType, EventInstigator, DamageCauser);
 }
 
 /** ======================= **/
@@ -124,6 +149,12 @@ bool ABaseShooter::ServerTryInteractItem_Validate() { return true; }
 
 void ABaseShooter::ServerEndInteractItem_Implementation() { EndInteractItem(); }
 bool ABaseShooter::ServerEndInteractItem_Validate() { return true; }
+
+void ABaseShooter::ServerUndoRagdoll_Implementation() { MulticastUndoRagdoll(); }
+bool ABaseShooter::ServerUndoRagdoll_Validate() { return !HealthComponent->IsDead(); }
+
+void ABaseShooter::ServerTriggerRagdoll_Implementation() { MulticastTriggerRagdoll(); }
+bool ABaseShooter::ServerTriggerRagdoll_Validate() { return HealthComponent->IsDead(); }
 
 /** ================================== **/
 /** Protected Methods: Component Setup **/
@@ -175,6 +206,80 @@ void ABaseShooter::SetupStickyGun()
 	// Initializing using RootComponent for attachment and Offset for placement
 	StickyGun->InitStickyGun(this, FVector(100.0f, 0.0f, 10.0f), CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation")));
 	TriggerPlayerStateAmmo(AmmoComp->GetAmmo());
+}
+
+void ABaseShooter::SetupCollision()
+{
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Visibility, ECollisionResponse::ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Ignore);
+	MeshPtr->SetCollisionObjectType(ECC_CharacterMesh);
+	MeshPtr->SetCollisionResponseToChannel(ECC_StickyProjectile, ECollisionResponse::ECR_Block);
+}
+
+void ABaseShooter::MulticastUndoRagdoll_Implementation()
+{
+	SetReplicateMovement(true);
+	/* Re-connect to server, maybe with CallPreReplication */
+
+	/* Disable all collision on capsule */
+	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
+	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	SetActorEnableCollision(true);
+
+	if (bIsRagdoll) {
+		// Ragdoll
+		GetMesh()->SetAllBodiesSimulatePhysics(false);
+		GetMesh()->SetSimulatePhysics(false);
+		GetMesh()->WakeAllRigidBodies();
+		GetMesh()->bBlendPhysics = false;
+
+		UCharacterMovementComponent* CharacterComp = Cast<UCharacterMovementComponent>(GetMovementComponent());
+		if (CharacterComp) {
+			CharacterComp->SetMovementMode(EMovementMode::MOVE_Walking, 0);
+			CharacterComp->SetComponentTickEnabled(true);
+		}
+
+		// SetLifeSpan(10.0f);
+		bIsRagdoll = false;
+	}
+}
+
+void ABaseShooter::MulticastTriggerRagdoll_Implementation()
+{
+	SetReplicateMovement(false);
+	TearOff();
+
+	DetachFromControllerPendingDestroy();
+
+	/* Reenable collision on capsule and mesh */
+	SetupCollision();
+
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	SetActorEnableCollision(true);
+
+	if (!bIsRagdoll) {
+		// Ragdoll
+		GetMesh()->SetAllBodiesSimulatePhysics(true);
+		GetMesh()->SetSimulatePhysics(true);
+		GetMesh()->WakeAllRigidBodies();
+		GetMesh()->bBlendPhysics = true;
+
+		UCharacterMovementComponent* CharacterComp = Cast<UCharacterMovementComponent>(GetMovementComponent());
+		if (CharacterComp) {
+			CharacterComp->StopMovementImmediately();
+			CharacterComp->DisableMovement();
+			CharacterComp->SetComponentTickEnabled(false);
+		}
+
+		SetLifeSpan(10.0f);
+		bIsRagdoll = true;
+	}
+
+	/* Apply physics impulse on the bone of the player mesh we hit */
+	GetMesh()->AddRadialImpulse(GetActorLocation(), 300.0f, 100000, ERadialImpulseFalloff::RIF_Linear);
 }
 
 /** ========================= **/

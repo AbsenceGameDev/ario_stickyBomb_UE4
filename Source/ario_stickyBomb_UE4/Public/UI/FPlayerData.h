@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #pragma once
 
@@ -15,7 +15,5 @@ struct ARIO_STICKYBOMB_UE4_API FPlayerData {
 	float		Score;
 	FString Name;
 
-	FPlayerData(float score = 0.0f, FString name = FString("No Player Name")) : Score(score), Name(name)
-	{
-	}
+	FPlayerData(float score = 0.0f, FString name = FString("No Player Name")) : Score(score), Name(name) {}
 };

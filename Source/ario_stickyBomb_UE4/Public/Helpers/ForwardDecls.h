@@ -10,6 +10,7 @@ class UInputComponent;
 class UMotionControllerComponent;
 class USkeletalMeshComponent;
 class UTimelineComponent;
+class UParticleSystemComponent;
 
 // Engine event types
 class FOnTimelineEvent;

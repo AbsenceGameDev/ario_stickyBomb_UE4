@@ -4,6 +4,7 @@
 #include "StickyGameMode.h"
 #include "UI/StickyHUD.h"
 
+// Engine Classes/Types
 #include <Engine/Engine.h>
 #include <Kismet/GameplayStatics.h>
 #include <Net/UnrealNetwork.h>

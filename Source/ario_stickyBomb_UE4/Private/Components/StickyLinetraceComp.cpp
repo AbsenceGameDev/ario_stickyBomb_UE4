@@ -1,13 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "Components/StickyLinetraceComp.h"
 
+// Actors
 #include "Actors/StickyProjectile.h"
 #include "Characters/BaseShooter.h"
+
+// Components
 #include "Components/AmmoComp.h"
+
+// Helpers
 #include "Helpers/Macros.h"
+
+// Interfaces
 #include "Interfaces/InteractionUOI.h"
 
+// Engine Frameworks
 #include <Kismet/KismetSystemLibrary.h>
 
 // Sets default values for this component's properties

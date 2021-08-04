@@ -1,19 +1,29 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "Actors/StickyBaseItem.h"
 
+// Actors
 #include "Characters/BaseShooter.h"
+
+// Components
 #include "Components/AmmoComp.h"
 #include "Components/HealthComp.h"
 #include "Components/StickyGunSkeletalComp.h"
-#include "Helpers/CollisionChannels.h"
-#include "Helpers/Macros.h"
+
+// Interfaces
 #include "Interfaces/InteractionUOI.h"
 
-#include <Components/SphereComponent.h>
+// Helpers
+#include "Helpers/CollisionChannels.h"
+#include "Helpers/Macros.h"
+
+// Engine Framework
 #include <GameFramework/ProjectileMovementComponent.h>
 #include <Kismet/GameplayStatics.h>
 #include <Net/UnrealNetwork.h>
+
+// Engine Components
+#include <Components/SphereComponent.h>
 
 AStickyBaseItem::AStickyBaseItem()
 {

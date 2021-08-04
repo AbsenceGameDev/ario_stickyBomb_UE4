@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #pragma once
 
@@ -12,9 +12,7 @@
 class ARIO_STICKYBOMB_UE4_API SInGameOverlay : public SCompoundWidget
 {
 	public:
-	SLATE_BEGIN_ARGS(SInGameOverlay)
-	{
-	}
+	SLATE_BEGIN_ARGS(SInGameOverlay) {}
 	SLATE_END_ARGS()
 
 	/** Constructs this widget with InArgs */

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #pragma once
 
@@ -35,6 +35,10 @@ class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
 	UFUNCTION(BlueprintCallable, Category = "Heal")
 	void TryHeal(float HealAmount);
 
+	UFUNCTION(BlueprintCallable, Category = "Damage")
+	void TryTakeDamage(
+		AActor* DamagedActor, float DamageAmount, const UDamageType* DamageType, AController* EventInstigator, AActor* DamageCauser);
+
 	/** ================================ **/
 	/** Public Methods: Inline Getters **/
 	float GetHealth() const { return Health; }
@@ -53,16 +57,17 @@ class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
 
 	UFUNCTION()
 	void HandleTakeAnyDamage(
-		AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+		AActor* DamagedActor, float DamageAmount, const class UDamageType* DamageType, class AController* InstigatedBy,
+		AActor* DamageCauser);
 
 	UFUNCTION()
 	void HandleRadialDamage(
-		AActor* DamagedActor, float Damage, const class UDamageType* DamageType, FVector Origin, FHitResult HitInfo,
+		AActor* DamagedActor, float DamageAmount, const class UDamageType* DamageType, FVector Origin, FHitResult HitInfo,
 		AController* InstigatedBy, AActor* DamageCauser);
 
 	UFUNCTION()
 	void HandleDamageHit(
-		AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent,
+		AActor* DamagedActor, float DamageAmount, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent,
 		FName BoneName, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser);
 
 	/** ================================== **/

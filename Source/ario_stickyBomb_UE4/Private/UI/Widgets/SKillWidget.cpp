@@ -1,11 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "UI/Widgets/SKillWidget.h"
 
 #include "SlateOptMacros.h"
 
+// Engine Helpers
 #include <Internationalization/Internationalization.h>
 #include <Widgets/DeclarativeSyntaxSupport.h>
+
+// Engine UI
 #include <Widgets/SOverlay.h>
 #include <Widgets/Text/STextBlock.h>
 
@@ -33,15 +36,9 @@ void SKillWidget::Construct(const FArguments& InArgs)
 	]];
 }
 
-void SKillWidget::SetScoreText(FText Score)
-{
-	ScoreText = Score;
-}
+void SKillWidget::SetScoreText(FText Score) { ScoreText = Score; }
 
-FText SKillWidget::GetScoreText() const
-{
-	return ScoreText;
-}
+FText SKillWidget::GetScoreText() const { return ScoreText; }
 
 #undef LOCTEXT_NAMESPACE
 

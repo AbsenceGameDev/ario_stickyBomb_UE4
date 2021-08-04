@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #pragma once
 
@@ -95,6 +95,12 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInterac
 	UFUNCTION()
 	void TriggerExplosionFX();
 
+	UFUNCTION(Server, Reliable)
+	void ServerTriggerExplosionFX();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastTriggerExplosionFX();
+
 	/** ============================ **/
 	/** Protected Fields: Components **/
 
@@ -109,6 +115,12 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInterac
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	UTimelineComponent* StickyTimelineComp = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ParticleEffect")
+	UParticleSystemComponent* ParticleSystemComp = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ParticleEffect")
+	UParticleSystem* ParticleFX = nullptr;
 
 	/** ================================== **/
 	/** Protected Fields: Timeline-Members **/
@@ -135,6 +147,7 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInterac
 	void SetCollisionResponses();
 	void ConstructProjectileMovementComponent();
 	void ConstructStaticMeshComponent();
+	void InitializeFXAssets();
 
 	/** ================================ **/
 	/** Private Fields: Basic Properties **/
@@ -144,9 +157,13 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AActor, public IInterac
 	UPROPERTY(VisibleDefaultsOnly, Category = Material)
 	UMaterialInstanceDynamic* MeshMaterialInstance;
 
+	// Explosion Sound, USoundBase
+	UPROPERTY(VisibleDefaultsOnly, Category = Material)
+	USoundBase* ExplosionSFX;
+
 	// Projectile damage
 	UPROPERTY(VisibleDefaultsOnly, Category = Damage)
-	float DamageValue;
+	float DamageValue = 50.0f;
 
 	// Projectile damage-radius
 	UPROPERTY(VisibleDefaultsOnly, Category = Damage)

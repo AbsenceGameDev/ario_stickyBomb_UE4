@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "Actors/StickyProjectile.h"
 
@@ -27,10 +27,12 @@
 // Engine Components
 #include <Components/SphereComponent.h>
 #include <GameFramework/ProjectileMovementComponent.h>
+#include <Particles/ParticleSystemComponent.h>
 
 // Engine Classes/Types
 #include <GameFramework/DamageType.h>
 #include <Materials/MaterialInstanceDynamic.h>
+#include <Sound/SoundBase.h>
 
 AStickyProjectile::AStickyProjectile()
 {
@@ -38,6 +40,13 @@ AStickyProjectile::AStickyProjectile()
 	ConstructProjectileMovementComponent();
 	ConstructStaticMeshComponent();
 	StickyTimelineComp = CreateDefaultSubobject<UTimelineComponent>(TEXT("StickyTimelineComp"));
+
+	// ParticleSystemComp
+	ParticleSystemComp = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystemComp"));
+	ParticleSystemComp->SetupAttachment(CollisionComp);
+	ParticleSystemComp->bAutoActivate = false;
+
+	InitializeFXAssets();
 
 	// Die after 'MaxCurrentLifetime' seconds by default
 	InitialLifeSpan												 = MaxCurrentLifetime;
@@ -53,7 +62,7 @@ AStickyProjectile::AStickyProjectile()
 	// SetActorTickEnabled(false);
 
 	InterpTimelineEvent.BindUFunction(this, FName{TEXT("ModulateColor")});
-	TimelineFinishedEvent.BindUFunction(this, FName{TEXT("TriggerExplosionFX")});
+	TimelineFinishedEvent.BindUFunction(this, FName{TEXT("ServerTriggerExplosionFX")});
 }
 
 /** ============================ **/
@@ -175,8 +184,8 @@ void AStickyProjectile::OnExplode()
 		UGameplayStatics::ApplyRadialDamage(
 			GetWorld(), DamageValue, GetActorLocation(), DamageRadius, UDamageType::StaticClass(), TArray<AActor*>(), this,
 			this->GetInstigatorController(), true, ECC_Visibility);
+		ServerTriggerExplosionFX();
 	}
-	TriggerExplosionFX();
 	Destroy();
 }
 
@@ -203,22 +212,26 @@ void AStickyProjectile::ModulateColor_Implementation(const float InterpValue)
 
 	auto DynamicMaterialInstance = MeshComponentPtr->CreateDynamicMaterialInstance(0);
 	DynamicMaterialInstance->SetVectorParameterValue("DiffuseColor", BaseColor);
+#ifdef TURNEDOFF		// STICKY_DEBUG
 	UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"TimelinePosition: %f -- InterpValue: %f \""), TimelinePosition, InterpValue);
 	UE_LOG(
 		LogTemp, Log, TEXT("git commit -S -m \"COLORADD.R: %f \n-- COLORADD.G: %f \n-- COLORADD.B: %f \n\""), ColorAdditive.R,
 		ColorAdditive.G, ColorAdditive.B);
+#endif		// STICKY_DEBUG
 }
 
 void AStickyProjectile::TriggerExplosionFX()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Finished Event Called."));
 
-	// UParticleSystemComponent* TempComponent = UGameplayStatics::SpawnEmitterAttached(
-	// 	UParticleSystem * EmitterTemplate, USceneComponent * AttachToComponent, FName AttachPointName, FVector Location,
-	// 	FRotator Rotation, EAttachLocation::Type LocationType, bool bAutoDestroy);
-	// Kill or Damage actor, trigger HealthComponent OnDamage
-	// at the very least on any BaseShooter derived character within DamageRadius
+	ParticleSystemComp =
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleFX, GetActorLocation(), FRotator::ZeroRotator, true);
+	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSFX, GetActorLocation());
 }
+
+void AStickyProjectile::ServerTriggerExplosionFX_Implementation() { MultiCastTriggerExplosionFX(); }
+
+void AStickyProjectile::MultiCastTriggerExplosionFX_Implementation() { TriggerExplosionFX(); }
 
 /** ======================================= **/
 /** Private Methods: Component Initializers **/
@@ -289,6 +302,39 @@ void AStickyProjectile::ConstructStaticMeshComponent()
 	MeshComponentPtr->SetupAttachment(RootComponent);
 
 	// MeshComponentPtr->SetCollisionResponseToChannel(ECC_Visibility, ECollisionResponse::ECR_Ignore);
+}
+
+void AStickyProjectile::InitializeFXAssets()
+{
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemObj(
+		TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
+	if (ParticleSystemObj.Succeeded()) {
+		// STICKY_DEBUG is set in Helpers/Macros.h
+#ifdef STICKY_DEBUG
+		UE_LOG(LogTemp, Warning, TEXT("FOUND EXPLOSION PARTICLE"));
+#endif		// STICKY_DEBUG
+		ParticleFX = ParticleSystemObj.Object;
+	}
+	else {
+#ifdef STICKY_DEBUG
+		UE_LOG(LogTemp, Warning, TEXT("DID NOT FIND EXPLOSION PARTICLE"));
+#endif		// STICKY_DEBUG
+		ParticleFX = CreateDefaultSubobject<UParticleSystem>(TEXT("ParticleFX"));
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> SoundBaseObj(TEXT("/Game/StarterContent/Audio/Explosion02.Explosion02"));
+	if (SoundBaseObj.Succeeded()) {
+#ifdef STICKY_DEBUG
+		UE_LOG(LogTemp, Warning, TEXT("FOUND EXPLOSION SOUND"));
+#endif		// STICKY_DEBUG
+		ExplosionSFX = SoundBaseObj.Object;
+	}
+	else {
+#ifdef STICKY_DEBUG
+		UE_LOG(LogTemp, Warning, TEXT("DID NOT FIND EXPLOSION SOUND"));
+#endif		// STICKY_DEBUG
+		ExplosionSFX = CreateDefaultSubobject<USoundBase>(TEXT("SoundFX"));
+	}
 }
 
 /*

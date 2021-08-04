@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #pragma once
 
@@ -15,9 +15,7 @@ enum class EVisibleState : uint8 {
 class ARIO_STICKYBOMB_UE4_API SSlideInText : public SCompoundWidget
 {
 	public:
-	SLATE_BEGIN_ARGS(SSlideInText)
-	{
-	}
+	SLATE_BEGIN_ARGS(SSlideInText) {}
 	SLATE_ARGUMENT(FText, TextToShow)
 	SLATE_END_ARGS()
 

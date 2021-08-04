@@ -1,9 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "Components/HealthComp.h"
 
+// Engine Classes/Types
 #include "StickyGameMode.h"
 
+// Helpers
+#include "Helpers/Macros.h"
+
+// Engine Frameworks
 #include <GameFramework/Actor.h>
 #include <Math/UnrealMathUtility.h>
 #include <Net/UnrealNetwork.h>
@@ -47,8 +52,23 @@ void UHealthComp::TryHeal(float HealAmount)
 	}
 
 	Health = FMath::Clamp(Health + HealAmount, 0.0f, MaxHealth);
+#ifdef STICKY_DEBUG
 	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s (+%s)"), *FString::SanitizeFloat(Health), *FString::SanitizeFloat(HealAmount));
+#endif		// STICKY_DEBUG
 	OnHealthChanged.Broadcast(this, Health, -HealAmount, nullptr, nullptr, nullptr);
+}
+
+void UHealthComp::TryTakeDamage(
+	AActor* DamagedActor, float DamageAmount, const UDamageType* DamageType, AController* EventInstigator, AActor* DamageCauser)
+{
+#ifdef STICKY_DEBUG
+	UE_LOG(LogTemp, Log, TEXT("Try Damage Health: -%sHP"), *FString::SanitizeFloat(DamageAmount));
+#endif		// STICKY_DEBUG
+
+	if (DamageAmount <= 0.0f || Health <= 0.0f || (GetOwnerRole() < ROLE_Authority)) {
+		return;
+	}
+	HandleTakeAnyDamage(DamagedActor, DamageAmount, DamageType, EventInstigator, DamageCauser);
 }
 
 /** ======================================== **/
@@ -60,15 +80,21 @@ void UHealthComp::OnRep_Health(float PrevHealth)
 }
 
 void UHealthComp::HandleTakeAnyDamage(
-	AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+	AActor* DamagedActor, float DamageAmount, const class UDamageType* DamageType, class AController* InstigatedBy,
+	AActor* DamageCauser)
 {
-	if (Damage <= 0.0f || bIsDead || (DamageCauser != DamagedActor)) {
+#ifdef STICKY_DEBUG
+	UE_LOG(LogTemp, Log, TEXT("Try Damage Health 2nd Pass: -%sHP"), *FString::SanitizeFloat(DamageAmount));
+#endif		// STICKY_DEBUG
+	if (DamageAmount <= 0.0f || bIsDead || (DamageCauser == DamagedActor)) {
 		return;
 	}
 
 	// Update health clamped
-	Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+	Health = FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
+#ifdef STICKY_DEBUG
 	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
+#endif		// STICKY_DEBUG
 	bIsDead = Health <= 0.0f;
 
 	if (bIsDead) {
@@ -77,14 +103,14 @@ void UHealthComp::HandleTakeAnyDamage(
 			GM->OnActorKilled.Broadcast(GetOwner(), DamageCauser, InstigatedBy);
 		}
 	}
-	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
+	OnHealthChanged.Broadcast(this, Health, DamageAmount, DamageType, InstigatedBy, DamageCauser);
 }
 
 void UHealthComp::HandleRadialDamage(
-	AActor* DamagedActor, float Damage, const class UDamageType* DamageType, FVector Origin, FHitResult HitInfo,
+	AActor* DamagedActor, float DamageAmount, const class UDamageType* DamageType, FVector Origin, FHitResult HitInfo,
 	class AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (Damage <= 0.0f || bIsDead) {
+	if (DamageAmount <= 0.0f || bIsDead) {
 		return;
 	}
 
@@ -95,9 +121,9 @@ void UHealthComp::HandleRadialDamage(
 		return;
 	}
 
-	Health	= FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+	Health	= FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
 	bIsDead = Health <= 0.0f;
-	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
+	OnHealthChanged.Broadcast(this, Health, DamageAmount, DamageType, InstigatedBy, DamageCauser);
 
 	/* Call will only succeed on the server */
 	AStickyGameMode* CurrentGameMode = Cast<AStickyGameMode>(GetWorld()->GetAuthGameMode());
@@ -108,22 +134,22 @@ void UHealthComp::HandleRadialDamage(
 }
 
 void UHealthComp::HandleDamageHit(
-	AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent,
+	AActor* DamagedActor, float DamageAmount, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent,
 	FName BoneName, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser)
 {
-	if (Damage <= 0.0f || bIsDead || DamageCauser == DamagedActor) {
+	if (DamageAmount <= 0.0f || bIsDead || DamageCauser == DamagedActor) {
 		return;
 	}
 
-	Health	= FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+	Health	= FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
 	bIsDead = Health <= 0.0f;
-	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
+	OnHealthChanged.Broadcast(this, Health, DamageAmount, DamageType, InstigatedBy, DamageCauser);
 
 	/* Call will only succeed on the server */
 	AStickyGameMode* CurrentGameMode = Cast<AStickyGameMode>(GetWorld()->GetAuthGameMode());
 
 	if (CurrentGameMode) {
-		CurrentGameMode->OnHitEvent.Broadcast(HitLocation, ShotFromDirection, Damage, GetOwner());
+		CurrentGameMode->OnHitEvent.Broadcast(HitLocation, ShotFromDirection, DamageAmount, GetOwner());
 	}
 
 	if (bIsDead && CurrentGameMode) {

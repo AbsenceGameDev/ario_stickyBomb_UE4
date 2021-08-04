@@ -1,12 +1,16 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "UI/Widgets/SAmmoWidget.h"
 
+// Helpers
 #include "Helpers/Macros.h"
 #include "SlateOptMacros.h"
 
+// Engine Helpers
 #include <Internationalization/Internationalization.h>
 #include <Widgets/DeclarativeSyntaxSupport.h>
+
+// Engine UI
 #include <Widgets/SOverlay.h>
 #include <Widgets/Text/STextBlock.h>
 

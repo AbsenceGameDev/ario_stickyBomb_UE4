@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #pragma once
 
@@ -6,9 +6,14 @@
 #include "Helpers/ForwardDecls.h"
 #include "Interfaces/InteractionUOI.h"
 
+#include <Delegates/Delegate.h>
 #include <GameFramework/Character.h>
 
 #include "BaseShooter.generated.h"
+
+// DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_FiveParams(
+// 	FTakeAnyDamageSignature, AActor, OnTakeAnyDamage, AActor*, DamagedActor, float, Damage, const class UDamageType*, DamageType,
+// 	class AController*, InstigatedBy, AActor*, DamageCauser);
 
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteractionUOI
@@ -23,6 +28,9 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	/** Inherited Methods: Overrides **/
 	virtual void BeginPlay();
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+
+	virtual float TakeDamage(
+		float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) final;
 
 	public:
 	/** ================================== **/
@@ -40,9 +48,15 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	UAmmoComp*							GetAmmoComp();
 	UCameraComponent*				GetFirstPersonCameraComponent();
 
-	/** ======================= **/
-	/** Public Methods: Actions **/
+	/** ================================ **/
+	/** Public Methods: Client Interface **/
 	void TryStartFire();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerTriggerRagdoll();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerUndoRagdoll();
 
 	/** ====================== **/
 	/** Public Methods: UI/HUD **/
@@ -59,11 +73,22 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	protected:
 	/** ================================= **/
 	/** Protected Methods: Server/Client **/
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastUndoRagdoll();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastTriggerRagdoll();
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTryInteractItem();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerEndInteractItem();
+
+	UFUNCTION(Server, Reliable)
+	void ServerTakeDamage(
+		AActor* ThisActor, float DamageAmount, const UDamageType* DamageType, AController* EventInstigator, AActor* DamageCauser);
 
 	/** ================================== **/
 	/** Protected Methods: Component Setup **/
@@ -71,6 +96,7 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	void InitCamera();
 	void InitActorComponents();
 	void SetupStickyGun();
+	void SetupCollision();
 
 	/** ========================= **/
 	/** Protected Methods: Inputs **/
@@ -124,5 +150,6 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 
 	AStickyProjectile* ClosestProjectile = nullptr;		 // replace with custom Pickup actor type if I have time
 	bool							 bCanInteract			 = false;
+	bool							 bIsRagdoll				 = false;
 	// AStickyPlayerController* StickyPC					 = nullptr;
 };

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "Components/StickyGunSkeletalComp.h"
 
@@ -116,20 +116,22 @@ void UStickyGunSkeletalComp::SuccessFireEffects()
 }
 void UStickyGunSkeletalComp::FailFireEffects()
 {
+#ifdef STICKY_DEBUG
 	UE_LOG(LogTemp, Warning, TEXT("FAILED FIRE FX!"));
-	// if (FireSound != nullptr) {
-	//   // FireSound->
-	// 	UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetComponentLocation());
-	// }
-	//
-	// // try and play a firing animation if specified
-	// if (FireAnimation != nullptr) {
-	// 	// Get the animation object for the arms mesh
-	// 	UAnimInstance* AnimInstance = GetAnimInstance();
-	// 	if (AnimInstance != nullptr) {
-	// 		AnimInstance->Montage_Play(FireAnimation, 1.f);
-	// 	}
-	// }
+#endif		// STICKY_DEBUG
+					// if (FireSound != nullptr) {
+					//   // FireSound->
+					// 	UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetComponentLocation());
+					// }
+					//
+					// // try and play a firing animation if specified
+					// if (FireAnimation != nullptr) {
+					// 	// Get the animation object for the arms mesh
+					// 	UAnimInstance* AnimInstance = GetAnimInstance();
+					// 	if (AnimInstance != nullptr) {
+					// 		AnimInstance->Montage_Play(FireAnimation, 1.f);
+					// 	}
+					// }
 }
 
 /** =============================== **/

@@ -3,9 +3,14 @@
 #include "SlateOptMacros.h"
 #include "UI/Widgets/SSlideInText.h"
 
-#include <Containers/UnrealString.h>
+// Engine Frameworks
 #include <Engine/World.h>
+
+// Engine Helpers
+#include <Containers/UnrealString.h>
 #include <Templates/SharedPointer.h>
+
+// Engine UI
 #include <Widgets/Input/SButton.h>
 #include <Widgets/Layout/SWrapBox.h>
 #include <Widgets/SCompoundWidget.h>

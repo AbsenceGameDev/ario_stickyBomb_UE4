@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #pragma once
 
@@ -8,9 +8,7 @@
 class ARIO_STICKYBOMB_UE4_API SKillContentContainer : public SCompoundWidget
 {
 	public:
-	SLATE_BEGIN_ARGS(SKillContentContainer)
-	{
-	}
+	SLATE_BEGIN_ARGS(SKillContentContainer) {}
 	SLATE_ARGUMENT(class AStickyHUD*, OwnerHud)
 	SLATE_END_ARGS()
 

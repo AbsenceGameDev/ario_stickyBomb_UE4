@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #pragma once
 
@@ -54,6 +54,9 @@ class ARIO_STICKYBOMB_UE4_API AStickyGameMode : public AGameModeBase
 	void CheckAnyPlayerAlive();
 	bool IsAnyPlayerAlive() const;
 	void RestartDeadPlayers();
+
+	UFUNCTION()
+	void PlayerKilled(AActor* DamageCauser, AActor* DamagedActor, AController* InstigatorController);
 	void GameOver();
 
 	/** ================================== **/

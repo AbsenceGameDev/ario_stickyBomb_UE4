@@ -1,15 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "UI/StickyHUD.h"
 
-#include "Helpers/Macros.h"
+// Frameworks
 #include "StickyGameMode.h"
 #include "StickyPlayerState.h"
+
+// Helpers
+#include "Helpers/Macros.h"
+
+// UI
 #include "UI/Widgets/SAmmoWidget.h"
 #include "UI/Widgets/SKillContentContainer.h"
 #include "UI/Widgets/SKillWidget.h"
 #include "UI/Widgets/SSlideInText.h"
 
+// Engine Classes/Types
 #include <Engine/Engine.h>
 #include <Widgets/DeclarativeSyntaxSupport.h>
 #include <Widgets/SWeakWidget.h>

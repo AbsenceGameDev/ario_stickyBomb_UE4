@@ -1,16 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "UI/Widgets/SSlideInText.h"
 
 #include "SlateOptMacros.h"
 
+// Engine Frameworks
 #include <Animation/CurveHandle.h>
 #include <Animation/CurveSequence.h>
-#include <Engine/EngineTypes.h>
 #include <Engine/World.h>
+
+// Engine Helpers
+#include <Engine/EngineTypes.h>
 #include <Fonts/SlateFontInfo.h>
 #include <Misc/Paths.h>
 #include <Widgets/DeclarativeSyntaxSupport.h>
+
+// Engine UI
 #include <Widgets/Layout/SBorder.h>
 #include <Widgets/Layout/SConstraintCanvas.h>
 #include <Widgets/SCanvas.h>

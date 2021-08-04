@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Ario Amin - 2021/08
 
 #include "StickyGameMode.h"
 
@@ -36,6 +36,8 @@ AStickyGameMode::AStickyGameMode() : Super()
 	GameStateClass				= AStickyGameState::StaticClass();
 	PlayerControllerClass = AStickyPlayerController::StaticClass();
 
+	OnActorKilled.AddDynamic(this, &AStickyGameMode::PlayerKilled);
+
 	/* Generate Material during compilation, doing it in the gamemode was an arbitrary decision.
 	 * Anywhere where it can compile into an object would have worked */
 	MatGen = FMaterialGenerator::CreateObject();
@@ -58,6 +60,7 @@ void AStickyGameMode::StartPlay()
 	Super::StartPlay();
 
 	if (!bTriggerOnce) {
+		GEngine->Exec(nullptr, TEXT("log LogTimeline off"));
 		MatGen->CreateCelShadedExplosionMat();
 		bTriggerOnce = true;
 	}
@@ -118,10 +121,14 @@ ABaseShooter* AStickyGameMode::FindPlayer(int32 LocalPlayerId)
 /** Protected Methods: Server/Client Actions **/
 void AStickyGameMode::RegisterNewPlayer(ABaseShooter* NewPlayer)
 {
+#ifdef STICKY_DEBUG
 	UE_LOG(LogTemp, Warning, TEXT("Player Unique ID on Server: %i"), NewPlayer->GetUniqueID());
+#endif		// STICKY_DEBUG
 	int Steps = 0;
 	for (auto& PlayerState : GetGameState<AStickyGameState>()->PlayerArray) {
+#ifdef STICKY_DEBUG
 		UE_LOG(LogTemp, Warning, TEXT("PlayerState#%i PlayerID: %i"), Steps, PlayerState->GetPlayerId());
+#endif		// STICKY_DEBUG
 		Steps++;
 	}
 	// Access gamestate, do something with player-state array?
@@ -167,8 +174,21 @@ void AStickyGameMode::RestartDeadPlayers()
 	}
 }
 
+void AStickyGameMode::PlayerKilled(AActor* DamagedActor, AActor* DamageCauser, AController* InstigatorController)
+{
+#ifdef STICKY_DEBUG
+	UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"PLAYER KILLED!\""));
+#endif		// STICKY_DEBUG
+	auto CastBaseShooter = StaticCast<ABaseShooter*>(DamagedActor);
+	if (IsValid(CastBaseShooter)) {
+		CastBaseShooter->ServerTriggerRagdoll();
+	}
+}
+
 void AStickyGameMode::GameOver()
 {
+#ifdef STICKY_DEBUG
 	UE_LOG(LogTemp, Log, TEXT("git commit -S -m \"GAME OVER!\""));
+#endif		// STICKY_DEBUG
 	bIsGameOver = true;
 }
