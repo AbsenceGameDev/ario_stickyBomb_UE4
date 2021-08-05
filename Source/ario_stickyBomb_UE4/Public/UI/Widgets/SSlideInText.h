@@ -13,9 +13,10 @@ enum class EVisibleState : uint8 {
 };
 
 /**
- * @author Ario Amin  @file UI/Widgets/SSlideInText.h
- * @class SSlideInText
- * @brief Slide In Text widget, derives from SCompoundWidget
+ * @author  Ario Amin
+ * @file    UI/Widgets/SSlideInText.h
+ * @class   SSlideInText
+ * @brief   Slide In Text widget, derives from SCompoundWidget
  * @details Simple widget to slide in text upon a player kill.
  */
 class ARIO_STICKYBOMB_UE4_API SSlideInText : public SCompoundWidget
@@ -26,20 +27,20 @@ class ARIO_STICKYBOMB_UE4_API SSlideInText : public SCompoundWidget
 	SLATE_END_ARGS()
 
 	/**
-	 * @brief
+	 * @brief   Construct widget
 	 *
-	 * @param InArgs
+	 * @param   InArgs
 	 */
 	void Construct(const FArguments& InArgs);
 
 	/**
-	 * @brief
+	 * @brief   Transitioning widget | in
 	 *
 	 */
 	void TransitionIn();
 
 	/**
-	 * @brief
+	 * @brief   Transitioning widget | out
 	 *
 	 */
 	void TransitionOut();
@@ -48,16 +49,16 @@ class ARIO_STICKYBOMB_UE4_API SSlideInText : public SCompoundWidget
 
 	protected:
 	/**
-	 * @brief Get the Color object
+	 * @brief   Get the Color object
 	 *
-	 * @return FLinearColor
+	 * @return  FLinearColor
 	 */
 	FLinearColor GetColor() const;
 
 	/**
-	 * @brief Get the Item Scale object
+	 * @brief   Get the Item Scale object
 	 *
-	 * @return FVector2D
+	 * @return  FVector2D
 	 */
 	FVector2D GetItemScale() const;
 
@@ -70,11 +71,11 @@ class ARIO_STICKYBOMB_UE4_API SSlideInText : public SCompoundWidget
 
 	private:
 	/**
-	 * @brief
+	 * @brief   Widget tick
 	 *
-	 * @param AllottedGeometry
-	 * @param InCurrentTime
-	 * @param InDeltaTime
+	 * @param   AllottedGeometry
+	 * @param   InCurrentTime
+	 * @param   InDeltaTime
 	 */
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 };

@@ -16,12 +16,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(
 	AController*, InstigatedBy, AActor*, DamageCauser);
 
 /**
- * @author Ario Amin
- * @file Components/HealthComp.h
- * @class UHealthComp
- * @brief Networked health component
+ * @author  Ario Amin
+ * @file    Components/HealthComp.h
+ * @class   UHealthComp
+ * @brief   Networked health component
  * @details Simple networked health component, to be used with ABaseShooter derived characters,
- * but could be retrofitted for other character types if it is rewritten as a templated class
+ *          but could be retrofitted for other character types if it is rewritten as a templated class
  */
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
@@ -36,7 +36,7 @@ class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
 	/** Inherited Methods: Overrides */
 
 	/**
-	 * @brief
+	 * @brief   Component Begin Play
 	 *
 	 */
 	virtual void BeginPlay() override;
@@ -46,21 +46,21 @@ class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
 	/* Public Methods: Client interface */
 
 	/**
-	 * @brief
+	 * @brief   Send Heal request, server decides if it is valid
 	 *
-	 * @param HealAmount
+	 * @param   HealAmount
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Heal")
 	void TryHeal(float HealAmount);
 
 	/**
-	 * @brief
+	 * @brief   Send Damage request, server decides if it is valid
 	 *
-	 * @param DamagedActor
-	 * @param DamageAmount
-	 * @param DamageType
-	 * @param EventInstigator
-	 * @param DamageCauser
+	 * @param   DamagedActor
+	 * @param   DamageAmount
+	 * @param   DamageType
+	 * @param   EventInstigator
+	 * @param   DamageCauser
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	void TryTakeDamage(
@@ -70,17 +70,16 @@ class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
 	/* Public Methods: Inline Getters */
 
 	/**
-	 * @brief Get the Health object
+	 * @brief   Get the Health object
 	 *
-	 * @return float
+	 * @return  float
 	 */
 	float GetHealth() const { return Health; }
 
 	/**
-	 * @brief
+	 * @brief   Check if Component bIsDead flag is set
 	 *
-	 * @return true
-	 * @return false
+	 * @return  true | false
 	 */
 	bool IsDead() const { return bIsDead; }
 
@@ -94,21 +93,21 @@ class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
 	/* Protected Methods: Client/Server actions */
 
 	/**
-	 * @brief
+	 * @brief   OnReplicate health
 	 *
-	 * @param PrevHealth
+	 * @param   PrevHealth
 	 */
 	UFUNCTION()
 	void OnRep_Health(float PrevHealth);
 
 	/**
-	 * @brief
+	 * @brief   TakeAnyDamage event
 	 *
-	 * @param DamagedActor
-	 * @param DamageAmount
-	 * @param DamageType
-	 * @param InstigatedBy
-	 * @param DamageCauser
+	 * @param   DamagedActor
+	 * @param   DamageAmount
+	 * @param   DamageType
+	 * @param   InstigatedBy
+	 * @param   DamageCauser
 	 */
 	UFUNCTION()
 	void HandleTakeAnyDamage(
@@ -116,15 +115,15 @@ class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
 		AActor* DamageCauser);
 
 	/**
-	 * @brief
+	 * @brief   TakeRadialDamage event
 	 *
-	 * @param DamagedActor
-	 * @param DamageAmount
-	 * @param DamageType
-	 * @param Origin
-	 * @param HitInfo
-	 * @param InstigatedBy
-	 * @param DamageCauser
+	 * @param   DamagedActor
+	 * @param   DamageAmount
+	 * @param   DamageType
+	 * @param   Origin
+	 * @param   HitInfo
+	 * @param   InstigatedBy
+	 * @param   DamageCauser
 	 */
 	UFUNCTION()
 	void HandleRadialDamage(
@@ -132,17 +131,17 @@ class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
 		AController* InstigatedBy, AActor* DamageCauser);
 
 	/**
-	 * @brief
+	 * @brief   PointDamage Hit event
 	 *
-	 * @param DamagedActor
-	 * @param DamageAmount
-	 * @param InstigatedBy
-	 * @param HitLocation
-	 * @param FHitComponent
-	 * @param BoneName
-	 * @param ShotFromDirection
-	 * @param DamageType
-	 * @param DamageCauser
+	 * @param   DamagedActor
+	 * @param   DamageAmount
+	 * @param   InstigatedBy
+	 * @param   HitLocation
+	 * @param   FHitComponent
+	 * @param   BoneName
+	 * @param   ShotFromDirection
+	 * @param   DamageType
+	 * @param   DamageCauser
 	 */
 	UFUNCTION()
 	void HandleDamageHit(

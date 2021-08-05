@@ -10,24 +10,19 @@
 
 #include "StickyGameMode.generated.h"
 
-/**
- * @brief Declare a new dynamic multicast delegate with three parameters
- *
- */
+/** @brief   Declare a new dynamic multicast delegate with three parameters */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
 	FOnActorKilled, AActor*, VictimActor, AActor*, KillerActor, AController*, KillerController);
 
-/**
- * @brief Declare a new dynamic multicast delegate with four parameters
- *
- */
+/** @brief   Declare a new dynamic multicast delegate with four parameters */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(
 	FOnTargetHitEvent, FVector, HitLocation, FVector, ShotDirection, float, HitValue, AActor*, HitOwner);
 
 /**
- * @author Ario Amin  @file /StickyGameMode.h
- * @class AStickyGameMode
- * @brief Simple GameMode which has beend designed to work with ABaseShooter derived classes.
+ * @author  Ario Amin
+ * @file    /StickyGameMode.h
+ * @class   AStickyGameMode
+ * @brief   Simple GameMode which has been designed to work with ABaseShooter derived classes.
  */
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyGameMode : public AGameModeBase
@@ -36,7 +31,7 @@ class ARIO_STICKYBOMB_UE4_API AStickyGameMode : public AGameModeBase
 
 	public:
 	/**
-	 * @brief Construct a new AStickyGameMode object
+	 * @brief   Construct a new AStickyGameMode object
 	 *
 	 */
 	AStickyGameMode();
@@ -46,35 +41,37 @@ class ARIO_STICKYBOMB_UE4_API AStickyGameMode : public AGameModeBase
 	/** Inherited Methods: Overrides */
 
 	/**
-	 * @brief
+	 * @brief   Plays when gamemode starts
+	 * @details Generates a material using FMaterialGenerator and turns off timeline logs
 	 *
 	 */
 	virtual void StartPlay() override;
 
 	/**
-	 * @brief
+	 * @brief   Unchanged, only calls Super::BeginPlay
 	 *
 	 */
 	virtual void BeginPlay() override;
 
 	/**
-	 * @brief
+	 * @brief   This gamemodes tick. uses it to keep track of the players and the game.
 	 *
-	 * @param DeltaSeconds
+	 * @param   DeltaSeconds
 	 */
 	virtual void Tick(float DeltaSeconds) override;
 
 	/**
-	 * @brief
+	 * @brief   Called when user logs-in
+	 * @todo    Register user-chosen names?
 	 *
-	 * @param NewPlayer
+	 * @param   NewPlayer
 	 */
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 	/**
-	 * @brief
+	 * @brief   Called when user is exiting the game.
 	 *
-	 * @param ExitingPlayer
+	 * @param   ExitingPlayer
 	 */
 	virtual void Logout(AController* ExitingPlayer) override;
 
@@ -82,24 +79,24 @@ class ARIO_STICKYBOMB_UE4_API AStickyGameMode : public AGameModeBase
 	/* Public Methods: Client Interface */
 
 	/**
-	 * @brief
+	 * @brief   Find player on server given player ID sent by client.
 	 *
-	 * @param LocalPlayerId
-	 * @return ABaseShooter*
+	 * @param   LocalPlayerId
+	 * @return  ABaseShooter*
 	 */
 	ABaseShooter* FindPlayer(int32 LocalPlayerId);
 
 	/* =============================== */
 	/* Public Fields: Events/Delegates */
 	/**
-	 * @brief OnActorKilled delegate, multicasts when a player has been killed
+	 * @brief   OnActorKilled delegate, multicasts when a player has been killed
 	 *
 	 */
 	UPROPERTY(BlueprintAssignable, Category = "Events: GameMode")
 	FOnActorKilled OnActorKilled;
 
 	/**
-	 * @brief OnHitEvent Delegate, multicasts when a hit has occured
+	 * @brief   OnHitEvent Delegate, multicasts when a hit has occured
 	 *
 	 */
 	UPROPERTY(BlueprintAssignable, Category = "Events: GameMode")
@@ -110,51 +107,53 @@ class ARIO_STICKYBOMB_UE4_API AStickyGameMode : public AGameModeBase
 	/* Protected Methods: Server/Client Actions */
 
 	/**
-	 * @brief
+	 * @brief   Register newly logged ing player
 	 *
-	 * @param NewPlayer
+	 * @param   NewPlayer
 	 */
 	void RegisterNewPlayer(ABaseShooter* NewPlayer);
 
 	/**
-	 * @brief
+	 * @brief   Unregister player who is logging out
 	 *
-	 * @param ExitingPlayer
+	 * @param   ExitingPlayer
 	 */
 	void DeregisterExitingPlayer(ABaseShooter* ExitingPlayer);
 
 	/**
-	 * @brief
+	 * @brief   Is any player alive?
+	 * @todo    remove, superflous function
 	 *
 	 */
 	void CheckAnyPlayerAlive();
 
 	/**
-	 * @brief
+	 * @brief   Checks whether match is still going of if has been won.
 	 *
-	 * @return true
-	 * @return false
+	 * @return  true | false
 	 */
 	bool HasPlayerWon() const;
 
 	/**
-	 * @brief
+	 * @brief   Restart any dead players who are still connected to the server.
+	 * @todo    Reset player capsule orientation and reset stance?
 	 *
 	 */
 	void RestartDeadPlayers();
 
 	/**
-	 * @brief
+	 * @brief   Registers a killed player
+	 * @details Does not do much right now, but could be expanded upon to trigger OnKill audio cues or something similar
 	 *
-	 * @param DamageCauser
-	 * @param DamagedActor
-	 * @param InstigatorController
+	 * @param   DamageCauser
+	 * @param   DamagedActor
+	 * @param   InstigatorController
 	 */
 	UFUNCTION()
 	void PlayerKilled(AActor* DamageCauser, AActor* DamagedActor, AController* InstigatorController);
 
 	/**
-	 * @brief
+	 * @brief   Ends the current game.
 	 *
 	 */
 	void GameOver();

@@ -23,23 +23,23 @@ class ARIO_STICKYBOMB_UE4_API SAmmoWidget : public SCompoundWidget
 	SLATE_END_ARGS()
 
 	/**
-	 * @brief
+	 * @brief   Construct widget
 	 *
-	 * @param InArgs
+	 * @param   InArgs
 	 */
 	void Construct(const FArguments& InArgs);
 
 	/**
-	 * @brief Set the Ammo Text object
+	 * @brief   Set the Ammo Text object
 	 *
-	 * @param Ammo
+	 * @param   Ammo
 	 */
 	void SetAmmoText(FText Ammo);
 
 	/**
-	 * @brief Get the Ammo Text object
+	 * @brief   Get the Ammo Text object
 	 *
-	 * @return FText
+	 * @return  FText
 	 */
 	FText GetAmmoText() const;
 

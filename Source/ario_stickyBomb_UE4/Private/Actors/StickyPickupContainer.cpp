@@ -23,7 +23,7 @@
 
 AStickyPickupContainer::AStickyPickupContainer()
 {
-	ConstructStaticMeshComponent();
+	ConstructStaticMeshComponents();
 	SetCollisionResponses();
 
 	PrimaryActorTick.bCanEverTick					 = false;
@@ -56,32 +56,4 @@ void AStickyPickupContainer::SetCollisionResponses()
 	// Mesh?  ->SetCollisionResponseToChannel(ECC_CharacterMesh, ECollisionResponse::ECR_Block);
 }
 
-void AStickyPickupContainer::ConstructStaticMeshComponent()
-{
-	// Create the static mesh component
-	MeshComponentPtr = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> Mesh(
-		TEXT("/Game/FirstPerson/Meshes/FirstPersonProjectileMesh.FirstPersonProjectileMesh"));
-	if (Mesh.Succeeded()) {
-		MeshComponentPtr->SetStaticMesh(Mesh.Object);
-	}
-
-	// TODO: pass the material as a constructor parameter instead of generating it here every spawn
-	static ConstructorHelpers::FObjectFinder<UMaterial> BaseMaterial(TEXT("/Game/FirstPerson/Meshes/BaseMaterial.BaseMaterial"));
-	if (BaseMaterial.Succeeded()) {
-		MeshMaterialInstance = UMaterialInstanceDynamic::Create(BaseMaterial.Object, MeshComponentPtr, "BaseMaterialInstance");
-		MeshMaterialInstance->SetVectorParameterValue("DiffuseColor", FLinearColor::Red);
-		MeshComponentPtr->SetMaterial(0, MeshMaterialInstance);
-
-		// MeshMaterialInstance = UMaterialInstanceDynamic::Create(Material.Object, MeshComponentPtr);
-	}
-	MeshComponentPtr->SetRelativeScale3D(FVector(0.12f, 0.12f, 0.12f));
-	MeshComponentPtr->SetupAttachment(RootComponent);
-
-	// MeshComponentPtr->SetCollisionResponseToChannel(ECC_Visibility, ECollisionResponse::ECR_Ignore);
-}
-
-void AStickyPickupContainer::FillBoxWithPickups()
-{
-	// Generate enough StickyPickups to fill a given Box, spawn them during BeginPlay
-}
+void AStickyPickupContainer::ConstructStaticMeshComponents() {}

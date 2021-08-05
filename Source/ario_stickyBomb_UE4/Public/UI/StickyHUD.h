@@ -12,9 +12,10 @@
 #include "StickyHUD.generated.h"
 
 /**
- * @author Ario Amin  @file UI/StickyHUD.h
- * @class AStickyHUD
- * @brief Main HUD class for ABaseShooter, derives from AHUD
+ * @author  Ario Amin
+ * @file    UI/StickyHUD.h
+ * @class   AStickyHUD
+ * @brief   Main HUD class for ABaseShooter, derives from AHUD
  * @details Simple HUD class to load the widgets in UI/Widgets/ and set up display
  */
 UCLASS()
@@ -24,7 +25,7 @@ class ARIO_STICKYBOMB_UE4_API AStickyHUD : public AHUD
 
 	public:
 	/**
-	 * @brief Construct a new AStickyHUD object
+	 * @brief   Construct a new AStickyHUD object
 	 *
 	 */
 	AStickyHUD();
@@ -33,27 +34,27 @@ class ARIO_STICKYBOMB_UE4_API AStickyHUD : public AHUD
 	/** Inherited Methods: Overrides */
 	protected:
 	/**
-	 * @brief
+	 * @brief   Inherited and unused PostInit
 	 *
 	 */
 	virtual void PostInitializeComponents() override;
 
 	/**
-	 * @brief
+	 * @brief   Initialize some components on BeginPlay
 	 *
 	 */
 	virtual void BeginPlay() final;
 
 	public:
 	/**
-	 * @brief
+	 * @brief   Inherited and mostly unused - Super::Tick
 	 *
-	 * @param DeltaTime
+	 * @param   DeltaTime
 	 */
 	virtual void Tick(float DeltaTime) final;
 
 	/**
-	 * @brief
+	 * @brief   Inherited and mostly unused - Super::DrawHUD
 	 *
 	 */
 	virtual void DrawHUD() final;
@@ -61,30 +62,30 @@ class ARIO_STICKYBOMB_UE4_API AStickyHUD : public AHUD
 	/* ================================ */
 	/* Public Methods: Client interface */
 	/**
-	 * @brief
+	 * @brief   Update Killbox/container with total kills
 	 *
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UIActions")
 	void UpdateTotalKills();
 
 	/**
-	 * @brief Reflect value to textbox
+	 * @brief   Reflect value to textbox
 	 * @details Reflects value from ABaseShooter->StickyGun->AmmoComp->GetAmmoCount(),e
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UIActions")
 	void UpdateAmmo();
 
 	/**
-	 * @brief
+	 * @brief   Toggle (unimplemented) game menu
 	 *
 	 */
 	void ToggleGameMenu();
 	// void AppendReloadPrompt();
 
 	/**
-	 * @brief
+	 * @brief   Update widget with Kill (unfinished/untested)
 	 *
-	 * @param Kill
+	 * @param   Kill
 	 */
 	void AddKillToWidget(FString Kill);
 
@@ -93,19 +94,19 @@ class ARIO_STICKYBOMB_UE4_API AStickyHUD : public AHUD
 	/* Protected Methods: Init Widgets */
 
 	/**
-	 * @brief
+	 * @brief   Init Kill Overlay widget
 	 *
 	 */
 	void InitializeKillOverlayWidget();
 
 	/**
-	 * @brief
+	 * @brief   Init Killbox/container widget
 	 *
 	 */
 	void InitializeTotalKillsWidget();
 
 	/**
-	 * @brief
+	 * @brief   Init AmmoWidget
 	 *
 	 */
 	void InitializeAmmoWidget();

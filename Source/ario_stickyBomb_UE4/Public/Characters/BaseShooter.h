@@ -29,51 +29,52 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 
 	public:
 	/**
-	 * @brief Construct a new ABaseShooter object
+	 * @brief   Construct a new ABaseShooter object
 	 *
 	 */
 	ABaseShooter();
 
 	protected:
 	/* ============================ */
-	/** Inherited Methods: Overrides */
+	/* Inherited Methods: Overrides */
 
 	/**
-	 * @brief Triggers BeginPlay
+	 * @brief   Component BeginPlay
+	 * @details Runs when world at BeginPlay, or when constructed in an already running world.
 	 *
 	 */
 	virtual void BeginPlay();
 
 	/**
-	 * @brief
+	 * @brief   Override in dervied classes to set up class-specific inputs
 	 *
-	 * @param InputComponent
+	 * @param   InputComponent
 	 */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
 	/**
-	 * @brief
+	 * @brief   TakeDamage event
 	 *
-	 * @param DamageAmount
-	 * @param DamageEvent
-	 * @param EventInstigator
-	 * @param DamageCauser
-	 * @return float
+	 * @param   DamageAmount
+	 * @param   DamageEvent
+	 * @param   EventInstigator
+	 * @param   DamageCauser
+	 * @return  float
 	 */
 	virtual float TakeDamage(
 		float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) final;
 
 	public:
 	/* ================================== */
-	/** Interface Methods: IInteractionOUI */
+	/* Interface Methods: IInteractionOUI */
 
 	/**
-	 * @brief Interact Item, Start
+	 * @brief   Interact Item, Start
 	 */
 	virtual void TryInteractItem() override;
 
 	/**
-	 * @brief Interact Item, End
+	 * @brief   Interact Item, End
 	 */
 	virtual void EndInteractItem() override;
 
@@ -81,37 +82,37 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	/* Public Methods: Getters */
 
 	/**
-	 * @brief Get the Sticky Gun object
+	 * @brief   Get the Sticky Gun object
 	 *
-	 * @return UStickyGunSkeletalComp*
+	 * @return  UStickyGunSkeletalComp*
 	 */
 	UStickyGunSkeletalComp* GetStickyGun();
 
 	/**
-	 * @brief Get the Char Mesh object
+	 * @brief   Get the Char Mesh object
 	 *
-	 * @return USkeletalMeshComponent*
+	 * @return  USkeletalMeshComponent*
 	 */
 	USkeletalMeshComponent* GetCharMesh();
 
 	/**
-	 * @brief Get the Health Comp object
+	 * @brief   Get the Health Comp object
 	 *
-	 * @return UHealthComp*
+	 * @return  UHealthComp*
 	 */
 	UHealthComp* GetHealthComp();
 
 	/**
-	 * @brief Get the Ammo Comp object
+	 * @brief   Get the Ammo Comp object
 	 *
-	 * @return UAmmoComp*
+	 * @return  UAmmoComp*
 	 */
 	UAmmoComp* GetAmmoComp();
 
 	/**
-	 * @brief Get the First Person Camera Component object
+	 * @brief   Get the First Person Camera Component object
 	 *
-	 * @return UCameraComponent*
+	 * @return  UCameraComponent*
 	 */
 	UCameraComponent* GetFirstPersonCameraComponent();
 
@@ -119,20 +120,20 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	/* Public Methods: Client Interface */
 
 	/**
-	 * @brief
+	 * @brief   Try triggering weapon, checks ammo with server in subsequent calls
 	 *
 	 */
 	void TryStartFire();
 
 	/**
-	 * @brief
+	 * @brief   Trigger ragdoll, can only be run by Server
 	 *
 	 */
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTriggerRagdoll();
 
 	/**
-	 * @brief
+	 * @brief   Reset player/Undo Ragdoll, Can only be run by server
 	 *
 	 */
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -142,58 +143,81 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	/* Public Methods: UI/HUD */
 
 	/**
-	 * @brief
+	 * @brief   Triggers an update to the players UAmmoWidget
 	 *
-	 * @param LocalAmmoUpdate
+	 * @param   LocalAmmoUpdate
 	 */
 	void TriggerPlayerStateAmmo(int LocalAmmoUpdate);
 
 	/* =========================== */
 	/* Public Fields: Rates/Limits */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float BaseTurnRate; /** In deg/sec. Other scaling may affect final turn rate. */
+	float BaseTurnRate; /** @brief  In deg/sec. Other scaling may affect final turn rate. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float BaseLookUpRate; /** In deg/sec. Other scaling may affect final rate. */
+	float BaseLookUpRate; /** @brief  In deg/sec. Other scaling may affect final rate. */
 
 	protected:
 	/* ================================= */
 	/* Protected Methods: Server/Client */
 
 	/**
-	 * @brief
+	 * @brief   Undo Ragdoll function, will run multicasted
 	 *
 	 */
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastUndoRagdoll();
 
 	/**
-	 * @brief
+	 * @brief   Trigger Ragdoll function, will run multicasted
 	 *
 	 */
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastTriggerRagdoll();
 
 	/**
-	 * @brief
+	 * @brief   Try Interaction function, will only run on server
 	 *
 	 */
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTryInteractItem();
 
+	/**
+	 * @brief   End Interaction function, will only run on server
+	 *
+	 */
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerEndInteractItem();
 
+	/**
+	 * @brief   TakeDamage function, will only run on server
+	 *
+	 * @param   ThisActor
+	 * @param   DamageAmount
+	 * @param   DamageType
+	 * @param   EventInstigator
+	 * @param   DamageCauser
+	 */
 	UFUNCTION(Server, Reliable)
 	void ServerTakeDamage(
 		AActor* ThisActor, float DamageAmount, const UDamageType* DamageType, AController* EventInstigator, AActor* DamageCauser);
 
 	/* ================================== */
 	/* Protected Methods: Component Setup */
+
+	/** @brief  Initializes the Skeletal mesh component and it's mesh */
 	void InitSkeletalBody();
+
+	/** @brief  Initializes the Camera component */
 	void InitCamera();
+
+	/** @brief  Initialize various actor components which aren't initialized in a function of their own*/
 	void InitActorComponents();
+
+	/** @brief  Construct a AStickyGunSkeletalComp and call some intializing functions on it*/
 	void SetupStickyGun();
+
+	/** @brief  Sets up collision channels and collision settings */
 	void SetupCollision();
 
 	/* ========================= */
@@ -202,34 +226,34 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	void MoveForward(float Val);
 
 	/**
-	 * @brief Turn Rate
+	 * @brief   Turn Rate
 	 * @details Called via input to turn at a given rate.
-	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
+	 * @param   Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void TurnAtRate(float Rate);
 
 	/**
-	 * @brief LookUp Rate
+	 * @brief   LookUp Rate
 	 * @details Called via input to turn look up/down at a given rate.
-	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
+	 * @param   Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void LookUpAtRate(float Rate);
 
 	/**
-	 * @brief Create a New Axis Mapping object
+	 * @brief   Create and store New Axis Mapping
 	 *
-	 * @param DesiredAxisName
-	 * @param DesiredAxisKey
-	 * @todo Move to a controller class perhaps?
+	 * @param   DesiredAxisName
+	 * @param   DesiredAxisKey
+	 * @todo    Move to a controller class perhaps?
 	 */
 	void CreateNewAxisMapping(FName DesiredAxisName, FKey DesiredAxisKey);
 
 	/**
-	 * @brief Create a New Action Mapping object
+	 * @brief   Create and store New Action Mapping
 	 *
-	 * @param DesiredActionName
-	 * @param DesiredActionKey
-	 * @todo Move to a controller class perhaps?
+	 * @param   DesiredActionName
+	 * @param   DesiredActionKey
+	 * @todo    Move to a controller class perhaps?
 	 */
 	void CreateNewActionMapping(FName DesiredActionName, FKey DesiredActionKey);
 
@@ -237,23 +261,22 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	/* Protected Fields: Components */
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* MeshPtr = nullptr; /** SkelMesh: 1st person view arms */
+	USkeletalMeshComponent* MeshPtr = nullptr; /** @brief   SkelMesh: 1st person view arms */
 
-	/** Gun mesh: 1st person view (seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	UStickyGunSkeletalComp* StickyGun = nullptr; /** SkelMesh: Skeletal Gun mesh */
+	UStickyGunSkeletalComp* StickyGun = nullptr; /** @brief   SkelMesh: Skeletal Gun mesh */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FirstPersonCameraComponent = nullptr; /** First person camera */
+	UCameraComponent* FirstPersonCameraComponent = nullptr; /** @brief  First person camera */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-	UHealthComp* HealthComponent = nullptr; /** Simple health component */
+	UHealthComp* HealthComponent = nullptr; /** @brief  Networked health component */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammo, meta = (AllowPrivateAccess = "true"))
-	UAmmoComp* AmmoComp = nullptr; /** Simpole ammo component */
+	UAmmoComp* AmmoComp = nullptr; /** @brief   Networked ammo component */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammo, meta = (AllowPrivateAccess = "true"))
-	UStickyLinetraceComp* LinetraceComp = nullptr; /** Interact detection linetrace comp */
+	UStickyLinetraceComp* LinetraceComp = nullptr; /** @brief   Interaction detection component, uses linetrace */
 
 	/* ================================== */
 	/* Protected Fields: Basic properties */

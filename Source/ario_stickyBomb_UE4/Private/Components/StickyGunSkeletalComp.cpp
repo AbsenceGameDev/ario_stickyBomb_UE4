@@ -151,7 +151,7 @@ UAnimMontage* UStickyGunSkeletalComp::GetFireAnimMontage() { return FireAnimatio
 
 void UStickyGunSkeletalComp::OnFire()
 {
-	// Request Server if we by some reason still are Client
+	// Request Server if we by some reason are calling as Client
 	if (GetOwnerRole() < ROLE_Authority) {
 		ServerOnFire();
 		return;

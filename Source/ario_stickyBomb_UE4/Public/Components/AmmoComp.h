@@ -16,9 +16,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(
 	FOnAmmoChangedSignature, UAmmoComp*, OwningAmmoComp, int, Ammo, int, AmmoDelta, AController*, InstigatedBy);
 
 /**
- * @author Ario Amin  @file Components/AmmoComp.h
- * @class UAmmoComp
- * @brief Networked ammo component
+ * @author  Ario Amin
+ * @file    Components/AmmoComp.h
+ * @class   UAmmoComp
+ * @brief   Networked ammo component
  * @details Simple networked Ammo Component to be used for ABaseShooter derived actors
  */
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -28,7 +29,7 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 
 	public:
 	/**
-	 * @brief Construct a new UAmmoComp object
+	 * @brief   Construct a new UAmmoComp object
 	 *
 	 */
 	UAmmoComp();
@@ -38,17 +39,18 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 	/** Inherited Methods: Overrides */
 
 	/**
-	 * @brief
+	 * @brief   Component BeginPlay
+	 * @details Runs when world at BeginPlay, or when constructed in an already running world.
 	 *
 	 */
 	virtual void BeginPlay() override;
 
 	/**
-	 * @brief
+	 * @brief   Unused, disabled in the constructor of the component
 	 *
-	 * @param DeltaTime
-	 * @param TickType
-	 * @param ThisTickFunction
+	 * @param   DeltaTime
+	 * @param   TickType
+	 * @param   ThisTickFunction
 	 */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -56,14 +58,14 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 	/* ================================ */
 	/* Public Methods: Client interface */
 	/**
-	 * @brief
+	 * @brief   Try firing a round of ammo, calls server which makes sure it is allowed.
 	 *
 	 */
 	UFUNCTION()
 	void TryFire();
 
 	/**
-	 * @brief
+	 * @brief   Try picking up a round of ammo, calls server which makes sure it is allowed.
 	 *
 	 */
 	UFUNCTION()
@@ -73,25 +75,24 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 	/* Public Methods: Inlined Getters */
 
 	/**
-	 * @brief Get the Ammo object
+	 * @brief   Get the Ammo Count
 	 *
-	 * @return float
+	 * @return  float
 	 */
 	float GetAmmo() const { return AmmoCount; }
 
 	/**
-	 * @brief
+	 * @brief   Is the ammo component out of rounds?
 	 *
-	 * @return true
-	 * @return false
+	 * @return  true | false
 	 */
 	bool IsEmpty() const { return bIsEmpty; }
 
 	/**
-	 * @brief
+	 * @brief   Comparison of Ammo count,
+	 * @details Returns result of comparison, true if AmmoCount is greater than or equal to MaxAmmo.
 	 *
-	 * @return true
-	 * @return false
+	 * @return  true | false
 	 */
 	bool IsFullClip() const { return AmmoCount >= MaxAmmo; }
 
@@ -105,43 +106,45 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 	/* Protected Methods: Client/Server actions */
 
 	/**
-	 * @brief
+	 * @brief   OnReplicate Ammo
 	 *
-	 * @param PrevAmmo
+	 * @param   PrevAmmo
 	 */
 	UFUNCTION()
 	void OnRep_Ammo(int PrevAmmo);
 
 	/**
-	 * @brief
-	 *
+	 * @brief   OnFire, called by server
+	 * @details Decrement the ammo count after request has been handles by server.
 	 */
 	UFUNCTION()
 	void OnFire();
 
 	/**
-	 * @brief
+	 * @brief   OnPickupRound, called by server
+	 * @details Increment the ammo count after request has been handles by server.
 	 *
 	 */
 	UFUNCTION()
 	void OnPickupRound();
 
 	/**
-	 * @brief
+	 * @brief   Server only, calls OnFire
 	 *
 	 */
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerOnFire(); /** Send request to host server, withValidation */
 
 	/**
-	 * @brief
+	 * @brief   Server only, calls OnPickupRound
 	 *
 	 */
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerOnPickupRound(); /** Send request to host server, withValidation */
 
-	/* ======================================== */
+	/* ====================== */
 	/* Protected Fields: Ammo */
+
 	bool bIsEmpty;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AmmoComp")

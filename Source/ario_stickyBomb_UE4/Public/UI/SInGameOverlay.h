@@ -7,9 +7,10 @@
 #include <Widgets/SCompoundWidget.h>
 
 /**
- * @author Ario Amin  @file UI/SInGameOverlay.h
- * @class SInGameOverlay
- * @brief Game Overlay widget, derives from SCompoundWidget
+ * @author  Ario Amin
+ * @file    UI/SInGameOverlay.h
+ * @class   SInGameOverlay
+ * @brief   Game Overlay widget, derives from SCompoundWidget
  * @details Simple widget to use a in game overlay.
  */
 class ARIO_STICKYBOMB_UE4_API SInGameOverlay : public SCompoundWidget
@@ -19,9 +20,9 @@ class ARIO_STICKYBOMB_UE4_API SInGameOverlay : public SCompoundWidget
 	SLATE_END_ARGS()
 
 	/**
-	 * @brief
+	 * @brief   Construct widget
 	 *
-	 * @param InArgs
+	 * @param   InArgs
 	 */
 	void Construct(const FArguments& InArgs);
 };

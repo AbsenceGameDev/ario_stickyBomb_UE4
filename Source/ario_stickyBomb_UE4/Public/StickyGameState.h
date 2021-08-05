@@ -8,10 +8,11 @@
 #include "StickyGameState.generated.h"
 
 /**
- * @author Ario Amin  @file /StickyGameState.h
- * @class AStickyGameState
- * @brief Dummy Gamestate, derives from AGameStateBase
- * @todo Add gamestate logic
+ * @author  Ario Amin
+ * @file    /StickyGameState.h
+ * @class   AStickyGameState
+ * @brief   Dummy Gamestate, derives from AGameStateBase
+ * @todo    Add gamestate logic
  */
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyGameState : public AGameStateBase

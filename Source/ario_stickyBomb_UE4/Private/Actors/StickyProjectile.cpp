@@ -195,17 +195,6 @@ void AStickyProjectile::OnExplode()
 	Destroy();
 }
 
-void AStickyProjectile::OnPickup(ABaseShooter* CallerBaseShooterActor)
-{
-	/*
-	CallerBaseShooterActor->->SetCanPickup(false);
-	CallerBaseShooterActor->GetAmmoComp()->TryPickupRound();
-	Destroy();
-	Call Ammo Component, add Ammo */
-
-	return;
-}
-
 /* ========================== */
 /* Protected Methods: VFX/SFX */
 

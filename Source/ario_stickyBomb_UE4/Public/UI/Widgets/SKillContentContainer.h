@@ -6,9 +6,10 @@
 #include "Helpers/ForwardDecls.h"
 
 /**
- * @author Ario Amin  @file UI/Widgets/SKillContentContainer.h
- * @class SKillContentContainer
- * @brief Kill Container widget, derives from SCompoundWidget
+ * @author  Ario Amin
+ * @file    UI/Widgets/SKillContentContainer.h
+ * @class   SKillContentContainer
+ * @brief   Kill Container widget, derives from SCompoundWidget
  * @details Simple widget to display the kills in a cornered box.
  */
 class ARIO_STICKYBOMB_UE4_API SKillContentContainer : public SCompoundWidget
@@ -19,26 +20,26 @@ class ARIO_STICKYBOMB_UE4_API SKillContentContainer : public SCompoundWidget
 	SLATE_END_ARGS()
 
 	/**
-	 * @brief
+	 * @brief   Construct widget
 	 *
-	 * @param InArgs
+	 * @param   InArgs
 	 */
 	void Construct(const FArguments& InArgs);
 
 	/**
-	 * @brief
+	 * @brief   Add Slot to widget
 	 *
-	 * @param Value
+	 * @param   Value
 	 */
 	void AddSlot(FString Value);
 
 	protected:
 	/**
-	 * @brief
+	 * @brief   Generate row from table
 	 *
-	 * @param NewItem
-	 * @param OwnerTable
-	 * @return TSharedRef<ITableRow>
+	 * @param   NewItem
+	 * @param   OwnerTable
+	 * @return  TSharedRef<ITableRow>
 	 */
 	TSharedRef<ITableRow> OnGenerateRowForList(TSharedPtr<FString> NewItem, const TSharedRef<STableViewBase>& OwnerTable);
 

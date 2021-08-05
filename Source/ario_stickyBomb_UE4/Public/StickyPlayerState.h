@@ -26,49 +26,49 @@ class ARIO_STICKYBOMB_UE4_API AStickyPlayerState : public APlayerState
 	/* Public Methods: Client interface */
 
 	/**
-	 * @brief
+	 * @brief   Add new Score Delta
 	 *
-	 * @param DeltaScore
+	 * @param   DeltaScore
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Score")
 	void AddUserScore(float DeltaScore);
 
 	/**
-	 * @brief Get the User Score value
+	 * @brief   Get the User Score value
 	 *
-	 * @return float
+	 * @return  float
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Score")
 	float GetUserScore() const;
 
 	/**
-	 * @brief
+	 * @brief   Add new kill count Delta
 	 *
-	 * @param KillCount
+	 * @param   KillCount
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Kills")
 	void AddKill(int32 KillCount);
 
 	/**
-	 * @brief Get the Kills value
+	 * @brief   Get the Kills value
 	 *
-	 * @return int32
+	 * @return  int32
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Kills")
 	int32 GetKills() const;
 
 	/**
-	 * @brief Set the Ammo count
+	 * @brief   Set the Ammo count
 	 *
-	 * @param AmmoCount
+	 * @param   AmmoCount
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Ammo")
 	void SetAmmo(int32 AmmoCount);
 
 	/**
-	 * @brief Get the Ammo count
+	 * @brief   Get the Ammo count
 	 *
-	 * @return int32
+	 * @return  int32
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Ammo")
 	int32 GetAmmo() const;
@@ -77,14 +77,14 @@ class ARIO_STICKYBOMB_UE4_API AStickyPlayerState : public APlayerState
 	/* ======================================== */
 	/* Protected Methods: Server/Client Actions */
 	/**
-	 * @brief On replication, Kills
+	 * @brief   On replication, Kills
 	 *
 	 */
 	UFUNCTION()
 	void OnRep_Kills();
 
 	/**
-	 * @brief OnReplication, Ammo
+	 * @brief   OnReplication, Ammo
 	 *
 	 */
 	UFUNCTION()

@@ -29,25 +29,27 @@ class ARIO_STICKYBOMB_UE4_API UStickyLinetraceComp : public USceneComponent
 
 	public:
 	/**
-	 * @brief Construct a new UStickyLinetraceComp object
+	 * @brief   Construct a new UStickyLinetraceComp object
 	 *
 	 */
 	UStickyLinetraceComp();
 
 	protected:
 	/**
-	 * @brief Called when the game starts
+	 * @brief   Called when the game starts
 	 *
 	 */
 	virtual void BeginPlay() override;
 
 	public:
 	/**
-	 * @brief
+	 * @brief   This components tick function.
+	 * @details It fires a line trace in direction of the components normal vector.
+	 *          Tick interval is set to 0.5 seconds for this component
 	 *
-	 * @param DeltaTime
-	 * @param TickType
-	 * @param ThisTickFunction
+	 * @param   DeltaTime
+	 * @param   TickType
+	 * @param   ThisTickFunction
 	 */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

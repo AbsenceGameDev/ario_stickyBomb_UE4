@@ -24,22 +24,23 @@ class ARIO_STICKYBOMB_UE4_API ABomberman : public ABaseShooter
 
 	public:
 	/**
-	 * @brief Construct a new ABomberman object
+	 * @brief   Construct a new ABomberman object
 	 *
 	 */
 	ABomberman();
 
 	protected:
 	/**
-	 * @brief
+	 * @brief   Actor BeginPlay
+	 * @details Runs when world at BeginPlay, or when constructed in an already running world.
 	 *
 	 */
 	virtual void BeginPlay();
 
 	/**
-	 * @brief
+	 * @brief   Override in dervied classes to set up class-specific inputs
 	 *
-	 * @param InputComponent
+	 * @param   InputComponent
 	 */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 };

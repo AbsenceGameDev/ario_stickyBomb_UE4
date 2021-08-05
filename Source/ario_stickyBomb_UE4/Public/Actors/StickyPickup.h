@@ -25,28 +25,28 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickup : public AStickyBaseActor
 
 	public:
 	/**
-	 * @brief Construct a new AStickyPickup object
+	 * @brief   Construct a new AStickyPickup object
 	 *
 	 */
 	AStickyPickup();
 
 	protected:
 	/* ============================ */
-	/** Inherited Methods: Overrides */
+	/* Inherited Methods: Overrides */
 	virtual void Tick(float DeltaTime) final;
 	virtual void BeginPlay() final;
 
 	public:
 	/* ============================== */
-	/** Interface Methods: Interaction */
+	/* Interface Methods: Interaction */
 
 	/**
-	 * @brief Interact Item, End
+	 * @brief   Interact Item, End
 	 */
 	virtual void EndInteractItem() override;
 
 	/**
-	 * @brief Interact Item, Start
+	 * @brief   Interact Item, Start
 	 */
 	virtual void TryInteractItem() override;
 
@@ -54,19 +54,18 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickup : public AStickyBaseActor
 	/* Public Methods: Client Interface */
 
 	/**
-	 * @brief
+	 * @brief   Tries picking up actor, returns to reflect if it was successful
 	 *
-	 * @param OtherActor
-	 * @return true
-	 * @return false
+	 * @param   OtherActor
+	 * @return  true | false
 	 */
 	UFUNCTION()
 	bool DidPickup(AActor* OtherActor);
 
 	/**
-	 * @brief Get the Collision Comp object
+	 * @brief   Get the Collision Comp object
 	 *
-	 * @return USphereComponent*
+	 * @return  USphereComponent*
 	 */
 	USphereComponent* GetCollisionComp() const;
 
@@ -84,19 +83,20 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickup : public AStickyBaseActor
 	/* Private Methods: Component Initializers */
 
 	/**
-	 * @brief
+	 * @brief   Construct collision component and sets it to root.
 	 *
 	 */
 	void ConstructCollisionComponent();
 
 	/**
-	 * @brief Set the Collision Responses object
+	 * @brief   Set the default Collision Responses for this actor
 	 *
 	 */
 	void SetCollisionResponses();
 
 	/**
-	 * @brief
+	 * @brief   Construct a static mesh sphere
+	 * @details Construct a static mesh component and attach it to root. Then set material for it.
 	 *
 	 */
 	void ConstructStaticMeshComponent();
@@ -105,7 +105,6 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickup : public AStickyBaseActor
 	/* Private Fields: Basic Properties */
 	FLinearColor BaseColor = FLinearColor(0.960784, 0.584314, 0.109804, 1.000000);
 
-	// Projectile material
 	UPROPERTY(VisibleDefaultsOnly, Category = Material)
 	UMaterialInstanceDynamic* MeshMaterialInstance;
 

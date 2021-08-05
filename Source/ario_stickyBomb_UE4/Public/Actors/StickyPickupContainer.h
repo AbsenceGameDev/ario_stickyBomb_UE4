@@ -24,62 +24,53 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickupContainer : public AStickyBaseActor
 
 	public:
 	/**
-	 * @brief Construct a new AStickyPickupContainer object
+	 * @brief   Construct a new AStickyPickupContainer object
 	 *
 	 */
 	AStickyPickupContainer();
 
 	protected:
 	/* ============================ */
-	/** Inherited Methods: Overrides */
+	/* Inherited Methods: Overrides */
 	virtual void Tick(float DeltaTime) final;
 	virtual void BeginPlay() final;
 
 	public:
 	/* ============================== */
-	/** Interface Methods: Interaction */
+	/* Interface Methods: Interaction */
 
 	/**
-	 * @brief Interact Item, End
+	 * @brief   Interact Item, End
 	 */
 	virtual void EndInteractItem() override;
 
 	/**
-	 * @brief Interact Item, Start
+	 * @brief   Interact Item, Start
 	 */
 	virtual void TryInteractItem() override;
-
-	/* =============================== */
-	/* Public Methods: Getters/Setters */
 
 	protected:
 	/* ============================ */
 	/* Protected Fields: Components */
 
-	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	UStaticMeshComponent* MeshComponentPtr = nullptr;
+	UPROPERTY(VisibleDefaultsOnly, Category = ContainerActors)
+	TArray<UStaticMeshComponent*> MeshComponentArray;
 
 	private:
 	/* ======================================= */
 	/* Private Methods: Component Initializers */
 
 	/**
-	 * @brief Set the Collision Responses object
+	 * @brief   Set the Collision Responses object
 	 *
 	 */
 	void SetCollisionResponses();
 
 	/**
-	 * @brief Construct and set static mesh
-	 *
+	 * @brief   Generate Static Mesh Component
+	 * @details Generates cube of spheres, surround with wall type static meshes.
 	 */
-	void ConstructStaticMeshComponent();
-
-	/**
-	 * @brief Generate a simple static mesh box filled with AStickyPickup'
-	 *
-	 */
-	void FillBoxWithPickups();
+	void ConstructStaticMeshComponents();
 
 	/* ================================ */
 	/* Private Fields: Basic Properties */

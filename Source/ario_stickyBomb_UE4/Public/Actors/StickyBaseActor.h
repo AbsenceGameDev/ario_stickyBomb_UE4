@@ -22,21 +22,21 @@ class ARIO_STICKYBOMB_UE4_API AStickyBaseActor : public AActor, public IInteract
 
 	public:
 	/**
-	 * @brief Construct a new AStickyBaseActor object
+	 * @brief   Construct a new AStickyBaseActor object
 	 *
 	 */
 	AStickyBaseActor();
 
 	/* ============================== */
-	/** Interface Methods: Interaction */
+	/* Interface Methods: Interaction */
 
 	/**
-	 * @brief Interact Item, End
+	 * @brief   Interact Item, End
 	 */
 	virtual void TryInteractItem() override;
 
 	/**
-	 * @brief Interact Item, Start
+	 * @brief   Interact Item, Start
 	 */
 	virtual void EndInteractItem() override;
 };

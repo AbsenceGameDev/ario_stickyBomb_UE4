@@ -8,9 +8,10 @@
 #include <Widgets/SCompoundWidget.h>
 
 /**
- * @author Ario Amin  @file UI/Widgets/SKillWidget.h
- * @class SKillWidget
- * @brief Kill Count widget, derives from SCompoundWidget
+ * @author  Ario Amin
+ * @file    UI/Widgets/SKillWidget.h
+ * @class   SKillWidget
+ * @brief   Kill Count widget, derives from SCompoundWidget
  * @details Simple widget to display the kill count.
  */
 class ARIO_STICKYBOMB_UE4_API SKillWidget : public SCompoundWidget
@@ -22,23 +23,23 @@ class ARIO_STICKYBOMB_UE4_API SKillWidget : public SCompoundWidget
 	SLATE_END_ARGS()
 
 	/**
-	 * @brief
+	 * @brief   Construct Widget
 	 *
-	 * @param InArgs
+	 * @param   InArgs
 	 */
 	void Construct(const FArguments& InArgs);
 
 	/**
-	 * @brief Set the Score Text object
+	 * @brief   Set the Score Text
 	 *
-	 * @param Score
+	 * @param   Score
 	 */
 	void SetScoreText(FText Score);
 
 	/**
-	 * @brief Get the Score Text object
+	 * @brief   Get the Score Text
 	 *
-	 * @return FText
+	 * @return  FText
 	 */
 	FText GetScoreText() const;
 
