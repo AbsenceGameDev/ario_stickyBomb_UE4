@@ -215,8 +215,22 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	 */
 	void LookUpAtRate(float Rate);
 
-	// Move to a inherited controller class perhaps?
+	/**
+	 * @brief Create a New Axis Mapping object
+	 *
+	 * @param DesiredAxisName
+	 * @param DesiredAxisKey
+	 * @todo Move to a controller class perhaps?
+	 */
 	void CreateNewAxisMapping(FName DesiredAxisName, FKey DesiredAxisKey);
+
+	/**
+	 * @brief Create a New Action Mapping object
+	 *
+	 * @param DesiredActionName
+	 * @param DesiredActionKey
+	 * @todo Move to a controller class perhaps?
+	 */
 	void CreateNewActionMapping(FName DesiredActionName, FKey DesiredActionKey);
 
 	/* ============================ */
