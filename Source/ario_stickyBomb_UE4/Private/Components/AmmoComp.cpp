@@ -53,12 +53,6 @@ void UAmmoComp::TryPickupRound() { OnPickupRound(); }
 /* ======================================== */
 /* Protected Methods: Client/Server actions */
 
-void UAmmoComp::OnRep_Ammo(int PrevAmmo)
-{
-	float AmmoDiff = AmmoCount - PrevAmmo;
-	OnAmmoChanged.Broadcast(this, AmmoCount, AmmoDiff, nullptr);
-}
-
 void UAmmoComp::OnFire()
 {
 	if (GetOwnerRole() < ROLE_Authority) {
@@ -99,15 +93,10 @@ void UAmmoComp::OnPickupRound()
 
 	AmmoCount++;
 	bIsEmpty = (AmmoCount = LL_CLAMP(AmmoCount, 0, MaxAmmo)) < 1;
-	StaticCast<ABaseShooter*>(GetOwner())->TriggerPlayerStateAmmo(AmmoCount);
 
-	// OnAmmoChanged.Broadcast(this, AmmoCount, RoundsOfAmmo, nullptr);
+	/** @todo Delegate would be more fitting here, maybe bind a delegate to the owner when owner constructs their ammo component */
+	StaticCast<ABaseShooter*>(GetOwner())->TriggerPlayerStateAmmo(AmmoCount);
 }
 
 void UAmmoComp::ServerOnPickupRound_Implementation() { OnPickupRound(); }
 bool UAmmoComp::ServerOnPickupRound_Validate() { return true; }
-void UAmmoComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(UAmmoComp, AmmoCount);
-}

@@ -106,14 +106,6 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 	/* Protected Methods: Client/Server actions */
 
 	/**
-	 * @brief   OnReplicate Ammo
-	 *
-	 * @param   PrevAmmo
-	 */
-	UFUNCTION()
-	void OnRep_Ammo(int PrevAmmo);
-
-	/**
 	 * @brief   OnFire, called by server
 	 * @details Decrement the ammo count after request has been handles by server.
 	 */
@@ -150,6 +142,6 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AmmoComp")
 	int MaxAmmo = DEFAULT_STICKY_GUN_MAX;
 
-	UPROPERTY(ReplicatedUsing = OnRep_Ammo, BlueprintReadOnly, Category = "AmmoComp")
+	UPROPERTY(BlueprintReadOnly, Category = "AmmoComp")
 	int AmmoCount = MaxAmmo;
 };
