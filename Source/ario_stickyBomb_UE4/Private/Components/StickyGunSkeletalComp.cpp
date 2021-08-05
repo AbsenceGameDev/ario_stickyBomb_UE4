@@ -5,7 +5,7 @@
  * @brief   Networked weapon component
  * @details Derived from USkeletalMeshComponent,
  *          Designed to be used with ABaseShooter derived classes
- **/
+ */
 #include "Components/StickyGunSkeletalComp.h"
 
 // Actors / Components / Helpers
@@ -49,8 +49,8 @@ UStickyGunSkeletalComp::UStickyGunSkeletalComp()
 	SetIsReplicated(true);
 }
 
-/** ================================ **/
-/** Public Methods: Client interface **/
+/* ================================ */
+/* Public Methods: Client interface */
 
 void UStickyGunSkeletalComp::InitStickyGun(ABaseShooter* Caller, FVector LocalGunOffset, USceneComponent* MuzzlePlacementComp)
 {
@@ -88,8 +88,8 @@ void UStickyGunSkeletalComp::InitStickyGun(ABaseShooter* Caller, FVector LocalGu
 
 void UStickyGunSkeletalComp::TryStartFire() { OnFire(); }
 
-/** ================================= **/
-/** Public Methods: Networked VFX/SFX **/
+/* ================================= */
+/* Public Methods: Networked VFX/SFX */
 
 void UStickyGunSkeletalComp::MulticastFireGunEffects_Implementation(AStickyProjectile* LocalProjectileActorPtr)
 {
@@ -102,8 +102,8 @@ void UStickyGunSkeletalComp::MulticastFireGunEffects_Implementation(AStickyProje
 	// SuccessFireEffects();
 }
 
-/** ========================== **/
-/** Protected Methods: VFX/SFX **/
+/* ========================== */
+/* Protected Methods: VFX/SFX */
 void UStickyGunSkeletalComp::SuccessFireEffects()
 {
 	if (FireSound != nullptr) {
@@ -139,15 +139,15 @@ void UStickyGunSkeletalComp::FailFireEffects()
 					// }
 }
 
-/** =============================== **/
-/** Public Methods: Getters/Setters **/
+/* =============================== */
+/* Public Methods: Getters/Setters */
 UAmmoComp*		UStickyGunSkeletalComp::GetAmmoComp() { return AmmoComp; }
 ABaseShooter* UStickyGunSkeletalComp::GetOwningCharacter() { return OwningCharacter; }
 USoundBase*		UStickyGunSkeletalComp::GetFireSound() { return FireSound; }
 UAnimMontage* UStickyGunSkeletalComp::GetFireAnimMontage() { return FireAnimation; }
 
-/** ======================================== **/
-/** Protected Methods: Client/Server actions **/
+/* ======================================== */
+/* Protected Methods: Client/Server actions */
 
 void UStickyGunSkeletalComp::OnFire()
 {
@@ -235,8 +235,8 @@ void UStickyGunSkeletalComp::ServerOnFire_Implementation() { OnFire(); }
 // intended for anti-cheat, validates code
 bool UStickyGunSkeletalComp::ServerOnFire_Validate() { return true; }
 
-/** ================================= **/
-/** Protected Methods: Client actions **/
+/* ================================= */
+/* Protected Methods: Client actions */
 
 void UStickyGunSkeletalComp::GenerateCurve()
 {

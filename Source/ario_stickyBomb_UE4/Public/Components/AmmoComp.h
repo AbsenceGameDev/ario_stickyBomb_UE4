@@ -20,7 +20,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(
  * @class UAmmoComp
  * @brief Networked ammo component
  * @details Simple networked Ammo Component to be used for ABaseShooter derived actors
- **/
+ */
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 {
@@ -34,8 +34,8 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 	UAmmoComp();
 
 	protected:
-	/** ============================ **/
-	/** Inherited Methods: Overrides **/
+	/* ============================ */
+	/** Inherited Methods: Overrides */
 
 	/**
 	 * @brief
@@ -53,8 +53,8 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	public:
-	/** ================================ **/
-	/** Public Methods: Client interface **/
+	/* ================================ */
+	/* Public Methods: Client interface */
 	/**
 	 * @brief
 	 *
@@ -69,8 +69,8 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 	UFUNCTION()
 	void TryPickupRound();
 
-	/** =============================== **/
-	/** Public Methods: Inlined Getters **/
+	/* =============================== */
+	/* Public Methods: Inlined Getters */
 
 	/**
 	 * @brief Get the Ammo object
@@ -95,14 +95,14 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 	 */
 	bool IsFullClip() const { return AmmoCount >= MaxAmmo; }
 
-	/** =============================== **/
-	/** Public Fields: Events/Delegates **/
+	/* =============================== */
+	/* Public Fields: Events/Delegates */
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnAmmoChangedSignature OnAmmoChanged;
 
 	protected:
-	/** ======================================== **/
-	/** Protected Methods: Client/Server actions **/
+	/* ======================================== */
+	/* Protected Methods: Client/Server actions */
 
 	/**
 	 * @brief
@@ -131,17 +131,17 @@ class ARIO_STICKYBOMB_UE4_API UAmmoComp : public UActorComponent
 	 *
 	 */
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerOnFire(); /** Send request to host server, withValidation **/
+	void ServerOnFire(); /** Send request to host server, withValidation */
 
 	/**
 	 * @brief
 	 *
 	 */
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerOnPickupRound(); /** Send request to host server, withValidation **/
+	void ServerOnPickupRound(); /** Send request to host server, withValidation */
 
-	/** ======================================== **/
-	/** Protected Fields: Ammo **/
+	/* ======================================== */
+	/* Protected Fields: Ammo */
 	bool bIsEmpty;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AmmoComp")

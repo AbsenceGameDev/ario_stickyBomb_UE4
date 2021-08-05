@@ -3,7 +3,7 @@
 /**
  * @author Ario Amin  @file Helpers/CollisionChannels.h
  * @brief Collision Channels defintions
- **/
+ */
 // Collision Object Channel shorthands
 #define ECC_StickyProjectile ECollisionChannel::ECC_GameTraceChannel3
 #define ECC_StickyGun ECollisionChannel::ECC_GameTraceChannel4

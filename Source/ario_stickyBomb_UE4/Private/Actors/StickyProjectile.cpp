@@ -4,7 +4,7 @@
  * @class   AStickyProjectile
  * @brief   A projectile moving actor class
  * @details A projectile actor which acts as a sticky bomb. Networked, but only naively implemented.
- **/
+ */
 #include "Actors/StickyProjectile.h"
 
 // General
@@ -71,8 +71,8 @@ AStickyProjectile::AStickyProjectile()
 	TimelineFinishedEvent.BindUFunction(this, FName{TEXT("ServerTriggerExplosionFX")});
 }
 
-/** ============================ **/
-/** Inherited Methods: Overrides **/
+/* ============================ */
+/** Inherited Methods: Overrides */
 
 void AStickyProjectile::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
 
@@ -102,8 +102,8 @@ void AStickyProjectile::TryInteractItem()
 }
 void AStickyProjectile::EndInteractItem() {}
 
-/** =============================== **/
-/** Public Methods: Getters/Setters **/
+/* =============================== */
+/* Public Methods: Getters/Setters */
 
 float													AStickyProjectile::GetMaxLifetime() const { return MaxCurrentLifetime; };
 USphereComponent*							AStickyProjectile::GetCollisionComp() const { return CollisionComp; }
@@ -122,8 +122,8 @@ void				 AStickyProjectile::SetCurve(UCurveFloat* InCurve) { StickyTimelineCurve
 UCurveFloat* AStickyProjectile::GetCurve() { return StickyTimelineCurve; }
 // void AStickyProjectile::MulticastSetCurve(UCurveFloat InCurve) { *StickyTimelineCurve = InCurve; }
 
-/** ============================ **/
-/** Public Methods: Conditionals **/
+/* ============================ */
+/* Public Methods: Conditionals */
 bool AStickyProjectile::DidPickup(AActor* OtherActor)
 {
 	if (GetLocalRole() == ROLE_Authority) {
@@ -145,8 +145,8 @@ bool AStickyProjectile::DidPickup(AActor* OtherActor)
 	return false;
 }
 
-/** ================================= **/
-/** Protected Methods: Actions/Events **/
+/* ================================= */
+/* Protected Methods: Actions/Events */
 void AStickyProjectile::OnHit(
 	UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -206,8 +206,8 @@ void AStickyProjectile::OnPickup(ABaseShooter* CallerBaseShooterActor)
 	return;
 }
 
-/** ========================== **/
-/** Protected Methods: VFX/SFX **/
+/* ========================== */
+/* Protected Methods: VFX/SFX */
 
 void AStickyProjectile::ModulateColor_Implementation(const float InterpValue)
 {
@@ -261,8 +261,8 @@ void AStickyProjectile::ServerTriggerExplosionFX_Implementation() { MultiCastTri
 
 void AStickyProjectile::MultiCastTriggerExplosionFX_Implementation() { TriggerExplosionFX(); }
 
-/** ======================================= **/
-/** Private Methods: Component Initializers **/
+/* ======================================= */
+/* Private Methods: Component Initializers */
 
 void AStickyProjectile::ConstructCollisionComponent()
 {

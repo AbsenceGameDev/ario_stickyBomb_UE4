@@ -11,13 +11,17 @@
  * @class SInGameOverlay
  * @brief Game Overlay widget, derives from SCompoundWidget
  * @details Simple widget to use a in game overlay.
- **/
+ */
 class ARIO_STICKYBOMB_UE4_API SInGameOverlay : public SCompoundWidget
 {
 	public:
 	SLATE_BEGIN_ARGS(SInGameOverlay) {}
 	SLATE_END_ARGS()
 
-	/** Constructs this widget with InArgs */
+	/**
+	 * @brief
+	 *
+	 * @param InArgs
+	 */
 	void Construct(const FArguments& InArgs);
 };

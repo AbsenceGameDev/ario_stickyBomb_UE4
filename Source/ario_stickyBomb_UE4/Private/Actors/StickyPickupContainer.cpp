@@ -3,7 +3,7 @@
  * @file    Actors/StickyPickupContainer.cpp
  * @class   AStickyPickupContainer
  * @brief   A simple actor which holds a static mesh container
- **/
+ */
 
 #include "Actors/StickyPickupContainer.h"
 
@@ -34,19 +34,19 @@ AStickyPickupContainer::AStickyPickupContainer()
 	SetReplicateMovement(true);
 }
 
-/** ============================ **/
-/** Inherited Methods: Overrides **/
+/* ============================ */
+/** Inherited Methods: Overrides */
 
 void AStickyPickupContainer::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
 void AStickyPickupContainer::BeginPlay() { Super::BeginPlay(); }
 void AStickyPickupContainer::EndInteractItem() {}
 void AStickyPickupContainer::TryInteractItem() {}
 
-/** =============================== **/
-/** Public Methods: Getters/Setters **/
+/* =============================== */
+/* Public Methods: Getters/Setters */
 
-/** ======================================= **/
-/** Private Methods: Component Initializers **/
+/* ======================================= */
+/* Private Methods: Component Initializers */
 
 void AStickyPickupContainer::SetCollisionResponses()
 {

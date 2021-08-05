@@ -17,7 +17,7 @@ enum class EVisibleState : uint8 {
  * @class SSlideInText
  * @brief Slide In Text widget, derives from SCompoundWidget
  * @details Simple widget to slide in text upon a player kill.
- **/
+ */
 class ARIO_STICKYBOMB_UE4_API SSlideInText : public SCompoundWidget
 {
 	public:
@@ -25,15 +25,41 @@ class ARIO_STICKYBOMB_UE4_API SSlideInText : public SCompoundWidget
 	SLATE_ARGUMENT(FText, TextToShow)
 	SLATE_END_ARGS()
 
+	/**
+	 * @brief
+	 *
+	 * @param InArgs
+	 */
 	void Construct(const FArguments& InArgs);
+
+	/**
+	 * @brief
+	 *
+	 */
 	void TransitionIn();
+
+	/**
+	 * @brief
+	 *
+	 */
 	void TransitionOut();
 
 	FText TextToShow;
 
 	protected:
+	/**
+	 * @brief Get the Color object
+	 *
+	 * @return FLinearColor
+	 */
 	FLinearColor GetColor() const;
-	FVector2D		 GetItemScale() const;
+
+	/**
+	 * @brief Get the Item Scale object
+	 *
+	 * @return FVector2D
+	 */
+	FVector2D GetItemScale() const;
 
 	EVisibleState	 CurrentState;
 	FCurveSequence VisibleAnimation;
@@ -43,5 +69,12 @@ class ARIO_STICKYBOMB_UE4_API SSlideInText : public SCompoundWidget
 	FCurveHandle	 FadeValue;
 
 	private:
+	/**
+	 * @brief
+	 *
+	 * @param AllottedGeometry
+	 * @param InCurrentTime
+	 * @param InDeltaTime
+	 */
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 };

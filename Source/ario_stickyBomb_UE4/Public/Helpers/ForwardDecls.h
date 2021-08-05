@@ -4,7 +4,7 @@
  * @author Ario Amin  @file Helpers/ForwardDecls.h
  * @brief Forward Declarations
  * @details Not pretty, but makes the actual headers look a bit cleaner
- **/
+ */
 // Engine Components
 class UPrimitiveComponent;
 class USphereComponent;
@@ -30,17 +30,17 @@ class USoundBase;
 
 struct FAttachmentTransformRules;
 
-/** Non-engine types **/
+/** Non-engine types */
 class FMaterialGenerator;
 
-/** Actors **/
+/** Actors */
 class AStickyProjectile;
 class AStickyGameMode;
 class AStickyGameState;
 class AStickyPlayerState;
 class ABaseShooter;
 
-/** Components **/
+/** Components */
 class UHealthComp;
 class UAmmoComp;
 class UStickyGunSkeletalComp;
@@ -48,7 +48,7 @@ class UStickyLinetraceComp;
 
 /** Forward decl. UI
  * @todo Have not made this widget yet, mid-priority
- **/
+ */
 class SHealthWidget;
 
 /** Forward decl. Basic Slate UI */

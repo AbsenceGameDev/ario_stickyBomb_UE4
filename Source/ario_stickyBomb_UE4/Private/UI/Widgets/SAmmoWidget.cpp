@@ -4,7 +4,7 @@
  * @class   SAmmoWidget
  * @brief   Ammo Widget which derives from SCompoundWidget
  * @details Simple widget to display the ammo count of the ammo component
- **/
+ */
 #include "UI/Widgets/SAmmoWidget.h"
 
 // Helpers

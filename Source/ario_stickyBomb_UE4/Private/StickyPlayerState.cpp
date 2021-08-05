@@ -5,7 +5,7 @@
  * @brief   Networked Player-state implementation
  * @details Keeps track of the state of the player, in regards to kills and ammo.
  * @todo    Redesign and remove extraneous code
- **/
+ */
 #include "StickyPlayerState.h"
 
 #include "StickyGameMode.h"
@@ -16,8 +16,8 @@
 #include <Kismet/GameplayStatics.h>
 #include <Net/UnrealNetwork.h>
 
-/** ================================ **/
-/** Public Methods: Client interface **/
+/* ================================ */
+/* Public Methods: Client interface */
 void	AStickyPlayerState::AddUserScore(float deltaScore) { SetScore(GetScore() + deltaScore); }
 float AStickyPlayerState::GetUserScore() const { return GetScore(); }
 void	AStickyPlayerState::AddKill(int32 Kill) { Kills += Kill; }
@@ -32,8 +32,8 @@ void	AStickyPlayerState::SetAmmo(int32 AmmoCount)
 }
 int32 AStickyPlayerState::GetAmmo() const { return Ammo; }
 
-/** ======================================== **/
-/** Protected Methods: Server/Client Actions **/
+/* ======================================== */
+/* Protected Methods: Server/Client Actions */
 void AStickyPlayerState::OnRep_Kills()
 {
 	AStickyHUD* PlayerHud = Cast<AStickyHUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());

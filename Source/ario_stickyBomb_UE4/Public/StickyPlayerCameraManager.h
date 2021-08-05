@@ -13,12 +13,16 @@
  * @brief Dummy Camera Manager, derives from APlayerCameraManager
  * @details Only used to set pitch to replicate thought the camera manager,
  * instead of forcing replication of pitch on the tick of the player
- **/
+ */
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyPlayerCameraManager : public APlayerCameraManager
 {
 	GENERATED_BODY()
 
 	public:
+	/**
+	 * @brief Construct a new AStickyPlayerCameraManager object
+	 *
+	 */
 	AStickyPlayerCameraManager();
 };

@@ -6,7 +6,7 @@
  * @details Currently it only sets up the key_bindings
  * @todo    Move some of the functions of ABaseShooter into Bomberman, or rather
  *          rewrite some as virtual and implement them in child classes such as ABomberMan
- **/
+ */
 #include "Characters/Bomberman.h"
 
 // Components

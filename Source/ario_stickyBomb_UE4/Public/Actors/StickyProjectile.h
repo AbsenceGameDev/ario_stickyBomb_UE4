@@ -16,7 +16,7 @@
  * @class   AStickyProjectile
  * @brief   A projectile moving actor class
  * @details A projectile actor which acts as a sticky bomb. Networked, but only naively implemented.
- **/
+ */
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AStickyBaseActor
 {
@@ -30,20 +30,20 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AStickyBaseActor
 	AStickyProjectile();
 
 	protected:
-	/** ============================ **/
-	/** Inherited Methods: Overrides **/
+	/* ============================ */
+	/** Inherited Methods: Overrides */
 	virtual void Tick(float DeltaTime) final;
 	virtual void BeginPlay() final;
 	virtual void LifeSpanExpired() final;
 
 	public:
-	/** ============================== **/
-	/** Interface Methods: Interaction **/
+	/* ============================== */
+	/** Interface Methods: Interaction */
 	virtual void TryInteractItem() final;
 	virtual void EndInteractItem() final;
 
-	/** ========================= **/
-	/** Public Methods: Interface **/
+	/* ========================= */
+	/* Public Methods: Interface */
 
 	/**
 	 * @brief Get the Max Lifetime object
@@ -147,8 +147,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AStickyBaseActor
 	bool DidPickup(AActor* OtherActor);
 
 	protected:
-	/** ======================================== **/
-	/** Protected Methods: Client/Server actions **/
+	/* ======================================== */
+	/* Protected Methods: Client/Server actions */
 
 	/**
 	 * @brief
@@ -178,8 +178,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AStickyBaseActor
 	UFUNCTION()
 	void OnPickup(ABaseShooter* CallerBaseShooterActor);
 
-	/** ========================== **/
-	/** Protected Methods: VFX/SFX **/
+	/* ========================== */
+	/* Protected Methods: VFX/SFX */
 	/**
 	 * @brief Multicasted timeline callback
 	 *
@@ -209,8 +209,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AStickyBaseActor
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastTriggerExplosionFX();
 
-	/** ============================ **/
-	/** Protected Fields: Components **/
+	/* ============================ */
+	/* Protected Fields: Components */
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	USphereComponent* CollisionComp = nullptr;
@@ -230,8 +230,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AStickyBaseActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ParticleEffect")
 	UParticleSystem* ParticleFX = nullptr;
 
-	/** ================================== **/
-	/** Protected Fields: Timeline-Members **/
+	/* ================================== */
+	/* Protected Fields: Timeline-Members */
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	UCurveFloat* StickyTimelineCurve = nullptr;
@@ -245,8 +245,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AStickyBaseActor
 	UPROPERTY()
 	TEnumAsByte<ETimelineDirection::Type> TimelineDirection = ETimelineDirection::Type::Forward;
 
-	/** ======================================= **/
-	/** Private Methods: Component Initializers **/
+	/* ======================================= */
+	/* Private Methods: Component Initializers */
 	private:
 	/**
 	 * @brief Constructs and sets up collision sphere
@@ -278,8 +278,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyProjectile : public AStickyBaseActor
 	 */
 	void InitializeFXAssets();
 
-	/** ================================ **/
-	/** Private Fields: Basic Properties **/
+	/* ================================ */
+	/* Private Fields: Basic Properties */
 	FLinearColor BaseColor = FLinearColor(0.960784, 0.584314, 0.109804, 1.000000);
 
 	// Projectile material

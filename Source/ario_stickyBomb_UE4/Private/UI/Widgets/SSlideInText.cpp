@@ -3,7 +3,7 @@
  * @file    UI/Widgets/SSlideInText.cpp
  * @class   SSlideInText
  * @brief   A simple widget that kan be used to display a recent player kill.
- **/
+ */
 #include "UI/Widgets/SSlideInText.h"
 
 #include "SlateOptMacros.h"

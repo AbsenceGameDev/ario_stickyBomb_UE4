@@ -17,57 +17,140 @@
  * @brief   Networked weapon component
  * @details Derived from USkeletalMeshComponent,
  *          Designed to be used with ABaseShooter derived classes
- **/
+ */
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshComponent
 {
 	GENERATED_BODY()
 
 	public:
+	/**
+	 * @brief Construct a new UStickyGunSkeletalComp object
+	 *
+	 */
 	UStickyGunSkeletalComp();
 
-	/** ================================ **/
-	/** Public Methods: Client interface **/
+	/* ================================ */
+	/* Public Methods: Client interface */
 
-	/** Called after constructing StickyGunSkeletalComp as a subobject */
+	/**
+	 * @brief Called after constructing StickyGunSkeletalComp as a subobject
+	 *
+	 * @param Caller
+	 * @param GunOffset
+	 * @param MuzzlePlacementComp
+	 */
 	void InitStickyGun(ABaseShooter* Caller, FVector GunOffset, USceneComponent* MuzzlePlacementComp);
 
+	/**
+	 * @brief
+	 *
+	 */
 	UFUNCTION()
 	void TryStartFire();
 
-	/** =============================== **/
-	/** Public Methods: Getters/Setters **/
-	UAmmoComp*		GetAmmoComp();
+	/* =============================== */
+	/* Public Methods: Getters/Setters */
+
+	/**
+	 * @brief Get the Ammo Comp object
+	 *
+	 * @return UAmmoComp*
+	 */
+	UAmmoComp* GetAmmoComp();
+
+	/**
+	 * @brief Get the Owning Character object
+	 *
+	 * @return ABaseShooter*
+	 */
 	ABaseShooter* GetOwningCharacter();
-	USoundBase*		GetFireSound();
+
+	/**
+	 * @brief Get the Fire Sound object
+	 *
+	 * @return USoundBase*
+	 */
+	USoundBase* GetFireSound();
+
+	/**
+	 * @brief Get the Fire Anim Montage object
+	 *
+	 * @return UAnimMontage*
+	 */
 	UAnimMontage* GetFireAnimMontage();
 
-	/** ================================= **/
-	/** Public Methods: Networked VFX/SFX **/
+	/* ================================= */
+	/* Public Methods: Networked VFX/SFX */
+
+	/**
+	 * @brief Multicasted VFX/SFX trigger
+	 *
+	 * @param LocalProjectileActorPtr
+	 */
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastFireGunEffects(AStickyProjectile* LocalProjectileActorPtr);
 
 	protected:
-	/** ========================== **/
-	/** Protected Methods: VFX/SFX **/
+	/* ========================== */
+	/* Protected Methods: VFX/SFX */
+
+	/**
+	 * @brief Succeeded with fire effcts
+	 *
+	 */
 	void SuccessFireEffects();
+
+	/**
+	 * @brief Failed with fire effcts
+	 *
+	 */
 	void FailFireEffects();
 
-	/** ======================================== **/
-	/** Protected Methods: Client/Server actions **/
+	/* ======================================== */
+	/* Protected Methods: Client/Server actions */
+
+	/**
+	 * @brief
+	 *
+	 */
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerOnFire();
 
+	/**
+	 * @brief
+	 *
+	 */
 	void OnFire();
+
+	/**
+	 * @brief
+	 *
+	 * @param LocalProjectileActorPtr
+	 */
 	void PrepDeferredSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr);
+
+	/**
+	 * @brief
+	 *
+	 * @param LocalProjectileActorPtr
+	 * @param SpawnTransform
+	 * @return true
+	 * @return false
+	 */
 	bool FinishSpawnProjectile(AStickyProjectile* LocalProjectileActorPtr, FTransform const& SpawnTransform);
 
-	/** ================================= **/
-	/** Protected Methods: Client actions **/
+	/* ================================= */
+	/* Protected Methods: Client actions */
+
+	/**
+	 * @brief
+	 *
+	 */
 	void GenerateCurve();
 
-	/** =================================== **/
-	/** Protected Methods: Basic properties **/
+	/* =================================== */
+	/* Protected Methods: Basic properties */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMesh* MeshPtr = nullptr; /** Actual Skeletal Mesh asset */
 
@@ -77,24 +160,24 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<AStickyProjectile> ProjectileClass; /** Projectile class to spawn */
 
-	/** ========================= **/
-	/** Protected Fields: VFX/SFX **/
+	/* ========================= */
+	/* Protected Fields: VFX/SFX */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	USoundBase* FireSound; /** Sound to play each time we fire */
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	UAnimMontage* FireAnimation; /** AnimMontage to play each time we fire */
 
-	/** ============================ **/
-	/** Protected Fields: Components **/
+	/* ============================ */
+	/* Protected Fields: Components */
 	UPROPERTY(VisibleDefaultsOnly, Category = Components)
 	USceneComponent* PlacementComp; /** Spawn-point for projectiles */
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Components)
 	UAmmoComp* AmmoComp;
 
-	/** ================================== **/
-	/** Protected Fields: Basic Properties **/
+	/* ================================== */
+	/* Protected Fields: Basic Properties */
 	ABaseShooter* OwningCharacter;
 
 	// UPROPERTY(VisibleDefaultsOnly, Category = Curves)

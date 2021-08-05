@@ -7,7 +7,7 @@
  * @todo    This component could be expaned into something more like an inventory.
  *          What would be needed is making a dedicated item_data class, hold the item_data in the inventory.
  *          Then spawn the items on server-side when brought out of inventory.
- **/
+ */
 #include "Components/AmmoComp.h"
 
 #include "Characters/BaseShooter.h"
@@ -33,8 +33,8 @@ UAmmoComp::UAmmoComp()
 	SetIsReplicated(true);
 }
 
-/** ============================ **/
-/** Inherited Methods: Overrides **/
+/* ============================ */
+/** Inherited Methods: Overrides */
 
 void UAmmoComp::BeginPlay() { Super::BeginPlay(); }
 
@@ -44,14 +44,14 @@ void UAmmoComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-/** ================================ **/
-/** Public Methods: Client interface **/
+/* ================================ */
+/* Public Methods: Client interface */
 
 void UAmmoComp::TryFire() { OnFire(); }
 void UAmmoComp::TryPickupRound() { OnPickupRound(); }
 
-/** ======================================== **/
-/** Protected Methods: Client/Server actions **/
+/* ======================================== */
+/* Protected Methods: Client/Server actions */
 
 void UAmmoComp::OnRep_Ammo(int PrevAmmo)
 {

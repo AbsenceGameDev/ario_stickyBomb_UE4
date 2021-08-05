@@ -14,7 +14,7 @@
  * @file    Actors/StickyBaseActor.h
  * @class   AStickyBaseActor
  * @brief   A simple shell of a class to be expanded upon.
- **/
+ */
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyBaseActor : public AActor, public IInteractionUOI
 {
@@ -27,8 +27,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyBaseActor : public AActor, public IInteract
 	 */
 	AStickyBaseActor();
 
-	/** ============================== **/
-	/** Interface Methods: Interaction **/
+	/* ============================== */
+	/** Interface Methods: Interaction */
 
 	/**
 	 * @brief Interact Item, End

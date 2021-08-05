@@ -16,7 +16,7 @@
  * @file    Actors/StickyPickupContainer.h
  * @class   AStickyPickupContainer
  * @brief   A simple actor which holds a static mesh container
- **/
+ */
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyPickupContainer : public AStickyBaseActor
 {
@@ -30,14 +30,14 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickupContainer : public AStickyBaseActor
 	AStickyPickupContainer();
 
 	protected:
-	/** ============================ **/
-	/** Inherited Methods: Overrides **/
+	/* ============================ */
+	/** Inherited Methods: Overrides */
 	virtual void Tick(float DeltaTime) final;
 	virtual void BeginPlay() final;
 
 	public:
-	/** ============================== **/
-	/** Interface Methods: Interaction **/
+	/* ============================== */
+	/** Interface Methods: Interaction */
 
 	/**
 	 * @brief Interact Item, End
@@ -49,19 +49,19 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickupContainer : public AStickyBaseActor
 	 */
 	virtual void TryInteractItem() override;
 
-	/** =============================== **/
-	/** Public Methods: Getters/Setters **/
+	/* =============================== */
+	/* Public Methods: Getters/Setters */
 
 	protected:
-	/** ============================ **/
-	/** Protected Fields: Components **/
+	/* ============================ */
+	/* Protected Fields: Components */
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	UStaticMeshComponent* MeshComponentPtr = nullptr;
 
 	private:
-	/** ======================================= **/
-	/** Private Methods: Component Initializers **/
+	/* ======================================= */
+	/* Private Methods: Component Initializers */
 
 	/**
 	 * @brief Set the Collision Responses object
@@ -81,8 +81,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickupContainer : public AStickyBaseActor
 	 */
 	void FillBoxWithPickups();
 
-	/** ================================ **/
-	/** Private Fields: Basic Properties **/
+	/* ================================ */
+	/* Private Fields: Basic Properties */
 	FLinearColor BaseColor = FLinearColor(0.960784, 0.584314, 0.109804, 1.000000);
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Material)

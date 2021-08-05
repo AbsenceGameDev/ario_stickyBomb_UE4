@@ -11,7 +11,7 @@
 /**
  * @author Ario Amin  @file Interfaces/InteractionUOI.h
  * @class UInteractionUOI
- **/
+ */
 UINTERFACE(MinimalAPI)
 class UInteractionUOI : public UInterface
 {
@@ -23,15 +23,23 @@ class UInteractionUOI : public UInterface
  * @class IInteractionUOI
  * @brief Interaction Interface
  * @details Simple Interaction Interface for managing pickups, could be more fleshed out if needed.
- **/
+ */
 class ARIO_STICKYBOMB_UE4_API IInteractionUOI
 {
 	GENERATED_BODY()
 
 	public:
+	/**
+	 * @brief Pure virtual, implement in child-classes
+	 *
+	 */
 	UFUNCTION()
 	virtual void TryInteractItem() = 0;
 
+	/**
+	 * @brief Pure virtual, implement in child-classes
+	 *
+	 */
 	UFUNCTION()
 	virtual void EndInteractItem() = 0;
 };

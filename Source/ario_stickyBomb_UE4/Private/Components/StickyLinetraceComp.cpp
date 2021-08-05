@@ -7,7 +7,7 @@
  *          It runs a tick on 0.2 second period, in which it shoots a linetrace about 2.5 meters adjusted from Unreal Units.
  *          It is designed in a way that it is attached to the camera of ABaseShooter (and derived) actors and will activate the
  *          component by pressing the designated key for it,
- **/
+ */
 #include "Components/StickyLinetraceComp.h"
 
 // Actors

@@ -3,7 +3,7 @@
  * @file    UI/StickyHUD.cpp
  * @class   AStickyHUD
  * @brief   A simple HUD class to handle widgets.
- **/
+ */
 #include "UI/StickyHUD.h"
 
 // Frameworks
@@ -35,8 +35,8 @@ AStickyHUD::AStickyHUD()
 	bIsOverlayMenuVisible		 = false;
 }
 
-/** ============================ **/
-/** Inherited Methods: Overrides **/
+/* ============================ */
+/** Inherited Methods: Overrides */
 
 void AStickyHUD::PostInitializeComponents() { Super::PostInitializeComponents(); }
 
@@ -51,8 +51,8 @@ void AStickyHUD::BeginPlay()
 void AStickyHUD::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
 void AStickyHUD::DrawHUD() { Super::DrawHUD(); }
 
-/** ================================ **/
-/** Public Methods: Client interface **/
+/* ================================ */
+/* Public Methods: Client interface */
 
 void AStickyHUD::UpdateTotalKills()
 {
@@ -109,8 +109,8 @@ void AStickyHUD::AddKillToWidget(FString Kill)
 	KillList->AddSlot(Kill);
 }
 
-/** =============================== **/
-/** Protected Methods: Init Widgets **/
+/* =============================== */
+/* Protected Methods: Init Widgets */
 void AStickyHUD::InitializeTotalKillsWidget()
 {
 	if (bIsKillWidgetInitialized) {

@@ -21,22 +21,34 @@
  *          It runs a tick on 0.2 second period, in which it shoots a linetrace about 2.5 meters adjusted from Unreal Units.
  *          It is designed in a way that it is attached to the camera of ABaseShooter (and derived) actors and will activate the
  *          component by pressing the designated key for it,
- **/
+ */
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ARIO_STICKYBOMB_UE4_API UStickyLinetraceComp : public USceneComponent
 {
 	GENERATED_BODY()
 
 	public:
-	// Sets default values for this component's properties
+	/**
+	 * @brief Construct a new UStickyLinetraceComp object
+	 *
+	 */
 	UStickyLinetraceComp();
 
 	protected:
-	// Called when the game starts
+	/**
+	 * @brief Called when the game starts
+	 *
+	 */
 	virtual void BeginPlay() override;
 
 	public:
-	// Called every frame
+	/**
+	 * @brief
+	 *
+	 * @param DeltaTime
+	 * @param TickType
+	 * @param ThisTickFunction
+	 */
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(EditAnywhere, Category = "Basic Params")

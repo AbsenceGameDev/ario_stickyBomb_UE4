@@ -8,7 +8,7 @@
  *          1. Move some of the functions of ABaseShooter into Bomberman, or rather
  *          rewrite some as virtual and implement them in child classes such as ABomberMan.
  *          2. Move methods such as those regarding to input setup to the player controller class
- **/
+ */
 #include "Characters/BaseShooter.h"
 
 // General
@@ -75,8 +75,8 @@ ABaseShooter::ABaseShooter()
 // to
 // 'void (ABaseShooter::*)(AActor *, float, const UDamageType *, FVector, FHitResult, AController *, AActor *)' for 2nd argument
 
-/** ============================ **/
-/** Inherited Methods: Overrides **/
+/* ============================ */
+/** Inherited Methods: Overrides */
 void ABaseShooter::BeginPlay()
 {
 	// Call the base class
@@ -125,8 +125,8 @@ void ABaseShooter::ServerTakeDamage_Implementation(
 	HealthComponent->TryTakeDamage(ThisActor, DamageAmount, DamageType, EventInstigator, DamageCauser);
 }
 
-/** ======================= **/
-/** Public Methods: Getters **/
+/* ======================= */
+/* Public Methods: Getters */
 
 UStickyGunSkeletalComp* ABaseShooter::GetStickyGun() { return StickyGun; }
 USkeletalMeshComponent* ABaseShooter::GetCharMesh() { return MeshPtr; }
@@ -134,12 +134,12 @@ UHealthComp*						ABaseShooter::GetHealthComp() { return HealthComponent; }
 UAmmoComp*							ABaseShooter::GetAmmoComp() { return AmmoComp; }
 UCameraComponent*				ABaseShooter::GetFirstPersonCameraComponent() { return FirstPersonCameraComponent; }
 
-/** ======================= **/
-/** Public Methods: Actions **/
+/* ======================= */
+/* Public Methods: Actions */
 void ABaseShooter::TryStartFire() { StickyGun->TryStartFire(); }
 
-/** ====================== **/
-/** Public Methods: UI/HUD **/
+/* ====================== */
+/* Public Methods: UI/HUD */
 
 void ABaseShooter::TriggerPlayerStateAmmo(int LocalAmmoUpdate)
 {
@@ -151,8 +151,8 @@ void ABaseShooter::TriggerPlayerStateAmmo(int LocalAmmoUpdate)
 	}
 }
 
-/** ================================ **/
-/** Protected Methods: Server/Client **/
+/* ================================ */
+/* Protected Methods: Server/Client */
 void ABaseShooter::ServerTryInteractItem_Implementation() { TryInteractItem(); }
 bool ABaseShooter::ServerTryInteractItem_Validate() { return true; }
 
@@ -171,8 +171,8 @@ void ABaseShooter::ServerTriggerRagdoll_Implementation()
 }
 bool ABaseShooter::ServerTriggerRagdoll_Validate() { return HealthComponent->IsDead(); }
 
-/** ================================== **/
-/** Protected Methods: Component Setup **/
+/* ================================== */
+/* Protected Methods: Component Setup */
 
 void ABaseShooter::InitSkeletalBody()
 {
@@ -300,8 +300,8 @@ void ABaseShooter::MulticastTriggerRagdoll_Implementation()
 	GetMesh()->AddRadialImpulse(GetActorLocation(), 300.0f, 10000, ERadialImpulseFalloff::RIF_Linear);
 }
 
-/** ========================= **/
-/** Protected Methods: Inputs **/
+/* ========================= */
+/* Protected Methods: Inputs */
 void ABaseShooter::MoveForward(float Value)
 {
 	if (Value != 0.0f) {

@@ -4,7 +4,7 @@
  * @class   AStickyPickup
  * @brief   A simple pickup actor
  * @details Has rudimentary pickup logic which sends it to the players ammo component
- **/
+ */
 #include "Actors/StickyPickup.h"
 
 // General
@@ -46,8 +46,8 @@ AStickyPickup::AStickyPickup()
 	SetReplicateMovement(true);
 }
 
-/** ============================ **/
-/** Inherited Methods: Overrides **/
+/* ============================ */
+/** Inherited Methods: Overrides */
 
 void AStickyPickup::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
 void AStickyPickup::BeginPlay() { Super::BeginPlay(); }
@@ -59,12 +59,12 @@ void AStickyPickup::TryInteractItem()
 	Destroy();
 }
 
-/** =============================== **/
-/** Public Methods: Getters/Setters **/
+/* =============================== */
+/* Public Methods: Getters/Setters */
 USphereComponent* AStickyPickup::GetCollisionComp() const { return CollisionComp; }
 
-/** ============================ **/
-/** Public Methods: Conditionals **/
+/* ============================ */
+/* Public Methods: Conditionals */
 bool AStickyPickup::DidPickup(AActor* OtherActor)
 {
 	if (GetLocalRole() == ROLE_Authority) {
@@ -86,8 +86,8 @@ bool AStickyPickup::DidPickup(AActor* OtherActor)
 	return false;
 }
 
-/** ======================================= **/
-/** Private Methods: Component Initializers **/
+/* ======================================= */
+/* Private Methods: Component Initializers */
 
 void AStickyPickup::ConstructCollisionComponent()
 {

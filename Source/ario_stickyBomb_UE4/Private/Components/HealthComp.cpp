@@ -5,7 +5,7 @@
  * @brief   Networked health component
  * @details Simple networked health component implementation, to be used with ABaseShooter derived characters,
  *          but could be retrofitted for other character types if it is rewritten as a templated class
- **/
+ */
 #include "Components/HealthComp.h"
 
 // Engine Classes/Types
@@ -29,8 +29,8 @@ UHealthComp::UHealthComp()
 	SetIsReplicated(true);
 }
 
-/** ============================ **/
-/** Inherited Methods: Overrides **/
+/* ============================ */
+/** Inherited Methods: Overrides */
 
 void UHealthComp::BeginPlay()
 {
@@ -49,8 +49,8 @@ void UHealthComp::BeginPlay()
 	Health = MaxHealth;
 }
 
-/** ================================ **/
-/** Public Methods: Client interface **/
+/* ================================ */
+/* Public Methods: Client interface */
 void UHealthComp::TryHeal(float HealAmount)
 {
 	if (HealAmount <= 0.0f || Health <= 0.0f) {
@@ -77,8 +77,8 @@ void UHealthComp::TryTakeDamage(
 	HandleTakeAnyDamage(DamagedActor, DamageAmount, DamageType, EventInstigator, DamageCauser);
 }
 
-/** ======================================== **/
-/** Protected Methods: Client/Server actions **/
+/* ======================================== */
+/* Protected Methods: Client/Server actions */
 void UHealthComp::OnRep_Health(float PrevHealth)
 {
 	float Damage = Health - PrevHealth;
@@ -163,8 +163,8 @@ void UHealthComp::HandleDamageHit(
 	}
 }
 
-/** =========================== **/
-/** Static Methods: Replication **/
+/* =========================== */
+/** Static Methods: Replication */
 void UHealthComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

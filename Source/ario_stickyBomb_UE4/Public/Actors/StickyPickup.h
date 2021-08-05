@@ -17,7 +17,7 @@
  * @class   AStickyPickup
  * @brief   A simple pickup actor
  * @details Has rudimentary pickup logic which sends it to the players ammo component
- **/
+ */
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyPickup : public AStickyBaseActor
 {
@@ -31,14 +31,14 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickup : public AStickyBaseActor
 	AStickyPickup();
 
 	protected:
-	/** ============================ **/
-	/** Inherited Methods: Overrides **/
+	/* ============================ */
+	/** Inherited Methods: Overrides */
 	virtual void Tick(float DeltaTime) final;
 	virtual void BeginPlay() final;
 
 	public:
-	/** ============================== **/
-	/** Interface Methods: Interaction **/
+	/* ============================== */
+	/** Interface Methods: Interaction */
 
 	/**
 	 * @brief Interact Item, End
@@ -50,8 +50,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickup : public AStickyBaseActor
 	 */
 	virtual void TryInteractItem() override;
 
-	/** ================================ **/
-	/** Public Methods: Client Interface **/
+	/* ================================ */
+	/* Public Methods: Client Interface */
 
 	/**
 	 * @brief
@@ -71,8 +71,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickup : public AStickyBaseActor
 	USphereComponent* GetCollisionComp() const;
 
 	protected:
-	/** ============================ **/
-	/** Protected Fields: Components **/
+	/* ============================ */
+	/* Protected Fields: Components */
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	USphereComponent* CollisionComp = nullptr;
 
@@ -80,8 +80,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickup : public AStickyBaseActor
 	UStaticMeshComponent* MeshComponentPtr = nullptr;
 
 	private:
-	/** ======================================= **/
-	/** Private Methods: Component Initializers **/
+	/* ======================================= */
+	/* Private Methods: Component Initializers */
 
 	/**
 	 * @brief
@@ -101,8 +101,8 @@ class ARIO_STICKYBOMB_UE4_API AStickyPickup : public AStickyBaseActor
 	 */
 	void ConstructStaticMeshComponent();
 
-	/** ================================ **/
-	/** Private Fields: Basic Properties **/
+	/* ================================ */
+	/* Private Fields: Basic Properties */
 	FLinearColor BaseColor = FLinearColor(0.960784, 0.584314, 0.109804, 1.000000);
 
 	// Projectile material

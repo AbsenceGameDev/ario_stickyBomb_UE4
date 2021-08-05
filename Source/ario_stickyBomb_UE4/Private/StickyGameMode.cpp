@@ -4,7 +4,7 @@
  * @class   AStickyGameMode
  * @brief   Naive implementation of Gamemode for networked play
  * @details Implements barebone player checks which could be expanded on.
- **/
+ */
 #include "StickyGameMode.h"
 
 // Player
@@ -57,8 +57,8 @@ AStickyGameMode::AStickyGameMode() : Super()
 	PrimaryActorTick.TickInterval = 1.0f;
 }
 
-/** ============================ **/
-/** Inherited Methods: Overrides **/
+/* ============================ */
+/** Inherited Methods: Overrides */
 
 void AStickyGameMode::StartPlay()
 {
@@ -82,7 +82,7 @@ void AStickyGameMode::Tick(float DeltaSeconds)
 	if (bHasGameStarted && HasPlayerWon()) {
 		GameOver();
 
-		/** @todo Have a timer based delay before resterting Dead players **/
+		/** @todo Have a timer based delay before resterting Dead players */
 		RestartDeadPlayers();
 	}
 }
@@ -125,8 +125,8 @@ ABaseShooter* AStickyGameMode::FindPlayer(int32 LocalPlayerId)
 	}
 	return nullptr;
 }
-/** ======================================== **/
-/** Protected Methods: Server/Client Actions **/
+/* ======================================== */
+/* Protected Methods: Server/Client Actions */
 void AStickyGameMode::RegisterNewPlayer(ABaseShooter* NewPlayer)
 {
 	int Steps = 0;

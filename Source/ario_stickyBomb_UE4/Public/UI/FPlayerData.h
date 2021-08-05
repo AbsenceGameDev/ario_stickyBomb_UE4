@@ -10,7 +10,7 @@
  * @author Ario Amin  @file UI/FPlayerData.h
  * @struct FPlayerData
  * @brief Simple utility struct to pass data into widgets.
- **/
+ */
 USTRUCT()
 struct ARIO_STICKYBOMB_UE4_API FPlayerData {
 	GENERATED_BODY()
@@ -18,5 +18,11 @@ struct ARIO_STICKYBOMB_UE4_API FPlayerData {
 	float		Score;
 	FString Name;
 
+	/**
+	 * @brief Construct a new FPlayerData object
+	 *
+	 * @param score
+	 * @param name
+	 */
 	FPlayerData(float score = 0.0f, FString name = FString("No Player Name")) : Score(score), Name(name) {}
 };

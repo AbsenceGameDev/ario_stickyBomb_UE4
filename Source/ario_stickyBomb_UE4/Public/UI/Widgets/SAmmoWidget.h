@@ -13,7 +13,7 @@
  * @class   SAmmoWidget
  * @brief   Ammo Widget which derives from SCompoundWidget
  * @details Simple widget to display the ammo count of the ammo component
- **/
+ */
 class ARIO_STICKYBOMB_UE4_API SAmmoWidget : public SCompoundWidget
 {
 	public:
@@ -22,8 +22,25 @@ class ARIO_STICKYBOMB_UE4_API SAmmoWidget : public SCompoundWidget
 	SLATE_ARGUMENT(FText, TextToSet)
 	SLATE_END_ARGS()
 
-	void	Construct(const FArguments& InArgs);
-	void	SetAmmoText(FText Ammo);
+	/**
+	 * @brief
+	 *
+	 * @param InArgs
+	 */
+	void Construct(const FArguments& InArgs);
+
+	/**
+	 * @brief Set the Ammo Text object
+	 *
+	 * @param Ammo
+	 */
+	void SetAmmoText(FText Ammo);
+
+	/**
+	 * @brief Get the Ammo Text object
+	 *
+	 * @return FText
+	 */
 	FText GetAmmoText() const;
 
 	private:

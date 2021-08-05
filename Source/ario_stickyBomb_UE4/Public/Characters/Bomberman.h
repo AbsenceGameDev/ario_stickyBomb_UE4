@@ -16,7 +16,7 @@
  * @details
  * @todo    Move some of the functions of ABaseShooter into Bomberman, or rather
  *          rewrite some as virtual and implement them in child classes such as ABomberMan
- **/
+ */
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API ABomberman : public ABaseShooter
 {

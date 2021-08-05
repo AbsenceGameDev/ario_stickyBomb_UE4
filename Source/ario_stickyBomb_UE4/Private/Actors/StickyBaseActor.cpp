@@ -3,7 +3,7 @@
  * @file    Actors/StickyBaseActor.h
  * @class   AStickyBaseActor
  * @brief   A simple shell of a class to be expanded upon.
- **/
+ */
 #include "Actors/StickyBaseActor.h"
 
 AStickyBaseActor::AStickyBaseActor()

@@ -4,7 +4,7 @@
  * @class   SInGameOverlay
  * @brief   A simple shell of a class to be expanded upon.
  *          Right now it only funcitons as a blank overlay.
- **/
+ */
 #include "UI/SInGameOverlay.h"
 
 #include "SlateOptMacros.h"
