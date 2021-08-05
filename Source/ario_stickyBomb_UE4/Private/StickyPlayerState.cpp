@@ -1,4 +1,11 @@
-
+/**
+ * @author  Ario Amin
+ * @file    /StickyPlayerState.cpp
+ * @class   AStickyPlayerState
+ * @brief   Networked Player-state implementation
+ * @details Keeps track of the state of the player, in regards to kills and ammo.
+ * @todo    Redesign and remove extraneous code
+ **/
 #include "StickyPlayerState.h"
 
 #include "StickyGameMode.h"
@@ -8,21 +15,6 @@
 #include <Engine/Engine.h>
 #include <Kismet/GameplayStatics.h>
 #include <Net/UnrealNetwork.h>
-
-/*
-
-	Persistent information for the player. Player controller only exists
-	on your machine and server.
-
-	Hierarchy in ue4 for player state
-
-	UObjectBase
-	UObjectBaseUtility
-	UObject
-	AActor
-	AInfo
-	APlayerState
-*/
 
 /** ================================ **/
 /** Public Methods: Client interface **/

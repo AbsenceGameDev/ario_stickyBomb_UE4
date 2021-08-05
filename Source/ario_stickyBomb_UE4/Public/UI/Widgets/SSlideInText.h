@@ -12,6 +12,12 @@ enum class EVisibleState : uint8 {
 	VS_Hidden,
 };
 
+/**
+ * @author Ario Amin  @file UI/Widgets/SSlideInText.h
+ * @class SSlideInText
+ * @brief Slide In Text widget, derives from SCompoundWidget
+ * @details Simple widget to slide in text upon a player kill.
+ **/
 class ARIO_STICKYBOMB_UE4_API SSlideInText : public SCompoundWidget
 {
 	public:

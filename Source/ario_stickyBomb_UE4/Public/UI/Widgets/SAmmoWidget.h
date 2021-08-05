@@ -7,6 +7,13 @@
 #include <Widgets/DeclarativeSyntaxSupport.h>
 #include <Widgets/SCompoundWidget.h>
 
+/**
+ * @author  Ario Amin
+ * @file    UI/Widgets/SAmmoWidget.h
+ * @class   SAmmoWidget
+ * @brief   Ammo Widget which derives from SCompoundWidget
+ * @details Simple widget to display the ammo count of the ammo component
+ **/
 class ARIO_STICKYBOMB_UE4_API SAmmoWidget : public SCompoundWidget
 {
 	public:

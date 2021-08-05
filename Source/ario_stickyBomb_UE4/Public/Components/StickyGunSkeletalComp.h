@@ -11,8 +11,13 @@
 #include "StickyGunSkeletalComp.generated.h"
 
 /**
- *
- */
+ * @author  Ario Amin
+ * @file    Components/StickyGunSkeletalComp.h
+ * @class   UStickyGunSkeletalComp
+ * @brief   Networked weapon component
+ * @details Derived from USkeletalMeshComponent,
+ *          Designed to be used with ABaseShooter derived classes
+ **/
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshComponent
 {
@@ -24,8 +29,8 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 	/** ================================ **/
 	/** Public Methods: Client interface **/
 
-	void InitStickyGun(ABaseShooter* Caller, FVector GunOffset, USceneComponent* MuzzlePlacementComp);
 	/** Called after constructing StickyGunSkeletalComp as a subobject */
+	void InitStickyGun(ABaseShooter* Caller, FVector GunOffset, USceneComponent* MuzzlePlacementComp);
 
 	UFUNCTION()
 	void TryStartFire();
@@ -100,6 +105,4 @@ class ARIO_STICKYBOMB_UE4_API UStickyGunSkeletalComp : public USkeletalMeshCompo
 
 	// UPROPERTY(VisibleDefaultsOnly, Category = Curves)
 	FRichCurve* GeneratedRichCurve;
-
-	bool bDisable = true;
 };

@@ -1,5 +1,10 @@
-// Ario Amin - 2021/08
-
+/**
+ * @author  Ario Amin
+ * @file    UI/Widgets/SAmmoWidget.h
+ * @class   SAmmoWidget
+ * @brief   Ammo Widget which derives from SCompoundWidget
+ * @details Simple widget to display the ammo count of the ammo component
+ **/
 #include "UI/Widgets/SAmmoWidget.h"
 
 // Helpers

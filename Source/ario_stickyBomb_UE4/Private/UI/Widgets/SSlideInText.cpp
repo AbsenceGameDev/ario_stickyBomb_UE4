@@ -1,5 +1,9 @@
-// Ario Amin - 2021/08
-
+/**
+ * @author  Ario Amin
+ * @file    UI/Widgets/SSlideInText.cpp
+ * @class   SSlideInText
+ * @brief   A simple widget that kan be used to display a recent player kill.
+ **/
 #include "UI/Widgets/SSlideInText.h"
 
 #include "SlateOptMacros.h"

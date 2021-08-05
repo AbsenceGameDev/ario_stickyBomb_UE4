@@ -7,18 +7,18 @@ TOP PRIO:
   ✔ 3. Finish the Pickup Actor Code // Remake, press bound Interact button to linetrace camera normal, resulting hit, if has interact interface gets interacted with @done(21-07-31 15:16)
   ✔ 4. Fix VFX/SFX Not playing @done(21-07-31 04:58)
   ✔ 5. Replicated pitch from player movement @done(21-08-01 16:23)
-  - 6. Make sure StickyLineTraceComponent passes a linetrace through the player-capsule
+  ✔ 6. Make sure StickyLineTraceComponent passes a linetrace through the player-capsule @done(21-08-05 05:04)
   - 7. ordered map of all live players {int ID, ABaseShooter* BaseChar}, fetch correct Character from the map 
-  - 8. Trigger GenerateBasicMaterial function AFTER the editor has finished loading. Crash on load due to subsytems not being loaded yet at boot.
+  ✔ 8. Trigger GenerateBasicMaterial function AFTER the editor has finished loading. Crash on load due to subsytems not being loaded yet at boot. @done(21-08-05 05:04)
 
 TODO:
   GENERAL:
     ✔ Restructure/Reordering decl. and def. @done(21-07-29 12:27)
       Regarding cohesiveness in their placements (Not refactoring).
 
-    ☐ Refactor if needed, try to remove dead code.
+    ✔ Refactor if needed, try to remove dead code. @done(21-08-05 05:04)
     ✔ Remove superflous UE_LOGs. @done(21-07-30 23:00)
-    ☐ Doxygen compatible comment blocks in headers.
+    ✔ Doxygen compatible comment blocks in headers. @done(21-08-05 05:04)
     ☐ Generate doxyblock documentation with doxygen.
 
   INTERACTION INTERFACE:
@@ -61,7 +61,7 @@ OVERVIEW GOALS:
     ✔ General: Helpers/Macros.h                        @done(21-07-29 07:22)
 
   Actors (Replicated):
-    ☐ Actor: StickyProjectile
+    ✔ Actor: StickyProjectile @done(21-08-05 05:05)
 
   Actors - ACharacters:
     ✔ Character: BaseShooter, Base class               @done(21-07-29 07:20)
@@ -73,7 +73,7 @@ OVERVIEW GOALS:
     ✔ Component: HealthComp @done(21-07-30 21:10)
 
   Interfaces: 
-    ☐ Interface: Events
+    ✔ Interface: Interactions @done(21-08-03 03:06)
     ☐ Interface: Items
 
   UI:
@@ -93,7 +93,7 @@ OVERVIEW GOALS:
     
     NOT TESTED BUT REPLICATION SHOULD WORK FOR ANYTHING ESSENTIAL: 
       ✔ Networking: Repl, ProjectileActor              @done(21-07-28 15:51)
-      ☐ Networking: Repl. HealthComponent
+      ✔ Networking: Repl. HealthComponent @done(21-08-05 05:03)
 
 
 

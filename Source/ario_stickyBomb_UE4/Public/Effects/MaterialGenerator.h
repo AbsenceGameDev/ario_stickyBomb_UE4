@@ -5,8 +5,19 @@
 #include "CoreMinimal.h"
 
 /**
+ * @author Ario Amin  @file Effects/MaterialGenerator.h
+ * @class FMaterialGenerator
+ * @brief A WIP utility class for Material creation/editing
+ * @details This class lets you create new packages, design them through code and save
+ * them to your content_browser (Currently only Materials).
+ * End result is a uasset primed for used in the editor, it can therefor be used to create templates.
  *
- */
+ * The Actual idea with this class was to be able to create an explosion material during BeginPlaym
+ * which would have been used in the actual explosion effects of the StickyProjectile.
+ *
+ * @todo Extend with many variants of templates, both in regards to expression types but also package types,
+ * and opt for selective compilation with 'constexpr if's for efficiency.
+ **/
 class ARIO_STICKYBOMB_UE4_API FMaterialGenerator
 {
 	FMaterialGenerator();

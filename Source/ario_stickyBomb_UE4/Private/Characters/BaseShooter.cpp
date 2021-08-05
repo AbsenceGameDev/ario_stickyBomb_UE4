@@ -1,5 +1,14 @@
-// Ario Amin - 2021/08
-
+/**
+ * @author  Ario Amin
+ * @file    Characters/ABaseShooter.cpp
+ * @class   ABomberman
+ * @brief   Inherits from ACharacter & IInteractionUOI
+ * @details Derived from ACharacter and implements a StickyGunSkeletalComponent, HealthComponent and a AmmoComponent
+ * @todo    Currently this class is fairly bloated.
+ *          1. Move some of the functions of ABaseShooter into Bomberman, or rather
+ *          rewrite some as virtual and implement them in child classes such as ABomberMan.
+ *          2. Move methods such as those regarding to input setup to the player controller class
+ **/
 #include "Characters/BaseShooter.h"
 
 // General
@@ -153,7 +162,13 @@ bool ABaseShooter::ServerEndInteractItem_Validate() { return true; }
 void ABaseShooter::ServerUndoRagdoll_Implementation() { MulticastUndoRagdoll(); }
 bool ABaseShooter::ServerUndoRagdoll_Validate() { return !HealthComponent->IsDead(); }
 
-void ABaseShooter::ServerTriggerRagdoll_Implementation() { MulticastTriggerRagdoll(); }
+void ABaseShooter::ServerTriggerRagdoll_Implementation()
+{
+#ifdef STICKY_DEBUG
+	UE_LOG(LogTemp, Warning, TEXT("SERVER TRIGGER RAGDOLL"));
+#endif		// STICKY_DEBUG
+	MulticastTriggerRagdoll();
+}
 bool ABaseShooter::ServerTriggerRagdoll_Validate() { return HealthComponent->IsDead(); }
 
 /** ================================== **/
@@ -249,6 +264,9 @@ void ABaseShooter::MulticastUndoRagdoll_Implementation()
 
 void ABaseShooter::MulticastTriggerRagdoll_Implementation()
 {
+#ifdef STICKY_DEBUG
+	UE_LOG(LogTemp, Warning, TEXT("MULTICAST TRIGGER RAGDOLL"));
+#endif		// STICKY_DEBUG
 	SetReplicateMovement(false);
 	TearOff();
 
@@ -279,7 +297,7 @@ void ABaseShooter::MulticastTriggerRagdoll_Implementation()
 	}
 
 	/* Apply physics impulse on the bone of the player mesh we hit */
-	GetMesh()->AddRadialImpulse(GetActorLocation(), 300.0f, 100000, ERadialImpulseFalloff::RIF_Linear);
+	GetMesh()->AddRadialImpulse(GetActorLocation(), 300.0f, 10000, ERadialImpulseFalloff::RIF_Linear);
 }
 
 /** ========================= **/

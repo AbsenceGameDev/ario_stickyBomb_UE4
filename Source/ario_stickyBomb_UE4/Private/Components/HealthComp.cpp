@@ -1,5 +1,11 @@
-// Ario Amin - 2021/08
-
+/**
+ * @author  Ario Amin
+ * @file    Components/HealthComp.cpp
+ * @class   UHealthComp
+ * @brief   Networked health component
+ * @details Simple networked health component implementation, to be used with ABaseShooter derived characters,
+ *          but could be retrofitted for other character types if it is rewritten as a templated class
+ **/
 #include "Components/HealthComp.h"
 
 // Engine Classes/Types

@@ -16,6 +16,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(
 	FOnTargetHitEvent, FVector, HitLocation, FVector, ShotDirection, float, HitValue, AActor*, HitOwner);
 
+/**
+ * @author Ario Amin  @file /StickyGameMode.h
+ * @class AStickyGameMode
+ * @brief Simple GameMode which has beend designed to work with ABaseShooter derived classes.
+ **/
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyGameMode : public AGameModeBase
 {
@@ -52,7 +57,7 @@ class ARIO_STICKYBOMB_UE4_API AStickyGameMode : public AGameModeBase
 	void DeregisterExitingPlayer(ABaseShooter* ExitingPlayer);
 
 	void CheckAnyPlayerAlive();
-	bool IsAnyPlayerAlive() const;
+	bool HasPlayerWon() const;
 	void RestartDeadPlayers();
 
 	UFUNCTION()

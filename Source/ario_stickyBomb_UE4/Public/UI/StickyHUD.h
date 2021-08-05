@@ -12,8 +12,11 @@
 #include "StickyHUD.generated.h"
 
 /**
- *
- */
+ * @author Ario Amin  @file UI/StickyHUD.h
+ * @class AStickyHUD
+ * @brief Main HUD class for ABaseShooter, derives from AHUD
+ * @details Simple HUD class to load the widgets in UI/Widgets/ and set up display
+ **/
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyHUD : public AHUD
 {

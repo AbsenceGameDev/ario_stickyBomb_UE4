@@ -1,5 +1,11 @@
-// Ario Amin - 2021/08
-
+/**
+ * @author  Ario Amin
+ * @file    Components/StickyGunSkeletalComp.cpp
+ * @class   UStickyGunSkeletalComp
+ * @brief   Networked weapon component
+ * @details Derived from USkeletalMeshComponent,
+ *          Designed to be used with ABaseShooter derived classes
+ **/
 #include "Components/StickyGunSkeletalComp.h"
 
 // Actors / Components / Helpers
@@ -60,7 +66,6 @@ void UStickyGunSkeletalComp::InitStickyGun(ABaseShooter* Caller, FVector LocalGu
 	CastShadow				 = false;
 
 	if (Caller != nullptr) {
-		bDisable = false;
 		SetupAttachment(Caller->GetRootComponent());
 		OwningCharacter = Caller;
 		AmmoComp				= OwningCharacter->GetAmmoComp();
@@ -152,7 +157,7 @@ void UStickyGunSkeletalComp::OnFire()
 		return;
 	}
 
-	if ((ProjectileClass == nullptr) || bDisable || AmmoComp->IsEmpty()) {
+	if ((ProjectileClass == nullptr) || AmmoComp->IsEmpty()) {
 		return;
 	}
 

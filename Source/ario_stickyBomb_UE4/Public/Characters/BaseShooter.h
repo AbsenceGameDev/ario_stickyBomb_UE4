@@ -11,55 +11,141 @@
 
 #include "BaseShooter.generated.h"
 
-// DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_FiveParams(
-// 	FTakeAnyDamageSignature, AActor, OnTakeAnyDamage, AActor*, DamagedActor, float, Damage, const class UDamageType*, DamageType,
-// 	class AController*, InstigatedBy, AActor*, DamageCauser);
-
+/**
+ * @author  Ario Amin
+ * @file    Characters/ABaseShooter.h
+ * @class   ABomberman
+ * @brief   Inherits from ACharacter & IInteractionUOI
+ * @details Derived from ACharacter and implements a StickyGunSkeletalComponent, HealthComponent and a AmmoComponent
+ * @todo    Currently this class is fairly bloated.
+ *          1. Move some of the functions of ABaseShooter into Bomberman, or rather
+ *          rewrite some as virtual and implement them in child classes such as ABomberMan.
+ *          2. Move methods such as those regarding to input setup to the player controller class
+ **/
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteractionUOI
 {
 	GENERATED_BODY()
 
 	public:
+	/**
+	 * @brief Construct a new ABaseShooter object
+	 *
+	 */
 	ABaseShooter();
 
 	protected:
 	/** ============================ **/
 	/** Inherited Methods: Overrides **/
+
+	/**
+	 * @brief Triggers BeginPlay
+	 *
+	 */
 	virtual void BeginPlay();
+
+	/**
+	 * @brief
+	 *
+	 * @param InputComponent
+	 */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
+	/**
+	 * @brief
+	 *
+	 * @param DamageAmount
+	 * @param DamageEvent
+	 * @param EventInstigator
+	 * @param DamageCauser
+	 * @return float
+	 */
 	virtual float TakeDamage(
 		float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) final;
 
 	public:
 	/** ================================== **/
 	/** Interface Methods: IInteractionOUI **/
-	// template <int IDX>
-	// void				 TryInteractItem();
+
+	/**
+	 * @brief Interact Item, Start
+	 */
 	virtual void TryInteractItem() override;
+
+	/**
+	 * @brief Interact Item, End
+	 */
 	virtual void EndInteractItem() override;
 
 	/** ======================= **/
 	/** Public Methods: Getters **/
+
+	/**
+	 * @brief Get the Sticky Gun object
+	 *
+	 * @return UStickyGunSkeletalComp*
+	 */
 	UStickyGunSkeletalComp* GetStickyGun();
+
+	/**
+	 * @brief Get the Char Mesh object
+	 *
+	 * @return USkeletalMeshComponent*
+	 */
 	USkeletalMeshComponent* GetCharMesh();
-	UHealthComp*						GetHealthComp();
-	UAmmoComp*							GetAmmoComp();
-	UCameraComponent*				GetFirstPersonCameraComponent();
+
+	/**
+	 * @brief Get the Health Comp object
+	 *
+	 * @return UHealthComp*
+	 */
+	UHealthComp* GetHealthComp();
+
+	/**
+	 * @brief Get the Ammo Comp object
+	 *
+	 * @return UAmmoComp*
+	 */
+	UAmmoComp* GetAmmoComp();
+
+	/**
+	 * @brief Get the First Person Camera Component object
+	 *
+	 * @return UCameraComponent*
+	 */
+	UCameraComponent* GetFirstPersonCameraComponent();
 
 	/** ================================ **/
 	/** Public Methods: Client Interface **/
+
+	/**
+	 * @brief
+	 *
+	 */
 	void TryStartFire();
 
+	/**
+	 * @brief
+	 *
+	 */
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTriggerRagdoll();
 
+	/**
+	 * @brief
+	 *
+	 */
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerUndoRagdoll();
 
 	/** ====================== **/
 	/** Public Methods: UI/HUD **/
+
+	/**
+	 * @brief
+	 *
+	 * @param LocalAmmoUpdate
+	 */
 	void TriggerPlayerStateAmmo(int LocalAmmoUpdate);
 
 	/** =========================== **/
@@ -74,12 +160,24 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	/** ================================= **/
 	/** Protected Methods: Server/Client **/
 
+	/**
+	 * @brief
+	 *
+	 */
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastUndoRagdoll();
 
+	/**
+	 * @brief
+	 *
+	 */
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastTriggerRagdoll();
 
+	/**
+	 * @brief
+	 *
+	 */
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTryInteractItem();
 
@@ -135,21 +233,15 @@ class ARIO_STICKYBOMB_UE4_API ABaseShooter : public ACharacter, public IInteract
 	UCameraComponent* FirstPersonCameraComponent = nullptr; /** First person camera */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-	UHealthComp* HealthComponent = nullptr; /** Generic health component */
+	UHealthComp* HealthComponent = nullptr; /** Simple health component */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammo, meta = (AllowPrivateAccess = "true"))
-	UAmmoComp* AmmoComp = nullptr; /** Generic ammo component */
+	UAmmoComp* AmmoComp = nullptr; /** Simpole ammo component */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammo, meta = (AllowPrivateAccess = "true"))
 	UStickyLinetraceComp* LinetraceComp = nullptr; /** Interact detection linetrace comp */
 
 	/** ================================== **/
 	/** Protected Fields: Basic properties **/
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammo, meta = (AllowPrivateAccess = "true"))
-	int PlayerID = 0; /** Interact detection linetrace comp */
-
-	AStickyProjectile* ClosestProjectile = nullptr;		 // replace with custom Pickup actor type if I have time
-	bool							 bCanInteract			 = false;
-	bool							 bIsRagdoll				 = false;
-	// AStickyPlayerController* StickyPC					 = nullptr;
+	bool bIsRagdoll = false;
 };

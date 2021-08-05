@@ -1,16 +1,21 @@
-// Ario Amin - 2021/08
-
+/**
+ * @author  Ario Amin
+ * @file    Components/StickyLinetraceComponent
+ * @class   UStickyLinetraceComp
+ * @brief   Not much more than a linetracer. Almost a functor,
+ * @details It is not quite a functor, but it is very small and serves only one function, the tick-component function.
+ *          It runs a tick on 0.2 second period, in which it shoots a linetrace about 2.5 meters adjusted from Unreal Units.
+ *          It is designed in a way that it is attached to the camera of ABaseShooter (and derived) actors and will activate the
+ *          component by pressing the designated key for it,
+ **/
 #include "Components/StickyLinetraceComp.h"
 
 // Actors
-#include "Actors/StickyProjectile.h"
+#include "Actors/StickyBaseActor.h"
 #include "Characters/BaseShooter.h"
 
 // Components
 #include "Components/AmmoComp.h"
-
-// Helpers
-#include "Helpers/Macros.h"
 
 // Interfaces
 #include "Interfaces/InteractionUOI.h"
@@ -26,16 +31,17 @@ UStickyLinetraceComp::UStickyLinetraceComp()
 	SetComponentTickInterval(TickInterval);
 	PrimaryComponentTick.bCanEverTick					 = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
-
-	// ...
 }
 
 // Called when the game starts
 void UStickyLinetraceComp::BeginPlay()
 {
 	Super::BeginPlay();
+
+#ifdef STICKY_DEBUG
 	WorldPtr		= GetWorld();
 	bValidOwner = (BaseChar = StaticCast<ABaseShooter*>(GetOwner())) == NULL ? true : false;
+#endif		// STICKY_DEBUG
 }
 
 // Called every frame
@@ -49,14 +55,14 @@ void UStickyLinetraceComp::TickComponent(float DeltaTime, ELevelTick TickType, F
 		GetWorld()->LineTraceSingleByChannel(*HitResult, StartPosition, EndPosition, ECC_Visibility);
 
 		if (HitResult != NULL) {
-			AStickyProjectile* CastOtherBaseItem = StaticCast<AStickyProjectile*>((HitResult->Actor.Get()));
+			AStickyBaseActor* CastOtherBaseItem = StaticCast<AStickyBaseActor*>((HitResult->Actor.Get()));
 			if (CastOtherBaseItem == NULL) {
 				return;
 			}
 
 			if (CastOtherBaseItem->GetClass()->ImplementsInterface(UInteractionUOI::StaticClass())) {
 				Cast<IInteractionUOI>(CastOtherBaseItem)->TryInteractItem();
-
+				// AStickyBaseActor
 				// Under the presumption that this component will only be used with BaseShooter derived classes
 				// @todo TryPickUpRound is too direct way to propagate the interaction to anothe component
 				StaticCast<ABaseShooter*>(GetOwner())->GetAmmoComp()->TryPickupRound();

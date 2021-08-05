@@ -1,5 +1,9 @@
-// Ario Amin - 2021/08
-
+/**
+ * @author  Ario Amin
+ * @file    UI/StickyHUD.cpp
+ * @class   AStickyHUD
+ * @brief   A simple HUD class to handle widgets.
+ **/
 #include "UI/StickyHUD.h"
 
 // Frameworks

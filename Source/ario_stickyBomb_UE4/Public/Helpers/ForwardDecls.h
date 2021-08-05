@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * @author Ario Amin  @file Helpers/ForwardDecls.h
+ * @brief Forward Declarations
+ * @details Not pretty, but makes the actual headers look a bit cleaner
+ **/
 // Engine Components
 class UPrimitiveComponent;
 class USphereComponent;

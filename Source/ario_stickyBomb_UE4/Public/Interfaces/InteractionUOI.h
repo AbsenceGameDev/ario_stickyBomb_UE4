@@ -8,7 +8,10 @@
 
 #include "InteractionUOI.generated.h"
 
-// This class does not need to be modified.
+/**
+ * @author Ario Amin  @file Interfaces/InteractionUOI.h
+ * @class UInteractionUOI
+ **/
 UINTERFACE(MinimalAPI)
 class UInteractionUOI : public UInterface
 {
@@ -16,13 +19,15 @@ class UInteractionUOI : public UInterface
 };
 
 /**
- *
- */
+ * @author Ario Amin  @file Interfaces/InteractionUOI.h
+ * @class IInteractionUOI
+ * @brief Interaction Interface
+ * @details Simple Interaction Interface for managing pickups, could be more fleshed out if needed.
+ **/
 class ARIO_STICKYBOMB_UE4_API IInteractionUOI
 {
 	GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 	public:
 	UFUNCTION()
 	virtual void TryInteractItem() = 0;

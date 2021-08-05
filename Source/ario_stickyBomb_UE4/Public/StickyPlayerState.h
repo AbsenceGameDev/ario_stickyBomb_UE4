@@ -8,10 +8,14 @@
 
 #include "StickyPlayerState.generated.h"
 
-/*
-	Replicated Class Data that holds Kills, Score, Player name
-*/
-
+/**
+ * @author  Ario Amin
+ * @file    /StickyPlayerState.h
+ * @class   AStickyPlayerState
+ * @brief   Networked Player-state definition, derives from AStickyPlayerState
+ * @details Keeps track of the state of the player, in regards to kills and ammo.
+ *          Shares data to the server through the gamemode->gamestate
+ **/
 UCLASS()
 class ARIO_STICKYBOMB_UE4_API AStickyPlayerState : public APlayerState
 {

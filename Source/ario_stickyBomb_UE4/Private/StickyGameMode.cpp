@@ -1,5 +1,10 @@
-// Ario Amin - 2021/08
-
+/**
+ * @author  Ario Amin
+ * @file    /StickyGameMode.cpp
+ * @class   AStickyGameMode
+ * @brief   Naive implementation of Gamemode for networked play
+ * @details Implements barebone player checks which could be expanded on.
+ **/
 #include "StickyGameMode.h"
 
 // Player
@@ -71,11 +76,14 @@ void AStickyGameMode::BeginPlay() { Super::BeginPlay(); }
 void AStickyGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	if (bIsGameOver) {
-		return;
-	}
-	if (bHasGameStarted && !IsAnyPlayerAlive()) {
+	// if (bIsGameOver) {
+	// 	return;
+	// }
+	if (bHasGameStarted && HasPlayerWon()) {
 		GameOver();
+
+		/** @todo Have a timer based delay before resterting Dead players **/
+		RestartDeadPlayers();
 	}
 }
 
@@ -121,17 +129,11 @@ ABaseShooter* AStickyGameMode::FindPlayer(int32 LocalPlayerId)
 /** Protected Methods: Server/Client Actions **/
 void AStickyGameMode::RegisterNewPlayer(ABaseShooter* NewPlayer)
 {
-#ifdef STICKY_DEBUG
-	UE_LOG(LogTemp, Warning, TEXT("Player Unique ID on Server: %i"), NewPlayer->GetUniqueID());
-#endif		// STICKY_DEBUG
 	int Steps = 0;
 	for (auto& PlayerState : GetGameState<AStickyGameState>()->PlayerArray) {
-#ifdef STICKY_DEBUG
-		UE_LOG(LogTemp, Warning, TEXT("PlayerState#%i PlayerID: %i"), Steps, PlayerState->GetPlayerId());
-#endif		// STICKY_DEBUG
 		Steps++;
+		// Access gamestate, do something with player-state array?
 	}
-	// Access gamestate, do something with player-state array?
 }
 void AStickyGameMode::DeregisterExitingPlayer(ABaseShooter* ExitingPlayer)
 {
@@ -140,27 +142,31 @@ void AStickyGameMode::DeregisterExitingPlayer(ABaseShooter* ExitingPlayer)
 void AStickyGameMode::CheckAnyPlayerAlive()
 {
 	// Switch to timer based perhaps, so players can respawn
-	if (IsAnyPlayerAlive()) {
+	if (!HasPlayerWon()) {
 		return;
 	}
 
-	// No player alive
+	// No or only one player alive
 	GameOver();
 }
 
-bool AStickyGameMode::IsAnyPlayerAlive() const
+bool AStickyGameMode::HasPlayerWon() const
 {
+	int LocalAlivePlayerCount = 0;
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It) {
 		APlayerController* CurrentPlayerCtl = It->Get();
 		if (CurrentPlayerCtl && CurrentPlayerCtl->GetPawn()) {
 			APawn*			 Pawn				= CurrentPlayerCtl->GetPawn();
 			UHealthComp* HealthComp = Cast<UHealthComp>(Pawn->GetComponentByClass(UHealthComp::StaticClass()));
 			if (ensure(HealthComp) && HealthComp->GetHealth() > 0.0f) {
-				return true;
+				LocalAlivePlayerCount++;
+			}
+			if (LocalAlivePlayerCount > 1) {
+				return false;
 			}
 		}
 	}
-	return false;
+	return true;
 }
 
 // only runs on the server, grabs all playerControllers

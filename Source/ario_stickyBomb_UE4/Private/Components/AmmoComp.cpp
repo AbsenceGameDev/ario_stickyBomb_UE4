@@ -1,5 +1,13 @@
-// Ario Amin - 2021/08
-
+/**
+ * @author  Ario Amin
+ * @file    Components/AmmoComp.cpp
+ * @class   UAmmoComp
+ * @brief   Simple ammo component.
+ * @details A simple but networked ammo component.
+ * @todo    This component could be expaned into something more like an inventory.
+ *          What would be needed is making a dedicated item_data class, hold the item_data in the inventory.
+ *          Then spawn the items on server-side when brought out of inventory.
+ **/
 #include "Components/AmmoComp.h"
 
 #include "Characters/BaseShooter.h"

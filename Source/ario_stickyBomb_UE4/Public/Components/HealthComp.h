@@ -15,13 +15,20 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(
 	FOnHealthChangedSignature, UHealthComp*, OwningHealthComp, float, Health, float, HealthDelta, const UDamageType*, DamageType,
 	AController*, InstigatedBy, AActor*, DamageCauser);
 
+/**
+ * @author Ario Amin
+ * @file Components/HealthComp.h
+ * @class UHealthComp
+ * @brief Networked health component
+ * @details Simple networked health component, to be used with ABaseShooter derived characters,
+ * but could be retrofitted for other character types if it is rewritten as a templated class
+ **/
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ARIO_STICKYBOMB_UE4_API UHealthComp : public UActorComponent
 {
 	GENERATED_BODY()
 
 	public:
-	// Sets default values for this component's properties
 	UHealthComp();
 
 	protected:

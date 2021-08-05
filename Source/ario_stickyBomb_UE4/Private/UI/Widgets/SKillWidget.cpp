@@ -1,5 +1,9 @@
-// Ario Amin - 2021/08
-
+/**
+ * @author  Ario Amin
+ * @file    UI/Widgets/SKillWidget.cpp
+ * @class   SKillWidget
+ * @brief   A simple shell of a class to be expanded upon to display current kills.
+ **/
 #include "UI/Widgets/SKillWidget.h"
 
 #include "SlateOptMacros.h"

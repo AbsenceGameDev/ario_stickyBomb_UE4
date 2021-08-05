@@ -1,5 +1,10 @@
-// Ario Amin - 2021/08
-
+/**
+ * @author  Ario Amin
+ * @file    Actors/StickyProjectile.cpp
+ * @class   AStickyProjectile
+ * @brief   A projectile moving actor class
+ * @details A projectile actor which acts as a sticky bomb. Networked, but only naively implemented.
+ **/
 #include "Actors/StickyProjectile.h"
 
 // General
@@ -19,6 +24,7 @@
 
 // Engine Frameworks
 #include <Kismet/GameplayStatics.h>
+#include <Kismet/KismetSystemLibrary.h>
 #include <Net/UnrealNetwork.h>
 
 // Engine Helpers
@@ -227,6 +233,28 @@ void AStickyProjectile::TriggerExplosionFX()
 	ParticleSystemComp =
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleFX, GetActorLocation(), FRotator::ZeroRotator, true);
 	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSFX, GetActorLocation());
+	// if (IsValid(AttachedToActor)) {
+	// 	AttachedToActor->GetMesh()->AddRadialImpulse(GetActorLocation(), 5000.0f, 100000, ERadialImpulseFalloff::RIF_Linear);
+	// }
+
+	TArray<AActor*>												 ActorsToIgnore;
+	TArray<TEnumAsByte<EObjectTypeQuery> > ObjectTypes;
+	UKismetSystemLibrary::SphereOverlapActors(
+		GetWorld(), GetActorLocation(), DamageRadius, ObjectTypes, ABaseShooter::StaticClass(), ActorsToIgnore, NearbyActors);
+
+	// Get all the nearby actors
+	for (auto It = NearbyActors.CreateIterator(); It; It++) {
+		// Get the static mesh component for each actor
+		UStaticMeshComponent* SM = Cast<UStaticMeshComponent>((*It)->GetRootComponent());
+
+		float Strength = 100000.0f;
+		float Radius	 = 5000.0f;
+
+		if (SM) {
+			SM->AddRadialImpulse(GetActorLocation(), Radius, Strength, ERadialImpulseFalloff::RIF_Linear, true);
+		}
+	}
+	//
 }
 
 void AStickyProjectile::ServerTriggerExplosionFX_Implementation() { MultiCastTriggerExplosionFX(); }

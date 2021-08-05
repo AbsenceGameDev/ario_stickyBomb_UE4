@@ -1,3 +1,9 @@
+/**
+ * @author  Ario Amin
+ * @file    UI/Widget/SKillContentContainer.cpp
+ * @class   SKillContentContainer
+ * @brief   A simple shell of a class to be expanded upon.
+ **/
 #include "UI/Widgets/SKillContentContainer.h"
 
 #include "SlateOptMacros.h"

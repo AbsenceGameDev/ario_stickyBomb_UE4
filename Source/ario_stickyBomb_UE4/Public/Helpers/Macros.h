@@ -1,5 +1,12 @@
 #pragma once
 
+/**
+ * @author Ario Amin  @file Helpers/Macros.h
+ * @brief Various macros
+ * @details Some arithmetic if statements for efficieny
+ * and some shorthands for nasty Slate function calls
+ **/
+
 #define STICKY_DEBUG
 
 /**
