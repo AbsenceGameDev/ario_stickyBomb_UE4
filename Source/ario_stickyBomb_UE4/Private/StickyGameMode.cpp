@@ -67,6 +67,7 @@ void AStickyGameMode::StartPlay()
 	if (!bTriggerOnce) {
 		GEngine->Exec(nullptr, TEXT("log LogTimeline off"));
 		MatGen->CreateCelShadedExplosionMat();
+		FMaterialGenerator::DeleteObject(MatGen);
 		bTriggerOnce = true;
 	}
 }

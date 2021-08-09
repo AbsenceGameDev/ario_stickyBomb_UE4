@@ -33,21 +33,11 @@
 #include <Materials/MaterialExpressionVectorParameter.h>
 #include <Materials/MaterialExpressionVertexNormalWS.h>
 
-FMaterialGenerator::FMaterialGenerator()
-{
-	// Do stuff
-	// CreateBasicMaterial("M_Material", "/Game/GenMaterials/");
-	// CreateCelShadedExplosionMat("M_Material", "/Game/GenMaterials/");
-}
+// Force last
+#include "Helpers/FPackageManager.h"
 
-template <class TPackageType>
-bool FMaterialGenerator::SaveUPackage(UPackage* Package, TPackageType* UnrealObj, FString& PackageName)
-{		 // Saving the uasset so it doesn't have to be saved manually in the editor
-	FString PackageFileName = FPackageName::LongPackageNameToFilename(PackageName, FPackageName::GetAssetPackageExtension());
-	return UPackage::SavePackage(
-		Package, UnrealObj, EObjectFlags::RF_Public | EObjectFlags::RF_Standalone, *PackageFileName, GError, nullptr, true, true,
-		SAVE_NoError);
-}
+FMaterialGenerator::FMaterialGenerator() { PackageManager = FPackageManager::CreateObject(); }
+FMaterialGenerator::~FMaterialGenerator() { FPackageManager::DeleteObject(PackageManager); }
 
 template <class TParamType>
 TParamType* FMaterialGenerator::MakeParam(FString ParamName, UMaterial* UnrealMaterial)
@@ -88,16 +78,8 @@ UMaterialExpressionTextureSample* FMaterialGenerator::MakeTextureSampler(UTextur
 	return TextureSample;
 }
 
-UMaterial* FMaterialGenerator::CreateThenRegisterMaterialObject(UPackage* Package, FString& MaterialBaseName)
-{
-	auto			 MaterialFactory = NewObject<UMaterialFactoryNew>();
-	UMaterial* UnrealMaterial	 = (UMaterial*) MaterialFactory->FactoryCreateNew(
-		 UMaterial::StaticClass(), Package, *MaterialBaseName, RF_Standalone | RF_Public, NULL, GWarn);
-	FAssetRegistryModule::AssetCreated(UnrealMaterial);
-	return UnrealMaterial;
-}
-
 FMaterialGenerator* FMaterialGenerator::CreateObject() { return new FMaterialGenerator; }
+void								FMaterialGenerator::DeleteObject(FMaterialGenerator* MatGen) { delete MatGen; }
 
 void FMaterialGenerator::CreateBasicMaterial(FString MaterialBaseName, FString PackageName)
 {
@@ -105,10 +87,11 @@ void FMaterialGenerator::CreateBasicMaterial(FString MaterialBaseName, FString P
 	// if (FindPackage(*PackageName) == nullptr) {
 	// 	return;		 // Return if package already exists, make a seperate function for editing materials
 	// }
-	UPackage* Package = CreatePackage(*PackageName);
 
-	// create an unreal material asset
-	UMaterial* UnrealMaterial = CreateThenRegisterMaterialObject(Package, PackageName);
+	UMaterial* UnrealMaterial = nullptr;
+	UPackage*	 Package =
+		PackageManager->ConstructUPackage<UMaterialFactoryNew, UMaterial>(PackageName, MaterialBaseName, UnrealMaterial);
+
 	Package->FullyLoad();
 	Package->SetDirtyFlag(true);
 
@@ -135,30 +118,20 @@ void FMaterialGenerator::CreateBasicMaterial(FString MaterialBaseName, FString P
 	auto TexCoords				 = AddExpression<UMaterialExpressionTextureCoordinate>(UnrealMaterial);
 	Multiply->A.Expression = TexCoords;
 
-	auto XParam					 = MakeParam<UMaterialExpressionScalarParameter>(FString("TextureRepeatX"), UnrealMaterial);
-	Append->A.Expression = XParam;
+	auto XParam = MakeParam<UMaterialExpressionScalarParameter>(FString("TextureRepeatX"), UnrealMaterial);
+	auto YParam = MakeParam<UMaterialExpressionScalarParameter>(FString("TextureRepeatY"), UnrealMaterial);
 
-	// Make Y Parameter and hook it into AppendB
-	auto YParam					 = MakeParam<UMaterialExpressionScalarParameter>(FString("TextureRepeatY"), UnrealMaterial);
+	Append->A.Expression = XParam;
 	Append->B.Expression = YParam;
+
+	// Hook X and Y Params into Append, by some reason the operators doesn't get overlaoded,
+	// it just tries using some ue4 FRegistry overload definition, which certainly isn't the one I defined
+	// *Append << *XParam << *YParam;
 
 	// Hook multiply into base
 	UnrealMaterial->BaseColor.Expression = Multiply;
 
-	// let the material update itself if necessary
-	UnrealMaterial->PreEditChange(NULL);
-	UnrealMaterial->PostEditChange();
-
-	// make sure that any static meshes, etc using this material will stop using the FMaterialResource of the original
-	// material, and will use the new FMaterialResource created when we make a new UMaterial in place
-	FGlobalComponentReregisterContext RecreateComponents;
-
-	// SaveMaterial(Package, UnrealMaterial, PackageName);
-	// SaveUPackage<UMaterial>(Package, UnrealMaterial, PackageName);
-	FString PackageFileName = FPackageName::LongPackageNameToFilename(PackageName, FPackageName::GetAssetPackageExtension());
-	UPackage::SavePackage(
-		Package, UnrealMaterial, EObjectFlags::RF_Public | EObjectFlags::RF_Standalone, *PackageFileName, GError, nullptr, true, true,
-		SAVE_NoError);
+	PackageManager->SaveUPackage<UMaterial>(Package, UnrealMaterial, PackageName);
 }
 
 void FMaterialGenerator::CreateCelShadedExplosionMat(FString MaterialBaseName, FString PackageName)
@@ -167,12 +140,16 @@ void FMaterialGenerator::CreateCelShadedExplosionMat(FString MaterialBaseName, F
 	// if (FindPackage(*PackageName) == nullptr) {
 	// 	return;		 // Return if package already exists, make a seperate function for editing materials
 	// }
-	UPackage* Package = CreatePackage(*PackageName);
 
-	// create an unreal material asset
-	UMaterial* UnrealMaterial = CreateThenRegisterMaterialObject(Package, MaterialBaseName);
-	Package->FullyLoad();
-	Package->SetDirtyFlag(true);
+	UMaterial* UnrealMaterial = nullptr;
+	UPackage*	 Package =
+		PackageManager->ConstructUPackage<UMaterialFactoryNew, UMaterial>(PackageName, MaterialBaseName, UnrealMaterial);
+
+	bool bShouldRecompile = true;
+	// Setup shaded Mesh Particle material
+	UnrealMaterial->BlendMode = EBlendMode::BLEND_Masked;
+	UnrealMaterial->SetMaterialUsage(bShouldRecompile, EMaterialUsage::MATUSAGE_MeshParticles);
+	UnrealMaterial->SetShadingModel(EMaterialShadingModel::MSM_Unlit);
 
 	// Diffuse
 	// /Engine/EngineResources/WhiteSquareTexture
@@ -359,14 +336,5 @@ void FMaterialGenerator::CreateCelShadedExplosionMat(FString MaterialBaseName, F
 		UnrealMaterial->OpacityMask.Expression = Subtract_OpacityMask;
 	}
 
-	// let the material update itself if necessary
-	UnrealMaterial->PreEditChange(NULL);
-	UnrealMaterial->PostEditChange();
-
-	// make sure that any static meshes, etc using this material will stop using the FMaterialResource of the original
-	// material, and will use the new FMaterialResource created when we make a new UMaterial in place
-	FGlobalComponentReregisterContext RecreateComponents;
-
-	// SaveMaterial(Package, UnrealMaterial, PackageName);
-	SaveUPackage<UMaterial>(Package, UnrealMaterial, PackageName);
+	PackageManager->SaveUPackage<UMaterial>(Package, UnrealMaterial, PackageName);
 }

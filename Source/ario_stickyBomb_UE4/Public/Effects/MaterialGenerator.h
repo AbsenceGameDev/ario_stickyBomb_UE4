@@ -1,8 +1,10 @@
-// Ario Amin - 2021/08
-
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include <Materials/MaterialExpressionAbs.h>
+#include <Materials/MaterialExpressionAdd.h>
+#include <Materials/MaterialExpressionAppendVector.h>
 
 /**
  * @author  Ario Amin
@@ -26,18 +28,7 @@ class ARIO_STICKYBOMB_UE4_API FMaterialGenerator
 	 * @note    This CTOR is private and note exposed, use ::CreateObject() to generate one
 	 */
 	FMaterialGenerator();
-
-	/**
-	 * @brief   Save UPacakge of type requested
-	 *
-	 * @tparam  TPackageType
-	 * @param   Package
-	 * @param   UnrealObj
-	 * @param   PackageName
-	 * @return  true | false
-	 */
-	template <class TPackageType>
-	bool SaveUPackage(UPackage* Package, TPackageType* UnrealObj, FString& PackageName);
+	~FMaterialGenerator();
 
 	/**
 	 * @brief   Save Material Expression Param of type requested
@@ -80,15 +71,6 @@ class ARIO_STICKYBOMB_UE4_API FMaterialGenerator
 	 */
 	UMaterialExpressionTextureSample* MakeTextureSampler(UTexture* DiffuseTexture, UMaterial* UnrealMaterial);
 
-	/**
-	 * @brief   Create a Then Register Material Object object
-	 *
-	 * @param   Package
-	 * @param   MaterialBaseName
-	 * @return  UMaterial*
-	 */
-	UMaterial* CreateThenRegisterMaterialObject(UPackage* Package, FString& MaterialBaseName);
-
 	public:
 	/**
 	 * @brief   Create a FMaterialGenerator object
@@ -96,6 +78,13 @@ class ARIO_STICKYBOMB_UE4_API FMaterialGenerator
 	 * @return  FMaterialGenerator*
 	 */
 	static FMaterialGenerator* CreateObject();
+
+	/**
+	 * @brief   Delete a FMaterialGenerator object
+	 *
+	 * @param   MatGen
+	 */
+	static void DeleteObject(FMaterialGenerator* MatGen);
 
 	/**
 	 * @brief   Create a Basic Material object
@@ -115,4 +104,40 @@ class ARIO_STICKYBOMB_UE4_API FMaterialGenerator
 	 */
 	void CreateCelShadedExplosionMat(
 		FString MaterialBaseName = FString("M_CelExplosionMat"), FString PackageName = FString("/Game/GenMaterials/"));
+
+	/* Friend Operator Overloads */
+
+	/* These overloads are faulty, but they cover the general idea of what I should design
+	 */
+
+	// >> = Hook A_Out into B_In
+	// << = Hook A_In into B_Out
+	friend UMaterialExpressionAbs& operator<<(UMaterialExpressionAbs& AbsExpr, UMaterialExpressionAdd& AddExpr)
+	{
+		AbsExpr.Input.Expression = &AddExpr;
+		return AbsExpr;
+	}
+
+	friend UMaterialExpressionAbs& operator>>(UMaterialExpressionAbs& AbsExpr, UMaterialExpressionAdd& AddExpr)
+	{
+		AddExpr.A.Expression = &AbsExpr;
+		return AbsExpr;
+	}
+
+	// <<  = append Material Expression to open pin, return same appendvector
+	friend UMaterialExpressionAppendVector& operator<<(UMaterialExpressionAppendVector& AppendExpr, UMaterialExpression& SomeExpr)
+	{
+		// Tiling
+		if (AppendExpr.A.Expression == nullptr) {
+			AppendExpr.A.Expression = &SomeExpr;
+		}
+		if (AppendExpr.B.Expression == nullptr) {
+			AppendExpr.B.Expression = &SomeExpr;
+		}
+
+		return AppendExpr;
+	}
+
+	private:
+	class FPackageManager* PackageManager = nullptr;
 };
